@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <LangVersion>8.0</LangVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A303BB4A-3345-40B8-BFF6-DF4A7CED2E8A}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>RMDebugger</RootNamespace>
+    <AssemblyName>RM Debugger</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>false</MapFileExtensions>
+    <ApplicationRevision>16</ApplicationRevision>
+    <ApplicationVersion>1.8.6.16</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>70CB9475C1FB84E303AE4DAC56DB66D0D051AE2A</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>RSSI_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>photo_2023-04-04_20-13-58.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AboutInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutInfo.designer.cs">
+      <DependentUpon>AboutInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CommandsOutput.cs" />
+    <Compile Include="CSVLib.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="BootloaderProtocol.cs" />
+    <Compile Include="CRC16.cs" />
+    <Compile Include="MainDebugger.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainDebugger.Designer.cs">
+      <DependentUpon>MainDebugger.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataDebugger.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataDebugger.Designer.cs">
+      <DependentUpon>DataDebugger.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ForTests.cs" />
+    <Compile Include="HexUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HexUpdate.Designer.cs">
+      <DependentUpon>HexUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Configuration.cs" />
+    <Compile Include="SearchProtocol.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="StaticMethods.cs" />
+    <Compile Include="Information.cs" />
+    <Compile Include="StaticSettings.cs" />
+    <Compile Include="WriteHere.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WriteHere.Designer.cs">
+      <DependentUpon>WriteHere.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="AboutInfo.resx">
+      <DependentUpon>AboutInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainDebugger.resx">
+      <DependentUpon>MainDebugger.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataDebugger.resx">
+      <DependentUpon>DataDebugger.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HexUpdate.resx">
+      <DependentUpon>HexUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="WriteHere.resx">
+      <DependentUpon>WriteHere.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="RSSI_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 и x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="photo_2023-04-04_20-13-58.ico" />
+    <None Include="Resources\DeleteTaskList.png" />
+    <None Include="Resources\DeleteTable.png" />
+    <None Include="Resources\Unhide.png" />
+    <None Include="Resources\Hide.png" />
+    <None Include="Resources\StatusRunning.15.15.png" />
+    <None Include="Resources\SaveAs.png" />
+    <None Include="Resources\Writeable.png" />
+    <None Include="Resources\CloudError.png" />
+    <None Include="Resources\CloudStagingStopped.png" />
+    <None Include="Resources\CloudRun.png" />
+    <None Include="Resources\Restart.png" />
+    <None Include="Resources\Online.png" />
+    <None Include="Resources\Pin.png" />
+    <None Include="Resources\Unpin.png" />
+    <None Include="Resources\Add.png" />
+    <None Include="Resources\UploadDocument.png" />
+    <None Include="Resources\DownloadDocument.png" />
+    <None Include="Resources\Delete.png" />
+    <None Include="Resources\SaveTable.png" />
+    <None Include="Resources\Computer.png" />
+    <None Include="Resources\Settings.png" />
+    <None Include="Resources\HelpApplication.png" />
+    <None Include="Resources\ColorDialog.png" />
+    <None Include="Resources\Download.png" />
+    <None Include="Resources\WhatsNew.txt" />
+    <EmbeddedResource Include="Properties\WhatsNew.txt" />
+    <None Include="Resources\StatusInformationOutlineNoColor.png" />
+    <None Include="Resources\Eraser.png" />
+    <None Include="Resources\Search.png" />
+    <None Include="Resources\StatusStopped.15.15.png" />
+    <None Include="Resources\CloudUpload.png" />
+    <None Include="Resources\CloudDownload.png" />
+    <None Include="Resources\OpenFolder.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
