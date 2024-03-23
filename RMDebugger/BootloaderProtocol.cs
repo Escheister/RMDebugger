@@ -120,10 +120,10 @@ namespace BootloaderProtocol
                     else break;
                 }
                 sizePack[0] = (byte)size;
-                foreach (byte b in sizePack) cmd.Add(b);
-                foreach (byte b in addrHex) cmd.Add(b);
-                foreach (byte b in addrElar) cmd.Add(b);
-                foreach (byte b in data) cmd.Add(b);
+                cmd.AddRange(sizePack);
+                cmd.AddRange(addrHex);
+                cmd.AddRange(addrElar);
+                cmd.AddRange(data);
                 return new Tuple<byte[], int>(cmd.ToArray(), indexZero);
             }
         }
