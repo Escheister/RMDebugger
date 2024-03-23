@@ -286,29 +286,27 @@ namespace RMDebugger
             loadFromPCToolStripMenuItem.Enabled = 
                 clearSettingsToolStrip.Enabled = !sw;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         private string[] FileReader(string path)
         {
-            StreamReader file = new StreamReader(path);
-            string data = file.ReadToEnd();
-            file.Close();
-            return data.Trim().Split('\n');
+            using StreamReader file = new StreamReader(path);
+            Task<string> data = file.ReadToEndAsync();
+            return data.Result.Trim().Split('\n');
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         private byte[] GET_RM_NUMBER(NumericUpDown updn) => BitConverter.GetBytes(Convert.ToUInt16(updn.Value));
         private byte[] GET_RM_NUMBER(int num) => BitConverter.GetBytes(Convert.ToUInt16(num));
         private void TaskForChangedRows()
