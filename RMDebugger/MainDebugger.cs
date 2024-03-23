@@ -203,8 +203,9 @@ namespace RMDebugger
             finally
             {
                 Invoke((MethodInvoker)(() => {
-                    if (udpGate.Connected) ConnectClick(null, null);
                     PingButton.BackColor = Color.Red;
+                    if (udpGate.Connected) ConnectClick(null, null);
+                    Connect.Enabled = PingButton.BackColor == Color.Green;
                 }));
             }
         }
