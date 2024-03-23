@@ -1,11 +1,11 @@
 ﻿using System.Net.NetworkInformation;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using RMDebugger.Properties;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Reflection;
-using RMDebugger.Properties;
 using Microsoft.Win32;
 using System.IO.Ports;
 using System.Drawing;
@@ -21,13 +21,12 @@ using ProtocolEnums;
 using StaticMethods;
 using File_Verifier;
 using CSV;
-using System.IO.Pipes;
 
 namespace RMDebugger
 {
     public partial class MainDebugger : Form
     {
-        Socket udpGate = new Socket(SocketType.Dgram, ProtocolType.Udp);
+        Socket udpGate;
         public HexUpdate windowUpdate = null;
         Color mirClr = Color.PaleGreen;
         const string mainName = "RM Debugger";
@@ -78,8 +77,6 @@ namespace RMDebugger
             SetProperties();
         }
         //********************
-
-
         private void MainFormClosed(object sender, FormClosedEventArgs e)
         {
             Settings.Default.ThroughRM485 = NeedThrough.Checked;
@@ -95,6 +92,61 @@ namespace RMDebugger
                 : 38400;
             Settings.Default.Save();
         }
+
+        async private void CheckUpdates()
+        {
+            if (Internet())
+            {
+                WebClient wc = new WebClient();
+                ver = await wc.DownloadStringTaskAsync(
+                    "https://drive.usercontent.google.com/download?id=1ip-kWdbtBA2Mpb1RAwTSdFMXD3MRHRvB&export=download&authuser=0&confirm=t&uuid=6096c5af-c408-4423-bffb-6b030dc50e09&at=APZUnTWfPp_1h-SJ001eKAdS_4Cf:1694263652561");
+                Version curVer = Assembly.GetEntryAssembly().GetName().Version;
+                if (Version.TryParse(ver, out Version driveVer) && driveVer.CompareTo(curVer) > 0)
+                {
+                    UpdateButton.Visible = true;
+                    UpdateButton.ToolTipText = $"Доступна новая версия: {ver}";
+                    NotifyMessage.BalloonTipTitle = "Обновление";
+                    NotifyMessage.BalloonTipText = $"Доступна новая версия: {ver}";
+                    NotifyMessage.ShowBalloonTip(10);
+                }
+            }
+        }
+        async private void UpdateButton_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show(this, $"Доступна новая версия программы: {ver}\nПосле завершения обновления программа откроется самостоятельно",
+                "Обновить?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (Internet())
+                    await Task.Run(() =>
+                    {
+                        string exeFile = AppDomain.CurrentDomain.FriendlyName;
+                        string exePath = Assembly.GetEntryAssembly().Location;
+                        string newFile = "new" + exeFile;
+                        WebClient wc = new WebClient();
+                        wc.DownloadFile(
+                                "https://drive.usercontent.google.com/download?id=1BpGT3HkD_YgYZDKbpFMuYx-Lwns8ZmZ0&export=download&authuser=0&confirm=t&uuid=e7a57cef-d2af-4976-b199-159b39b27d65&at=APZUnTVXMZcSBq-MHX2N0AfCypsi:1694263317080",
+                                newFile);
+                        CMD($"/c taskkill /f /im \"{exeFile}\" && " +
+                            $"timeout /t 1 && " +
+                            $"del \"{exePath}\" && " +
+                            $"ren \"{newFile}\" \"{exeFile}\" &&" +
+                            $"\"{exeFile}\"");
+                    });
+                else UpdateButton.Visible = false;
+        }
+        private void CMD(string cmd) => 
+            Process.Start(new ProcessStartInfo { 
+                FileName = "cmd.exe", 
+                Arguments = cmd, 
+                WindowStyle = ProcessWindowStyle.Hidden, 
+            });
+        private bool Internet()
+        {
+            try { Dns.GetHostEntry("drive.google.com");
+                return true; }
+            catch { return false; }
+        }
+
+
         private void ComDefault()
         {
             mainPort.WriteTimeout =
@@ -249,58 +301,6 @@ namespace RMDebugger
 
 
 
-        async private void CheckUpdates()
-        {
-            if (Internet())
-            {
-                WebClient wc = new WebClient();
-                ver = await wc.DownloadStringTaskAsync(
-                    "https://drive.usercontent.google.com/download?id=1ip-kWdbtBA2Mpb1RAwTSdFMXD3MRHRvB&export=download&authuser=0&confirm=t&uuid=6096c5af-c408-4423-bffb-6b030dc50e09&at=APZUnTWfPp_1h-SJ001eKAdS_4Cf:1694263652561");
-                Version curVer = Assembly.GetEntryAssembly().GetName().Version;
-                if (Version.TryParse(ver, out Version driveVer) && driveVer.CompareTo(curVer) > 0)
-                {
-                    UpdateButton.Visible = true;
-                    UpdateButton.ToolTipText = $"Доступна новая версия: {ver}";
-                    NotifyMessage.BalloonTipTitle = "Обновление";
-                    NotifyMessage.BalloonTipText = $"Доступна новая версия: {ver}";
-                    NotifyMessage.ShowBalloonTip(10);
-                }
-            }
-        }
-        async private void UpdateButton_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show(this, $"Доступна новая версия программы: {ver}\nПосле завершения обновления программа откроется самостоятельно",
-                "Обновить?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                if (Internet())
-                    await Task.Run(() =>
-                    {
-                        string exeFile = AppDomain.CurrentDomain.FriendlyName;
-                        string exePath = Assembly.GetEntryAssembly().Location;
-                        string newFile = "new" + exeFile;
-                        WebClient wc = new WebClient();
-                        wc.DownloadFile(
-                                "https://drive.usercontent.google.com/download?id=1BpGT3HkD_YgYZDKbpFMuYx-Lwns8ZmZ0&export=download&authuser=0&confirm=t&uuid=e7a57cef-d2af-4976-b199-159b39b27d65&at=APZUnTVXMZcSBq-MHX2N0AfCypsi:1694263317080",
-                                newFile);
-                        CMD($"/c taskkill /f /im \"{exeFile}\" && " +
-                            $"timeout /t 1 && " +
-                            $"del \"{exePath}\" && " +
-                            $"ren \"{newFile}\" \"{exeFile}\" &&" +
-                            $"\"{exeFile}\"");
-                    });
-                else UpdateButton.Visible = false;
-        }
-        private void CMD(string cmd) => 
-            Process.Start(new ProcessStartInfo { 
-                FileName = "cmd.exe", 
-                Arguments = cmd, 
-                WindowStyle = ProcessWindowStyle.Hidden, 
-            });
-        private bool Internet()
-        {
-            try { Dns.GetHostEntry("drive.google.com");
-                return true; }
-            catch { return false; }
-        }
 
         private string[] FileReader(string path)
         {
@@ -356,14 +356,6 @@ namespace RMDebugger
             else action();
         }
         private bool CheckInsidePaths(string path) => HexPathBox.Items.Contains(path);
-        private void TryDisconnect()
-        {
-            BeginInvoke((MethodInvoker)(() =>
-            {
-                try { udpGate.Shutdown(SocketShutdown.Both); udpGate.Disconnect(true); }
-                catch { udpGate.Close(); }
-            }));
-        }
         private void BackToDefaults()
         {
             BeginInvoke((MethodInvoker)(() =>
