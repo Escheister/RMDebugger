@@ -255,9 +255,8 @@ namespace RMDebugger
                 WebClient wc = new WebClient();
                 ver = await wc.DownloadStringTaskAsync(
                     "https://drive.usercontent.google.com/download?id=1ip-kWdbtBA2Mpb1RAwTSdFMXD3MRHRvB&export=download&authuser=0&confirm=t&uuid=6096c5af-c408-4423-bffb-6b030dc50e09&at=APZUnTWfPp_1h-SJ001eKAdS_4Cf:1694263652561");
-                int verCur = Convert.ToInt32(Assembly.GetEntryAssembly().GetName().Version.ToString().Replace(".", string.Empty));
-                int verDrive = Convert.ToInt32(ver.Replace(".", string.Empty));
-                if (verDrive > verCur)
+                Version curVer = Assembly.GetEntryAssembly().GetName().Version;
+                if (Version.TryParse(ver, out Version driveVer) && driveVer.CompareTo(curVer) > 0)
                 {
                     UpdateButton.Visible = true;
                     UpdateButton.ToolTipText = $"Доступна новая версия: {ver}";
@@ -270,11 +269,9 @@ namespace RMDebugger
         async private void UpdateButton_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show(this, $"Доступна новая версия программы: {ver}\nПосле завершения обновления программа откроется самостоятельно",
-                "Обновить?",
-                MessageBoxButtons.YesNo) == DialogResult.Yes)
-                await Task.Run(() =>
-                {
-                    if (Internet())
+                "Обновить?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (Internet())
+                    await Task.Run(() =>
                     {
                         string exeFile = AppDomain.CurrentDomain.FriendlyName;
                         string exePath = Assembly.GetEntryAssembly().Location;
@@ -288,9 +285,8 @@ namespace RMDebugger
                             $"del \"{exePath}\" && " +
                             $"ren \"{newFile}\" \"{exeFile}\" &&" +
                             $"\"{exeFile}\"");
-                    }
-                    else UpdateButton.Visible = false;
-                });
+                    });
+                else UpdateButton.Visible = false;
         }
         private void CMD(string cmd) => 
             Process.Start(new ProcessStartInfo { 
