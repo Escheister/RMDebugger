@@ -32,6 +32,8 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainDebugger));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -69,12 +71,12 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle33 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle34 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle35 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.TargetSignID = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.mainPort = new System.IO.Ports.SerialPort(this.components);
             this.DistTofGrid = new System.Windows.Forms.DataGridView();
+            this.SignDistTof = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RSSIDistTof = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.RMData = new System.Windows.Forms.TabControl();
             this.DistTofPage = new System.Windows.Forms.TabPage();
             this.TimeForDistTof = new System.Windows.Forms.Label();
@@ -251,8 +253,6 @@
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.WorkTestTimer = new System.Windows.Forms.Timer(this.components);
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.SignDistTof = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.RSSIDistTof = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.TargetSignID)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.DistTofGrid)).BeginInit();
             this.RMData.SuspendLayout();
@@ -383,6 +383,45 @@
             this.DistTofGrid.TabStop = false;
             this.DistTofGrid.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.DistTofGrid_RowsAdded);
             this.DistTofGrid.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.DistTofGrid_RowsRemoved);
+            // 
+            // SignDistTof
+            // 
+            this.SignDistTof.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Black;
+            this.SignDistTof.DefaultCellStyle = dataGridViewCellStyle3;
+            this.SignDistTof.FillWeight = 50F;
+            this.SignDistTof.HeaderText = "Sign";
+            this.SignDistTof.MaxInputLength = 5;
+            this.SignDistTof.MinimumWidth = 50;
+            this.SignDistTof.Name = "SignDistTof";
+            this.SignDistTof.ReadOnly = true;
+            this.SignDistTof.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.SignDistTof.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.SignDistTof.Width = 50;
+            // 
+            // RSSIDistTof
+            // 
+            this.RSSIDistTof.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.RSSIDistTof.DataPropertyName = "(нет)";
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Black;
+            this.RSSIDistTof.DefaultCellStyle = dataGridViewCellStyle4;
+            this.RSSIDistTof.FillWeight = 60F;
+            this.RSSIDistTof.HeaderText = "RSSI";
+            this.RSSIDistTof.MaxInputLength = 4;
+            this.RSSIDistTof.MinimumWidth = 60;
+            this.RSSIDistTof.Name = "RSSIDistTof";
+            this.RSSIDistTof.ReadOnly = true;
+            this.RSSIDistTof.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.RSSIDistTof.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.RSSIDistTof.Width = 60;
             // 
             // RMData
             // 
@@ -2159,7 +2198,6 @@
             this.OpenCom.TabIndex = 42;
             this.OpenCom.Text = "Open";
             this.OpenCom.UseVisualStyleBackColor = false;
-            this.OpenCom.Click += new System.EventHandler(this.OpenCom_Click);
             // 
             // label10
             // 
@@ -2208,7 +2246,6 @@
             this.PingButton.TabIndex = 32;
             this.PingButton.Text = "Ping";
             this.PingButton.UseVisualStyleBackColor = false;
-            this.PingButton.Click += new System.EventHandler(this.PingButton_Click);
             // 
             // numericPort
             // 
@@ -2232,7 +2269,6 @@
             this.Connect.TabIndex = 29;
             this.Connect.Text = "Connect";
             this.Connect.UseVisualStyleBackColor = true;
-            this.Connect.Click += new System.EventHandler(this.Connect_Click);
             // 
             // label14
             // 
@@ -2821,45 +2857,6 @@
             this.saveFileDialog.Filter = "Log files (*.log)|*.log|All files (*.*)|*.*";
             this.saveFileDialog.RestoreDirectory = true;
             // 
-            // SignDistTof
-            // 
-            this.SignDistTof.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Black;
-            this.SignDistTof.DefaultCellStyle = dataGridViewCellStyle3;
-            this.SignDistTof.FillWeight = 50F;
-            this.SignDistTof.HeaderText = "Sign";
-            this.SignDistTof.MaxInputLength = 5;
-            this.SignDistTof.MinimumWidth = 50;
-            this.SignDistTof.Name = "SignDistTof";
-            this.SignDistTof.ReadOnly = true;
-            this.SignDistTof.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.SignDistTof.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.SignDistTof.Width = 50;
-            // 
-            // RSSIDistTof
-            // 
-            this.RSSIDistTof.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.RSSIDistTof.DataPropertyName = "(нет)";
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Black;
-            this.RSSIDistTof.DefaultCellStyle = dataGridViewCellStyle4;
-            this.RSSIDistTof.FillWeight = 60F;
-            this.RSSIDistTof.HeaderText = "RSSI";
-            this.RSSIDistTof.MaxInputLength = 4;
-            this.RSSIDistTof.MinimumWidth = 60;
-            this.RSSIDistTof.Name = "RSSIDistTof";
-            this.RSSIDistTof.ReadOnly = true;
-            this.RSSIDistTof.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.RSSIDistTof.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.RSSIDistTof.Width = 60;
-            // 
             // MainDebugger
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -2877,8 +2874,6 @@
             this.Opacity = 0.95D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "RM Debugger";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.RMDebugger_FormClosed);
-            this.Load += new System.EventHandler(this.RMDebugger_Load);
             ((System.ComponentModel.ISupportInitialize)(this.TargetSignID)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.DistTofGrid)).EndInit();
             this.RMData.ResumeLayout(false);

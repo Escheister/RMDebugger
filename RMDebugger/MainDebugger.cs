@@ -5,7 +5,6 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Threading;
 using RMDebugger.Properties;
 using Microsoft.Win32;
 using System.IO.Ports;
@@ -22,6 +21,7 @@ using ProtocolEnums;
 using StaticMethods;
 using File_Verifier;
 using CSV;
+using System.IO.Pipes;
 
 namespace RMDebugger
 {
@@ -46,67 +46,56 @@ namespace RMDebugger
         public MainDebugger()
         {
             InitializeComponent();
-            this.Text += $" ver{Assembly.GetEntryAssembly().GetName().Version}";
+            NotifyMessage.Text = this.Text = $"{Assembly.GetEntryAssembly().GetName().Name} {Assembly.GetEntryAssembly().GetName().Version}";
             AddEvents();
-            NotifyMessage.Text = this.Text;
         }
-        async private void CheckUpdates()
+        private void AddEvents()
         {
-            if (Internet())
-            {
-                WebClient wc = new WebClient();
-                ver = await wc.DownloadStringTaskAsync(
-                    "https://drive.usercontent.google.com/download?id=1ip-kWdbtBA2Mpb1RAwTSdFMXD3MRHRvB&export=download&authuser=0&confirm=t&uuid=6096c5af-c408-4423-bffb-6b030dc50e09&at=APZUnTWfPp_1h-SJ001eKAdS_4Cf:1694263652561");
-                int verCur = Convert.ToInt32(Assembly.GetEntryAssembly().GetName().Version.ToString().Replace(".", string.Empty));
-                int verDrive = Convert.ToInt32(ver.Replace(".", string.Empty));
-                if (verDrive > verCur)
-                {
-                    UpdateButton.Visible = true;
-                    UpdateButton.ToolTipText = $"Доступна новая версия: {ver}";
-                    NotifyMessage.BalloonTipTitle = "Обновление";
-                    NotifyMessage.BalloonTipText = $"Доступна новая версия: {ver}";
-                    NotifyMessage.ShowBalloonTip(10);
-                }
-            }
-        }
-        async private void UpdateButton_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show(this, $"Доступна новая версия программы: {ver}\nПосле завершения обновления программа откроется самостоятельно",
-                "Обновить?",
-                MessageBoxButtons.YesNo) == DialogResult.Yes)
-                await Task.Run(() =>
-                {
-                    if (Internet())
-                    {
-                        string exeFile = AppDomain.CurrentDomain.FriendlyName;
-                        string exePath = Assembly.GetEntryAssembly().Location;
-                        string newFile = "new" + exeFile;
-                        WebClient wc = new WebClient();
-                        wc.DownloadFile(
-                                "https://drive.usercontent.google.com/download?id=1BpGT3HkD_YgYZDKbpFMuYx-Lwns8ZmZ0&export=download&authuser=0&confirm=t&uuid=e7a57cef-d2af-4976-b199-159b39b27d65&at=APZUnTVXMZcSBq-MHX2N0AfCypsi:1694263317080",
-                                newFile);
-                        CMD($"/c taskkill /f /im \"{exeFile}\" && " +
-                            $"timeout /t 1 && " +
-                            $"del \"{exePath}\" && " +
-                            $"ren \"{newFile}\" \"{exeFile}\" &&" +
-                            $"\"{exeFile}\"");
-                    }
-                    else UpdateButton.Visible = false;
-                });
-        }
-        private void CMD(string cmd) => Process.Start(new ProcessStartInfo {
-            FileName = "cmd.exe",
-            Arguments = cmd,
-            WindowStyle = ProcessWindowStyle.Hidden,
-        });
-        private bool Internet()
-        {
-            try { Dns.GetHostEntry("drive.google.com");
-                return true; }
-            catch { return false; }
+            Load += MainFormLoad;
+            FormClosed += MainFormClosed;
+            comPort.SelectedIndexChanged += (s, e) => mainPort.PortName = comPort.SelectedItem.ToString();
+            BaudRate.SelectedIndexChanged += (s, e) => BaudRateSelectedIndexChanged(s, e);
+            RefreshSerial.Click += (s, e) => AddPorts(comPort);
+            foreach (ToolStripDropDownItem item in dataBits.DropDownItems) item.Click += dataBitsForSerial;
+            foreach (ToolStripDropDownItem item in Parity.DropDownItems) item.Click += ParityForSerial;
+            foreach (ToolStripDropDownItem item in stopBits.DropDownItems) item.Click += StopBitsForSerial;
+            OpenCom.Click += OpenComClick;
+            PingButton.Click += PingButtonClick;
+            Connect.Click += ConnectClick;
         }
 
-        private void ComDefault(SerialPort com)
+
+
+        //********************
+        private void MainFormLoad(object sender, EventArgs e)
+        {
+            CheckUpdates();
+            ComDefault();
+            AddPorts(comPort);
+            CheckReg();
+            DefaultInfoGrid();
+            DefaultConfigGrid();
+            SetProperties();
+        }
+        //********************
+
+
+        private void MainFormClosed(object sender, FormClosedEventArgs e)
+        {
+            Settings.Default.ThroughRM485 = NeedThrough.Checked;
+            Settings.Default.MainSignatureID = (ushort)TargetSignID.Value;
+            Settings.Default.ThroughSignatureID = (ushort)ThroughSignID.Value;
+            Settings.Default.UDPGatePort = (ushort)numericPort.Value;
+            Settings.Default.LastPageSize = (int)HexPageSize.Value;
+            Settings.Default.UDPGateIP = IPaddressBox.Text;
+            Settings.Default.LastPathToHex = HexPathBox.Text;
+            Settings.Default.LastPortName = comPort.Text;
+            Settings.Default.LastBaudRate = Int32.TryParse(BaudRate.Text, out int digit)
+                ? digit
+                : 38400;
+            Settings.Default.Save();
+        }
+        private void ComDefault()
         {
             mainPort.WriteTimeout =
                 mainPort.ReadTimeout = 500;
@@ -169,6 +158,153 @@ namespace RMDebugger
             stopbits.CheckState = CheckState.Checked;
             StopBitsInfo.Text = stopbits.Text;
         }
+        private void OpenComClick(object sender, EventArgs e)
+        {
+            if (OpenCom.Text == "Open")
+            {
+                try { mainPort.Open(); }
+                catch (Exception ex) { ToInfoStatus(ex.Message); }
+            }
+            else mainPort.Close();
+            OpenCom.Text = mainPort.IsOpen ? "Close" : "Open";
+            AfterComEvent(mainPort.IsOpen);
+            AfterAnyInterfaceEvent(mainPort.IsOpen);
+        }
+        private void AfterComEvent(bool sw)
+            => comPort.Enabled = 
+                RefreshSerial.Enabled = 
+                UdpPage.Enabled = !sw;
+        async private void PingButtonClick(object sender, EventArgs e)
+        {
+            if (PingButton.BackColor == Color.Green)
+                PingButton.BackColor = Color.Red;
+            else await check_ip();
+        }
+        async private Task check_ip()
+        {
+            int timeout = 250;
+            using Ping ping = new Ping();
+            byte[] buffer = new byte[32];
+            PingOptions pingOptions = new PingOptions(buffer.Length, true);
+            if (!IPAddress.TryParse(IPaddressBox.Text, out IPAddress ip)) return;
+            PingReply reply = await ping.SendPingAsync(ip, timeout, buffer, pingOptions);
+            if (reply.Status != IPStatus.Success) return;
+            try
+            {
+                Invoke((MethodInvoker)(() => { Connect.Enabled = true; PingButton.BackColor = Color.Green; }));
+                for (int reconnect = 0; reconnect < 5 && PingButton.BackColor == Color.Green;)
+                {
+                    reply = await ping.SendPingAsync(ip, timeout, buffer, pingOptions);
+                    if (reply.Status != IPStatus.Success) reconnect++;
+                    await Task.Delay(timeout);
+                }
+            }
+            catch (Exception ex) { ToInfoStatus(ex.Message.ToString()); }
+            finally
+            {
+                Invoke((MethodInvoker)(() => {
+                    if (udpGate.Connected) ConnectClick(null, null);
+                    PingButton.BackColor = Color.Red;
+                }));
+            }
+        }
+        private void ConnectClick(object sender, EventArgs e)
+        {
+            if (Connect.Text == "Connect")
+            {
+                udpGate = new Socket(SocketType.Dgram, ProtocolType.Udp);
+                udpGate.Connect(IPaddressBox.Text, Convert.ToUInt16(numericPort.Text));
+            }
+            else
+            {
+                udpGate.Shutdown(SocketShutdown.Both);
+                udpGate.Close();
+            }
+            Connect.Text = udpGate.Connected ? "Close" : "Connect";
+            AfterUdpEvent(udpGate.Connected);
+            AfterAnyInterfaceEvent(udpGate.Connected);
+        }
+        private void AfterUdpEvent(bool sw)
+            => SerialPage.Enabled = !sw;
+        private void AfterAnyInterfaceEvent(bool sw)
+        {
+            RMData.Enabled =
+                    ExtraButtonsGroup.Enabled = sw;
+            loadFromPCToolStripMenuItem.Enabled = 
+                clearSettingsToolStrip.Enabled = !sw;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        async private void CheckUpdates()
+        {
+            if (Internet())
+            {
+                WebClient wc = new WebClient();
+                ver = await wc.DownloadStringTaskAsync(
+                    "https://drive.usercontent.google.com/download?id=1ip-kWdbtBA2Mpb1RAwTSdFMXD3MRHRvB&export=download&authuser=0&confirm=t&uuid=6096c5af-c408-4423-bffb-6b030dc50e09&at=APZUnTWfPp_1h-SJ001eKAdS_4Cf:1694263652561");
+                int verCur = Convert.ToInt32(Assembly.GetEntryAssembly().GetName().Version.ToString().Replace(".", string.Empty));
+                int verDrive = Convert.ToInt32(ver.Replace(".", string.Empty));
+                if (verDrive > verCur)
+                {
+                    UpdateButton.Visible = true;
+                    UpdateButton.ToolTipText = $"Доступна новая версия: {ver}";
+                    NotifyMessage.BalloonTipTitle = "Обновление";
+                    NotifyMessage.BalloonTipText = $"Доступна новая версия: {ver}";
+                    NotifyMessage.ShowBalloonTip(10);
+                }
+            }
+        }
+        async private void UpdateButton_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show(this, $"Доступна новая версия программы: {ver}\nПосле завершения обновления программа откроется самостоятельно",
+                "Обновить?",
+                MessageBoxButtons.YesNo) == DialogResult.Yes)
+                await Task.Run(() =>
+                {
+                    if (Internet())
+                    {
+                        string exeFile = AppDomain.CurrentDomain.FriendlyName;
+                        string exePath = Assembly.GetEntryAssembly().Location;
+                        string newFile = "new" + exeFile;
+                        WebClient wc = new WebClient();
+                        wc.DownloadFile(
+                                "https://drive.usercontent.google.com/download?id=1BpGT3HkD_YgYZDKbpFMuYx-Lwns8ZmZ0&export=download&authuser=0&confirm=t&uuid=e7a57cef-d2af-4976-b199-159b39b27d65&at=APZUnTVXMZcSBq-MHX2N0AfCypsi:1694263317080",
+                                newFile);
+                        CMD($"/c taskkill /f /im \"{exeFile}\" && " +
+                            $"timeout /t 1 && " +
+                            $"del \"{exePath}\" && " +
+                            $"ren \"{newFile}\" \"{exeFile}\" &&" +
+                            $"\"{exeFile}\"");
+                    }
+                    else UpdateButton.Visible = false;
+                });
+        }
+        private void CMD(string cmd) => 
+            Process.Start(new ProcessStartInfo { 
+                FileName = "cmd.exe", 
+                Arguments = cmd, 
+                WindowStyle = ProcessWindowStyle.Hidden, 
+            });
+        private bool Internet()
+        {
+            try { Dns.GetHostEntry("drive.google.com");
+                return true; }
+            catch { return false; }
+        }
+
         private string[] FileReader(string path)
         {
             StreamReader file = new StreamReader(path);
@@ -223,48 +359,6 @@ namespace RMDebugger
             else action();
         }
         private bool CheckInsidePaths(string path) => HexPathBox.Items.Contains(path);
-        async private Task<IPStatus> PingDevice(string ip)
-        {
-            int timeout = 50;
-            Ping ping = new Ping();
-            byte[] buffer = new byte[16];
-            PingOptions pingOptions = new PingOptions(buffer.Length, true);
-            PingReply reply = await ping.SendPingAsync(ip, timeout, buffer, pingOptions);
-            if (reply.Status == IPStatus.Success) return IPStatus.Success;
-            else return IPStatus.TimedOut;
-        }
-        async private Task check_ip()
-        {
-            try
-            {
-                int reconnect = 0;
-                int timeout = 100;
-                do
-                {
-                    if (await PingDevice(IPaddressBox.Text) == IPStatus.Success)
-                        BeginInvoke((MethodInvoker)(() =>
-                        {
-                            Connect.Enabled = true;
-                            PingButton.BackColor = Color.Green;
-                            reconnect = 0;
-                        }));
-                    else reconnect++;
-                    await Task.Delay(timeout);
-                }
-                while (reconnect < 5 && PingButton.BackColor == Color.Green);
-            }
-            catch (Exception ex) { ToInfoStatus(ex.Message.ToString()); }
-            BeginInvoke((MethodInvoker)(() =>
-            {
-                if (!mainPort.IsOpen) RMData.Enabled = false;
-                Connect.Enabled = false;
-                Connect.Text = "Connect";
-                PingButton.BackColor = Color.Red;
-                SerialPage.Enabled = true;
-                TryDisconnect();
-                
-            }));
-        }
         private void TryDisconnect()
         {
             BeginInvoke((MethodInvoker)(() =>
@@ -366,28 +460,9 @@ namespace RMDebugger
 
         }
         private void ToInfoStatus(string msg) => BeginInvoke((MethodInvoker)(() => { InfoStatus.Text = msg; }));
-        private void AddEvents()
-        {
-            comPort.SelectedIndexChanged += (s, e) => mainPort.PortName = comPort.SelectedItem.ToString();
-            BaudRate.SelectedIndexChanged += (s, e) => BaudRateSelectedIndexChanged(s, e);
-            RefreshSerial.Click += (s, e) => AddPorts(comPort);
-            foreach (ToolStripDropDownItem item in dataBits.DropDownItems) item.Click += dataBitsForSerial;
-            foreach (ToolStripDropDownItem item in Parity.DropDownItems) item.Click += ParityForSerial;
-            foreach (ToolStripDropDownItem item in stopBits.DropDownItems) item.Click += StopBitsForSerial;
-        }
         private void BaudRateSelectedIndexChanged(object sender, EventArgs e)
             => mainPort.BaudRate = Convert.ToInt32(BaudRate.SelectedItem);
 
-        private void RMDebugger_Load(object sender, EventArgs e)
-        {
-            CheckUpdates();
-            ComDefault(mainPort);
-            AddPorts(comPort);
-            CheckReg();
-            DefaultInfoGrid(); 
-            DefaultConfigGrid(); 
-            SetProperties(); 
-        }
         private void DefaultConfigGrid()
         {
             BeginInvoke((MethodInvoker)(() =>
@@ -423,53 +498,8 @@ namespace RMDebugger
                 foreach (TreeNode node in InfoTree.Nodes) node.Nodes.Clear();
             }));
         }
-        private void RMDebugger_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Settings.Default.ThroughRM485 = NeedThrough.Checked;
-            Settings.Default.MainSignatureID = (ushort)TargetSignID.Value;
-            Settings.Default.ThroughSignatureID = (ushort)ThroughSignID.Value;
-            Settings.Default.UDPGatePort = (ushort)numericPort.Value;
-            Settings.Default.LastPageSize = (int)HexPageSize.Value;
-            Settings.Default.UDPGateIP = IPaddressBox.Text;
-            Settings.Default.LastPathToHex = HexPathBox.Text;
-            Settings.Default.LastPortName = comPort.Text;
-            Settings.Default.LastBaudRate = Int32.TryParse(BaudRate.Text, out int digit) 
-                ? digit
-                : 38400;
-            Settings.Default.Save();
-        }
+        
         private void BaudRate_SelectedIndexChanged(object sender, EventArgs e) => mainPort.BaudRate = Convert.ToInt32(BaudRate.Text);
-        private void OpenCom_Click(object sender, EventArgs e)
-        {
-            if (OpenCom.Text == "Open")
-            {
-                try
-                {
-                    mainPort.Open();
-                    comPort.Enabled = false;
-                    RefreshSerial.Enabled = false;
-                    UdpPage.Enabled = false;
-                    RMData.Enabled = true;
-                    ExtraButtonsGroup.Enabled = true;
-                    loadFromPCToolStripMenuItem.Enabled = false;
-                    clearSettingsToolStrip.Enabled = false;
-                    OpenCom.Text = "Close";
-                }
-                catch (Exception ex) { ToInfoStatus(ex.Message); }
-            }
-            else
-            {
-                mainPort.Close();
-                comPort.Enabled = true;
-                UdpPage.Enabled = true;
-                RefreshSerial.Enabled = true;
-                RMData.Enabled = false;
-                ExtraButtonsGroup.Enabled = false;
-                loadFromPCToolStripMenuItem.Enabled = true;
-                clearSettingsToolStrip.Enabled = true;
-                OpenCom.Text = "Open";
-            }
-        }
         private void IPaddressBox_TextChanged(object sender, EventArgs e)
         {
             try
@@ -495,53 +525,7 @@ namespace RMDebugger
             PingButton.BackColor = Color.Red;
             Connect.Text = "Connect";
         }
-        async private void PingButton_Click(object sender, EventArgs e)
-        {
-            if (PingButton.BackColor == Color.Green)
-            {
-                PingButton.BackColor = Color.Red;
-                Connect.Enabled = false;
-                Connect.Text = "Connect";
-            }
-            else { if (await PingDevice(IPaddressBox.Text) == IPStatus.Success) await check_ip(); }
-        }
-        private void Connect_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (Connect.Text == "Connect")
-                {
-                    if (udpGate.Connected) TryDisconnect();
-                    udpGate = new Socket(SocketType.Dgram, ProtocolType.Udp);
-                    udpGate.Connect(IPaddressBox.Text, Convert.ToUInt16(numericPort.Text));
-                    SerialPage.Enabled = false;
-                    RMData.Enabled = true;
-                    loadFromPCToolStripMenuItem.Enabled = false;
-                    clearSettingsToolStrip.Enabled = false;
-                    ExtraButtonsGroup.Enabled = true;
-                    Connect.Text = "Close";
-                }
-                else
-                {
-                    TryDisconnect();
-                    SerialPage.Enabled = true;
-                    loadFromPCToolStripMenuItem.Enabled = true;
-                    clearSettingsToolStrip.Enabled = true;
-                    RMData.Enabled = false;
-                    ExtraButtonsGroup.Enabled = false;
-                    Connect.Text = "Connect";
-                }
-            }
-            catch
-            {
-                TryDisconnect();
-                SerialPage.Enabled = true;
-                loadFromPCToolStripMenuItem.Enabled = true;
-                clearSettingsToolStrip.Enabled = true;
-                RMData.Enabled = false;
-                Connect.Text = "Connect";
-            }
-        }
+
         private void DistTofTimeout_Scroll(object sender, EventArgs e) => Invoke((MethodInvoker)(() => { TimeForDistTof.Text = DistToftimeout.Value.ToString() + " ms"; }));
         private void GetNearTimeout_Scroll(object sender, EventArgs e) => Invoke((MethodInvoker)(() => { TimeForGetNear.Text = GetNeartimeout.Value.ToString() + " ms"; }));
         async private void ManualDistTof_Click(object sender, EventArgs e) => await Task.Run(() => AsyncDistTof());
