@@ -157,6 +157,7 @@ namespace RMDebugger
             StopBitsForSerial(stopBits1, null);
             BaudRateSelectedIndexChanged(null, null);
         }
+
         private void AddPorts(ComboBox box)
         {
             box.Items.Clear();
@@ -168,6 +169,50 @@ namespace RMDebugger
             }
             OpenCom.Enabled = ports.Length > 0;
         }
+
+        private void CheckReg()
+        {
+            using (RegistryKey curUK = Registry.CurrentUser)
+            {
+                if (checkMainFolder(curUK))
+                    using (RegistryKey rKey = curUK.OpenSubKey(mainName, true))
+                    {
+                        string[] keys = rKey.GetSubKeyNames();
+                        if (keys.Length > 0)
+                        {
+                            this.Enabled = false;
+
+                            foreach (string key in keys) AddSettingsToStrip(key);
+                            AddNewEvents();
+                        }
+                        else
+                        {
+                            loadFromPCToolStripMenuItem.Visible = false;
+                            deleteSaveFromPCToolStripMenuItem.Visible = false;
+                        }
+                        this.Enabled = true;
+                    }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         private void dataBitsForSerial(object sender, EventArgs e)
         {
             ToolStripMenuItem databits = (ToolStripMenuItem)sender;
@@ -286,6 +331,17 @@ namespace RMDebugger
             loadFromPCToolStripMenuItem.Enabled = 
                 clearSettingsToolStrip.Enabled = !sw;
         }
+
+
+
+
+
+
+
+
+
+
+
         private string[] FileReader(string path)
         {
             using StreamReader file = new StreamReader(path);
@@ -1497,29 +1553,7 @@ namespace RMDebugger
                 }));
             }
         }
-        private void CheckReg()
-        {
-            RegistryKey currentUserKey = Registry.CurrentUser;
-            if (checkMainFolder(currentUserKey))
-            {
-                RegistryKey rKey = currentUserKey.OpenSubKey(mainName, true);
-                string[] keys = rKey.GetSubKeyNames();
-                if (keys.Length > 0)
-                {
-                    this.Enabled = false;
-                    foreach (string key in keys) AddSettingsToStrip(key);
-                    AddNewEvents();
-                }
-                else
-                {
-                    loadFromPCToolStripMenuItem.Visible = false;
-                    deleteSaveFromPCToolStripMenuItem.Visible = false;
-                }
-                rKey.Close();
-                this.Enabled = true;
-            }
-            currentUserKey.Close();
-        }
+ 
         private void timerRmp_Tick(object sender, EventArgs e)
         {
             if (RMPStatusBar.Value != 0) BeginInvoke((MethodInvoker)(() => {
