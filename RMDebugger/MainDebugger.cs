@@ -146,7 +146,6 @@ namespace RMDebugger
             catch { return false; }
         }
 
-
         private void ComDefault()
         {
             mainPort.WriteTimeout =
@@ -170,6 +169,11 @@ namespace RMDebugger
             OpenCom.Enabled = ports.Length > 0;
         }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Переделать чтение реестра
+        /// Публичные контролы вернуть в приватные, перенести в статический класс
+        /// </summary>
         private void CheckReg()
         {
             using (RegistryKey curUK = Registry.CurrentUser)
@@ -194,25 +198,132 @@ namespace RMDebugger
                     }
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        private bool checkInStripMenuItems(ToolStripItemCollection collection, string subKey)
+        {
+            foreach (ToolStripMenuItem item in collection)
+                if (item.Text == subKey) return true;
+            return false;
+        }
+        public void AddNewEvents()
+        {
+            Invoke((MethodInvoker)(() => {
+                foreach (ToolStripMenuItem item in loadFromPCToolStripMenuItem.DropDownItems)
+                    item.Click += loadSaveFrom;
+                foreach (ToolStripMenuItem item in deleteSaveFromPCToolStripMenuItem.DropDownItems)
+                    item.Click += deleteSaveFrom;
+            }));
+        }
+        public void AddSettingsToStrip(string subKey)
+        {
+            if (!checkInStripMenuItems(loadFromPCToolStripMenuItem.DropDownItems, subKey) &&
+                !checkInStripMenuItems(deleteSaveFromPCToolStripMenuItem.DropDownItems, subKey))
+            {
+                Invoke((MethodInvoker)(() =>
+                {
+                    loadFromPCToolStripMenuItem.Visible = true;
+                    loadFromPCToolStripMenuItem.DropDownItems.Add(subKey);
+                    deleteSaveFromPCToolStripMenuItem.Visible = true;
+                    deleteSaveFromPCToolStripMenuItem.DropDownItems.Add(subKey);
+                }));
+            }
+        }
+        private void clearSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Settings.Default.Reset();
+            SetProperties();
+            Settings.Default.Save();
+        }
+        private void saveToRegToolStripMenuItem_Click(object sender, EventArgs e) => new WriteHere(this).ShowDialog();
+        public bool checkMainFolder(RegistryKey cuKey) => cuKey.GetSubKeyNames().Contains(mainName);
+        public bool checkInMainFolder(RegistryKey rKey, string subKey) => rKey.GetSubKeyNames().Contains(subKey);
+        private void loadSaveFrom(object sender, EventArgs e)
+        {
+            bool removeError = false;
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            RegistryKey currentUserKey = Registry.CurrentUser;
+            if (checkMainFolder(currentUserKey))
+            {
+                RegistryKey rKey = currentUserKey.OpenSubKey(mainName, true);
+                if (checkInMainFolder(rKey, item.Text))
+                {
+                    RegistryKey sKey = rKey.OpenSubKey(item.Text, true);
+                    if (!RegEditLoadParams(sKey)) removeError = true;
+                    sKey.Close();
+                    rKey.Close();
+                    if (removeError) RegEditDeleteParams(currentUserKey, item);
+                }
+            }
+            currentUserKey.Close();
+        }
+        private bool RegEditLoadParams(RegistryKey rKey)
+        {
+            try
+            {
+                Invoke((MethodInvoker)(() => {
+                    NeedThrough.Checked = Convert.ToBoolean(rKey.GetValue("ThroughRM485"));
+                    TargetSignID.Value = Convert.ToUInt16(rKey.GetValue("MainSignatureID"));
+                    HexPageSize.Value = Convert.ToInt32(rKey.GetValue("LastPageSize"));
+                    IPaddressBox.Text = rKey.GetValue("UDPGateIP").ToString();
+                    numericPort.Value = Convert.ToUInt16(rKey.GetValue("UDPGatePort"));
+                    HexPathBox.Text = rKey.GetValue("LastPathToHex").ToString();
+                    ThroughSignID.Value = Convert.ToUInt16(rKey.GetValue("ThroughSignatureID"));
+                    comPort.Text = rKey.GetValue("LastComPort").ToString();
+                    BaudRate.Text = rKey.GetValue("LastBaudrate").ToString();
+                }));
+            }
+            catch
+            {
+                if (MessageBox.Show(this, $"Неверный формат одного или нескольких значений.\nУдалить настройку?", "Format Error",
+                    MessageBoxButtons.YesNo) == DialogResult.Yes) return false;
+            }
+            return true;
+        }
+        private void deleteSaveFrom(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            RegistryKey currentUserKey = Registry.CurrentUser;
+            if (checkMainFolder(currentUserKey))
+            {
+                RegistryKey rKey = currentUserKey.OpenSubKey(mainName, true);
+                if (checkInMainFolder(rKey, item.Text))
+                    RegEditDeleteParams(rKey, item);
+                if (rKey.GetSubKeyNames().Length == 0)
+                {
+                    loadFromPCToolStripMenuItem.Visible = false;
+                    deleteSaveFromPCToolStripMenuItem.Visible = false;
+                }
+            }
+            currentUserKey.Close();
+        }
+        private void RegEditDeleteParams(RegistryKey cuKey, ToolStripMenuItem item)
+        {
+            try
+            {
+                Invoke((MethodInvoker)(() => {
+                    this.Enabled = false;
+                    for (int i = 0; i < loadFromPCToolStripMenuItem.DropDownItems.Count; i++)
+                        if (loadFromPCToolStripMenuItem.DropDownItems[i].Text == item.Text)
+                        {
+                            loadFromPCToolStripMenuItem.DropDownItems.RemoveAt(i);
+                            break;
+                        }
+                    for (int i = 0; i < deleteSaveFromPCToolStripMenuItem.DropDownItems.Count; i++)
+                        if (deleteSaveFromPCToolStripMenuItem.DropDownItems[i].Text == item.Text)
+                        {
+                            deleteSaveFromPCToolStripMenuItem.DropDownItems.RemoveAt(i);
+                            break;
+                        }
+                    this.Enabled = true;
+                }));
+                cuKey.DeleteSubKey(item.Text);
+            }
+            catch
+            {
+                MessageBox.Show(this, $"Ошибка при удалении сохранения");
+                this.Enabled = true;
+            }
+        }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
         private void dataBitsForSerial(object sender, EventArgs e)
         {
             ToolStripMenuItem databits = (ToolStripMenuItem)sender;
@@ -331,17 +442,6 @@ namespace RMDebugger
             loadFromPCToolStripMenuItem.Enabled = 
                 clearSettingsToolStrip.Enabled = !sw;
         }
-
-
-
-
-
-
-
-
-
-
-
         private string[] FileReader(string path)
         {
             using StreamReader file = new StreamReader(path);
@@ -1428,131 +1528,8 @@ namespace RMDebugger
             if (MirrorColor.ShowDialog() == DialogResult.OK)
                 mirClr = MirrorColor.Color;
         }
-        private void clearSettingsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Settings.Default.Reset();
-            SetProperties();
-            Settings.Default.Save();
-        }
-        private void saveToRegToolStripMenuItem_Click(object sender, EventArgs e) => new WriteHere(this).ShowDialog();
-        public bool checkMainFolder(RegistryKey cuKey) => cuKey.GetSubKeyNames().Contains(mainName);
-        public bool checkInMainFolder(RegistryKey rKey, string subKey) => rKey.GetSubKeyNames().Contains(subKey);
-        private void loadSaveFrom(object sender, EventArgs e)
-        {
-            bool removeError = false;
-            ToolStripMenuItem item = sender as ToolStripMenuItem;
-            RegistryKey currentUserKey = Registry.CurrentUser;
-            if (checkMainFolder(currentUserKey))
-            {
-                RegistryKey rKey = currentUserKey.OpenSubKey(mainName, true);
-                if (checkInMainFolder(rKey, item.Text))
-                {
-                    RegistryKey sKey = rKey.OpenSubKey(item.Text, true);
-                    if (!RegEditLoadParams(sKey)) removeError = true;
-                    sKey.Close();
-                    rKey.Close();
-                    if (removeError) RegEditDeleteParams(currentUserKey, item);
-                }
-            }
-            currentUserKey.Close();
-        }
-        private bool RegEditLoadParams(RegistryKey rKey)
-        {
-            try
-            {
-                Invoke((MethodInvoker)(() => {
-                    NeedThrough.Checked = Convert.ToBoolean(rKey.GetValue("ThroughRM485"));
-                    TargetSignID.Value = Convert.ToUInt16(rKey.GetValue("MainSignatureID"));
-                    HexPageSize.Value = Convert.ToInt32(rKey.GetValue("LastPageSize"));
-                    IPaddressBox.Text = rKey.GetValue("UDPGateIP").ToString();
-                    numericPort.Value = Convert.ToUInt16(rKey.GetValue("UDPGatePort"));
-                    HexPathBox.Text = rKey.GetValue("LastPathToHex").ToString();
-                    ThroughSignID.Value = Convert.ToUInt16(rKey.GetValue("ThroughSignatureID"));
-                    comPort.Text = rKey.GetValue("LastComPort").ToString();
-                    BaudRate.Text = rKey.GetValue("LastBaudrate").ToString();
-                }));
-            }
-            catch
-            {
-                if (MessageBox.Show(this, $"Неверный формат одного или нескольких значений.\nУдалить настройку?", "Format Error",
-                    MessageBoxButtons.YesNo) == DialogResult.Yes) return false;
-            }
-            return true;
-        }
-        private void deleteSaveFrom(object sender, EventArgs e)
-        {
-            ToolStripMenuItem item = sender as ToolStripMenuItem;
-            RegistryKey currentUserKey = Registry.CurrentUser;
-            if (checkMainFolder(currentUserKey))
-            {
-                RegistryKey rKey = currentUserKey.OpenSubKey(mainName, true);
-                if (checkInMainFolder(rKey, item.Text))
-                    RegEditDeleteParams(rKey, item);
-                if (rKey.GetSubKeyNames().Length == 0)
-                {
-                    loadFromPCToolStripMenuItem.Visible = false;
-                    deleteSaveFromPCToolStripMenuItem.Visible = false;
-                }
-            }
-            currentUserKey.Close();
-        }
-        private void RegEditDeleteParams(RegistryKey cuKey, ToolStripMenuItem item)
-        {
-            try
-            {
-                Invoke((MethodInvoker)(() => {
-                    this.Enabled = false;
-                    for (int i = 0; i < loadFromPCToolStripMenuItem.DropDownItems.Count; i++)
-                        if (loadFromPCToolStripMenuItem.DropDownItems[i].Text == item.Text)
-                        {
-                            loadFromPCToolStripMenuItem.DropDownItems.RemoveAt(i);
-                            break;
-                        }
-                    for (int i = 0; i < deleteSaveFromPCToolStripMenuItem.DropDownItems.Count; i++)
-                        if (deleteSaveFromPCToolStripMenuItem.DropDownItems[i].Text == item.Text)
-                        {
-                            deleteSaveFromPCToolStripMenuItem.DropDownItems.RemoveAt(i);
-                            break;
-                        }
-                    this.Enabled = true;
-                }));
-                cuKey.DeleteSubKey(item.Text);
-            }
-            catch
-            {
-                MessageBox.Show(this, $"Ошибка при удалении сохранения");
-                this.Enabled = true;
-            }
-        }
-        private bool checkInStripMenuItems(ToolStripItemCollection collection, string subKey)
-        {
-            foreach (ToolStripMenuItem item in collection)
-                if (item.Text == subKey) return true;
-            return false;
-        }
-        public void AddNewEvents()
-        {
-            Invoke((MethodInvoker)(() => {
-                foreach (ToolStripMenuItem item in loadFromPCToolStripMenuItem.DropDownItems)
-                    item.Click += new EventHandler(loadSaveFrom);
-                foreach (ToolStripMenuItem item in deleteSaveFromPCToolStripMenuItem.DropDownItems)
-                    item.Click += new EventHandler(deleteSaveFrom);
-            }));
-        }
-        public void AddSettingsToStrip(string subKey)
-        {
-            if (!checkInStripMenuItems(loadFromPCToolStripMenuItem.DropDownItems, subKey) &&
-                !checkInStripMenuItems(deleteSaveFromPCToolStripMenuItem.DropDownItems, subKey))
-            {
-                Invoke((MethodInvoker)(() =>
-                {
-                    loadFromPCToolStripMenuItem.Visible = true;
-                    loadFromPCToolStripMenuItem.DropDownItems.Add(subKey);
-                    deleteSaveFromPCToolStripMenuItem.Visible = true;
-                    deleteSaveFromPCToolStripMenuItem.DropDownItems.Add(subKey);
-                }));
-            }
-        }
+        
+        
  
         private void timerRmp_Tick(object sender, EventArgs e)
         {
