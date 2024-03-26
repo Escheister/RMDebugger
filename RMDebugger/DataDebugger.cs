@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using StaticSettings;
+using System.Windows.Forms;
 
 namespace RMDebugger
 {
@@ -9,7 +10,7 @@ namespace RMDebugger
             InitializeComponent();
         }
         private void ClearLogger_Click(object sender, System.EventArgs e)
-            => BeginInvoke((MethodInvoker)(() => { LogBox.Clear(); }));
+            => BeginInvoke((MethodInvoker)(() => LogBox.Clear() ));
         private void errorsToolStripMenuItem_Click(object sender, System.EventArgs e) => CheckFlags(sender);
         private void allToolStripMenuItem_Click(object sender, System.EventArgs e) => CheckFlags(sender);
         private void CheckFlags(object sender)
@@ -31,7 +32,7 @@ namespace RMDebugger
 
         private void DataDebuggerForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            StaticSettings.debugForm = null;
+            Options.debugForm = null;
         }
     }
 }

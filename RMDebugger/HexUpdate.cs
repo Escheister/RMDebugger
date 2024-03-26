@@ -9,26 +9,21 @@ using System.IO;
 using System;
 
 using RMDebugger.Properties;
+using StaticSettings;
 
 namespace RMDebugger
 {
     public partial class HexUpdate : Form
     {
-        MainDebugger debugger = null;
-        Socket Sock = null;
-        SerialPort Port = null;
-
-        public HexUpdate(MainDebugger main, Socket sock, SerialPort com)
+        public HexUpdate()
         {
             InitializeComponent();
             HexUploadButton.Enabled = false;
-            debugger = main;
-            NeedThrough.Checked = debugger.NeedThrough.Checked;
-            ThroughSignID.Value = debugger.ThroughSignID.Value;
-            TargetSignID.Value = debugger.TargetSignID.Value;
-            foreach(string item in debugger.HexPathBox.Items) HexPathBox.Items.Add(item);
-            HexPathBox.Text = debugger.HexPathBox.Text;
-            Sock = sock; Port = com;
+            NeedThrough.Checked = Options.debugger.NeedThrough.Checked;
+            ThroughSignID.Value = Options.debugger.ThroughSignID.Value;
+            TargetSignID.Value = Options.debugger.TargetSignID.Value;
+            foreach(string item in Options.debugger.HexPathBox.Items) HexPathBox.Items.Add(item);
+            HexPathBox.Text = Options.debugger.HexPathBox.Text;
         }
 
         private byte[] GET_RM_NUMBER(NumericUpDown updn) => BitConverter.GetBytes(Convert.ToUInt16(updn.Value));
@@ -45,8 +40,8 @@ namespace RMDebugger
                 HexPathButton.Enabled = true;
                 HexUploadButton.Enabled = true;
                 SignaturePanel.Enabled = true;
-                debugger.RMData.Enabled = true;
-                debugger.SerUdpPages.Enabled = true;
+                Options.debugger.RMData.Enabled = true;
+                Options.debugger.SerUdpPages.Enabled = true;
             }));
         }
         private void NeedThrough_CheckedChanged(object sender, EventArgs e)
@@ -134,11 +129,11 @@ namespace RMDebugger
                 HexUploadButton.Text = "Upload";
             else
             {
-                debugger.RMData.Enabled = false;
-                debugger.SerUdpPages.Enabled = false;
+                Options.debugger.RMData.Enabled = false;
+                Options.debugger.SerUdpPages.Enabled = false;
                 HexUploadButton.Text = "Stop";
                 HexUploadButton.Image = Resources.StatusStopped;
-                await Task.Run(() => UploadDataToDevice(new Bootloader(Port, Sock)));
+                await Task.Run(() => UploadDataToDevice(new Bootloader(Options.deviceInterface)));
             }
         }
         private byte[] GetCmdThroughOrNot(Bootloader boot, byte[] rmSign, byte[] rmThrough, CmdOutput cmdOutput)
@@ -285,8 +280,8 @@ namespace RMDebugger
         }
         private void HexUpdate_FormClosed(object sender, FormClosedEventArgs e)
         {
-            debugger.windowUpdate = null;
-            debugger.HexUpdatePage.Enabled = true;
+            Options.debugger.windowUpdate = null;
+            Options.debugger.HexUpdatePage.Enabled = true;
         }
     }
 }

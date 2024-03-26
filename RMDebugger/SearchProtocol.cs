@@ -11,7 +11,8 @@ namespace SearchProtocol
 {
     internal class Searching : CommandsOutput
     {
-        public Searching(SerialPort com, Socket sock) : base(com, sock) { }
+        public Searching(object sender) : base(sender) { }
+
         async public Task<Tuple<byte, Dictionary<int, int>>> RequestAndParseNew(CmdOutput cmdOutput, byte ix, byte[] rmSign, byte[] rmThrough, bool through)
         {
             Dictionary<int, int> values = new Dictionary<int, int>();

@@ -61,7 +61,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>photo_2023-04-04_20-13-58.ico</ApplicationIcon>
@@ -89,6 +89,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="BootloaderProtocol.cs" />
     <Compile Include="CRC16.cs" />
+    <Compile Include="Extension.cs" />
     <Compile Include="MainDebugger.cs">
       <SubType>Form</SubType>
     </Compile>

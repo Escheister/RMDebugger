@@ -2610,7 +2610,6 @@
             this.NeedThrough.TabIndex = 4;
             this.NeedThrough.Text = "Through RM485:";
             this.NeedThrough.UseVisualStyleBackColor = false;
-            this.NeedThrough.CheckedChanged += new System.EventHandler(this.NeedThrough_CheckedChanged);
             // 
             // ExtraButtonsGroup
             // 

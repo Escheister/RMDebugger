@@ -6,11 +6,40 @@ using System;
 
 using ProtocolEnums;
 using CRC16;
+using System.Windows.Forms;
+using StaticSettings;
 
 namespace StaticMethods
 {
     static class Methods
     {
+        public static void ToLogger(byte[] cmdOut, byte[] cmdIn, ProtocolReply reply)
+        {
+            if (Options.debugForm is null) return;
+            try
+            {
+                Options.debugForm.BeginInvoke((MethodInvoker)delegate
+                {
+                    string stringOut = BitConverter.ToString(cmdOut).Replace("-", " ");
+                    string stringIn = cmdIn is null ? "" : BitConverter.ToString(cmdIn).Replace("-", " ");
+                    string msg = $"Send\t->  {stringOut}\n{reply}\t<-  {stringIn}\n";
+                    if (Options.debugForm.allToolStripMenuItem.Checked)
+                    {
+                        Options.debugForm.LogBox.AppendText(msg);
+                        Options.debugForm.LogBox.ScrollToCaret();
+                        return;
+                    }
+                    if (Options.debugForm.errorsToolStripMenuItem.Checked)
+                        if (reply != ProtocolReply.Ok)
+                        {
+                            Options.debugForm.LogBox.AppendText(msg);
+                            Options.debugForm.LogBox.ScrollToCaret();
+                            return;
+                        }
+                });
+            }
+            catch { }
+        }
         public static string CheckSymbols(byte[] array)
         {
             string text = "";
@@ -101,45 +130,6 @@ namespace StaticMethods
         {
             try { return (RmResult)bufferIn[bufferIn.Length - 3]; }
             catch { return RmResult.Error; }
-        }
-        public static byte[] ReceiveData(Socket socket, int length, int ms = 250)
-        {
-            if (!socket.Connected) return null;
-            DateTime t0 = DateTime.Now;
-            TimeSpan tstop;
-            int bytes;
-            do
-            {
-                bytes = socket.Available;
-                tstop = DateTime.Now - t0;
-            }
-            while (bytes < length && tstop.Milliseconds <= ms);
-            if (bytes > 0) 
-            { 
-                byte[] buffer = new byte[bytes]; 
-                socket.Receive(buffer);
-                return buffer;
-            }
-            return null;
-        }
-        public static byte[] ReceiveData(SerialPort serial, int length, int ms = 250)
-        {
-            if (!serial.IsOpen) return null;
-            DateTime t0 = DateTime.Now;
-            TimeSpan tstop;
-            int bytes;
-            do
-            {
-                bytes = serial.BytesToRead;
-                tstop = DateTime.Now - t0;
-            }
-            while (bytes < length && tstop.Milliseconds <= ms);
-            if (bytes > 0) { 
-                byte[] buffer = new byte[bytes]; 
-                serial.Read(buffer, 0, bytes); 
-                return buffer;
-            }
-            return null;
         }
         public static void FlushBuffer(SerialPort serial)
         {

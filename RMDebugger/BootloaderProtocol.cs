@@ -14,7 +14,7 @@ namespace BootloaderProtocol
 {
     internal class Bootloader : CommandsOutput
     {
-        public Bootloader(SerialPort com, Socket sock) : base(com, sock)
+        public Bootloader(object sender) : base(sender)
         {
             addrHex = new byte[2];
             addrElar = new byte[2];

@@ -1,33 +1,27 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Net.Sockets;
-using System.IO.Ports;
 using System;
 
 using SearchProtocol;
 using StaticMethods;
 using ProtocolEnums;
+using StaticSettings;
 
 namespace RMDebugger
 {
     internal class ForTests : Searching
     {
-        public ForTests(SerialPort com, Socket sock) : base(com, sock)
-        {
-            Port = com;
-            Sock = sock;
-        }
+        public ForTests(object sender) : base (sender) { }
 
-        public SerialPort Port;
-        public Socket Sock;
+
         async private Task<Tuple<byte[], ProtocolReply>> GetDataTest(byte[] cmdOut, int size, int ms = 250)
         {
-            if (!Sock.Connected && !Port.IsOpen) throw new Exception("No interface");
-            await SendData(cmdOut);
+            if (!Options.anyInterface) throw new Exception("No interface");
+            await sendData(cmdOut);
             Tuple<CmdInput, byte[], CmdInput?, byte[]> insideCmd = ParseCmdSign(cmdOut);
-            byte[] cmdIn = ReceiveData(size, ms);
+            byte[] cmdIn = receiveData(size, ms);
             ProtocolReply reply = Methods.GetReply(cmdIn, insideCmd.Item2, insideCmd.Item1, true);
-            ToLogger(cmdOut, cmdIn, reply);
+            Methods.ToLogger(cmdOut, cmdIn, reply);
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
         }
         private bool CheckIn(Dictionary<int, Tuple<int, int, DevType>> mainDict, Dictionary<int, int> secondDict)
@@ -124,17 +118,4 @@ namespace RMDebugger
             return GetCode(reply.Item2);
         }
     }
-
-    internal class ForTestsNew
-    {
-        public ForTestsNew(object sender)
-        {
-            IObject = sender;
-        }
-        private object IObject;
-        public object Object { get { return IObject; } }
-    }
-
-
-
 }

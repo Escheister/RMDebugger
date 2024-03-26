@@ -11,7 +11,7 @@ namespace RMDebugger
 {
     internal class Information : Searching
     {
-        public Information(SerialPort com, Socket sock) : base(com, sock) { }
+        public Information(object sender) : base(sender) { }
 
         public byte[] GetInfo(byte[] rmSign, CmdOutput cmdOutput)
             => FormatCmdOut(rmSign, cmdOutput, 0xff);

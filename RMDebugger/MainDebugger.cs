@@ -19,6 +19,7 @@ using BootloaderProtocol;
 using SearchProtocol;
 using ProtocolEnums;
 using StaticMethods;
+using StaticSettings;
 using File_Verifier;
 using CSV;
 
@@ -26,7 +27,7 @@ namespace RMDebugger
 {
     public partial class MainDebugger : Form
     {
-        Socket udpGate;
+        Socket udpGate = new Socket(SocketType.Dgram, ProtocolType.Udp);
         public HexUpdate windowUpdate = null;
         Color mirClr = Color.PaleGreen;
         const string mainName = "RM Debugger";
@@ -45,6 +46,7 @@ namespace RMDebugger
         public MainDebugger()
         {
             InitializeComponent();
+            Options.debugger = this;
             NotifyMessage.Text = this.Text = $"{Assembly.GetEntryAssembly().GetName().Name} {Assembly.GetEntryAssembly().GetName().Version}";
             AddEvents();
         }
@@ -61,6 +63,7 @@ namespace RMDebugger
             OpenCom.Click += OpenComClick;
             PingButton.Click += PingButtonClick;
             Connect.Click += ConnectClick;
+            NeedThrough.CheckedChanged += NeedThroughCheckedChanged;
         }
 
 
@@ -328,7 +331,7 @@ namespace RMDebugger
         {
             ToolStripMenuItem databits = (ToolStripMenuItem)sender;
             foreach (ToolStripMenuItem item in dataBits.DropDownItems) item.CheckState = CheckState.Unchecked;
-            mainPort.DataBits = Convert.ToInt32(databits.Text);
+            mainPort.DataBits = Convert.ToByte(databits.Text);
             databits.CheckState = CheckState.Checked;
             dataBitsInfo.Text = mainPort.DataBits.ToString();
         }
@@ -379,9 +382,12 @@ namespace RMDebugger
             AfterAnyInterfaceEvent(mainPort.IsOpen);
         }
         private void AfterComEvent(bool sw)
-            => comPort.Enabled = 
-                RefreshSerial.Enabled = 
+        {
+            comPort.Enabled =
+                RefreshSerial.Enabled =
                 UdpPage.Enabled = !sw;
+            Options.deviceInterface = sw ? mainPort : null;
+        }
         async private void PingButtonClick(object sender, EventArgs e)
         {
             if (PingButton.BackColor == Color.Green)
@@ -434,11 +440,15 @@ namespace RMDebugger
             AfterAnyInterfaceEvent(udpGate.Connected);
         }
         private void AfterUdpEvent(bool sw)
-            => SerialPage.Enabled = !sw;
+        {
+            SerialPage.Enabled = !sw;
+            Options.deviceInterface = sw ? udpGate : null;
+        }
         private void AfterAnyInterfaceEvent(bool sw)
         {
             RMData.Enabled =
-                    ExtraButtonsGroup.Enabled = sw;
+                    ExtraButtonsGroup.Enabled = 
+                    Options.anyInterface = sw;
             loadFromPCToolStripMenuItem.Enabled = 
                 clearSettingsToolStrip.Enabled = !sw;
         }
@@ -448,6 +458,33 @@ namespace RMDebugger
             Task<string> data = file.ReadToEndAsync();
             return data.Result.Trim().Split('\n');
         }
+        private void NeedThroughCheckedChanged(object sender, EventArgs e)
+        {
+            bool through = NeedThrough.Checked;
+            ThroughOrNot(through);
+
+            decimal targetID;
+            if (through)
+            {
+                targetID = ThroughSignID.Value;
+                ThroughSignID.Value = TargetSignID.Value;
+                TargetSignID.Value = targetID;
+            }
+            else
+            {
+                targetID = TargetSignID.Value;
+                TargetSignID.Value = ThroughSignID.Value;
+                ThroughSignID.Value = targetID;
+            }
+        }
+        private void ThroughOrNot(bool through)
+        {
+            MirrorBox.Enabled = 
+                MirrorColorButton.Enabled = 
+                RS485Page.Enabled = 
+                ExtFind.Enabled = !through;
+            ThroughSignID.Enabled = through;
+        }
 
 
 
@@ -463,8 +500,29 @@ namespace RMDebugger
 
 
 
-        private byte[] GET_RM_NUMBER(NumericUpDown updn) => BitConverter.GetBytes(Convert.ToUInt16(updn.Value));
-        private byte[] GET_RM_NUMBER(int num) => BitConverter.GetBytes(Convert.ToUInt16(num));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         private void TaskForChangedRows()
         {
             StartTestRMButton.Enabled =
@@ -514,7 +572,7 @@ namespace RMDebugger
         {
             BeginInvoke((MethodInvoker)(() =>
             {
-                if (!RMData.Enabled) RMData.Enabled = true;
+                RMData.Enabled = Options.anyInterface;
                 HexUploadButton.Text = "Upload";
                 HexUploadButton.Image = Resources.StatusRunning;
                 AutoDistTof.Text = "Auto";
@@ -763,13 +821,13 @@ namespace RMDebugger
                 HexUploadButton.Text = "Stop";
                 HexUploadButton.Image = Resources.StatusStopped;
                 if (windowUpdate == null) HexUpdateInAWindow.Enabled = false;
-                await Task.Run(() => UploadDevice(new Bootloader(mainPort, udpGate)));
+                await Task.Run(() => UploadDevice(new Bootloader(Options.deviceInterface)));
             }
         }
         async private void RefreshRMButton_Click(object sender, EventArgs e)
         {
             if (windowUpdate != null) windowUpdate.Enabled = false;
-            await Task.Run(() => AddToStatusGrid(new ForTests(mainPort, udpGate)));
+            await Task.Run(() => AddToStatusGrid(new Searching(Options.deviceInterface)));
         }
         
         private void StatusGridView_DoubleClick(object sender, EventArgs e) => StatusRM485GridView.ClearSelection();
@@ -785,35 +843,7 @@ namespace RMDebugger
             realTimeWorkingTest = 0;
             ChangeWorkTestTime(realTimeWorkingTest);
         }
-        private void ThroughOrNot(bool through)
-        {
-            BeginInvoke((MethodInvoker)(() => {
-                MirrorBox.Enabled = !through;
-                MirrorColorButton.Enabled = !through;
-                ThroughSignID.Enabled = through;
-                RS485Page.Enabled = !through;
-                ExtFind.Enabled = !through;
-            }));
-        }
-        private void NeedThrough_CheckedChanged(object sender, EventArgs e)
-        {
-            ThroughOrNot(NeedThrough.Checked);
 
-            decimal targetID;
-
-            if (NeedThrough.Checked)
-            {
-                targetID = ThroughSignID.Value;
-                ThroughSignID.Value = TargetSignID.Value;
-                TargetSignID.Value = targetID;
-            }
-            else
-            {
-                targetID = TargetSignID.Value;
-                TargetSignID.Value = ThroughSignID.Value;
-                ThroughSignID.Value = targetID;
-            }
-        }
         private void AboutButton_Click(object sender, EventArgs e) => new AboutInfo().ShowDialog();
         async private Task<Tuple<List<int>, Dictionary<int, int>>> GetMoreDevices(Searching search, Dictionary<int, int> data)
         {
@@ -826,9 +856,9 @@ namespace RMDebugger
             {
                 try
                 {
-                    replyes = await search.GetData(search.FormatCmdOut(GET_RM_NUMBER(key), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50);
+                    replyes = await search.GetData(search.FormatCmdOut(key.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50);
                     Dictionary<int, int> tempData = new Dictionary<int, int>();
-                    tempData = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, GET_RM_NUMBER(key));
+                    tempData = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes());
                     search.AddKeys(extData, tempData);
                     devices++;
                 }
@@ -851,7 +881,7 @@ namespace RMDebugger
         }
         async private Task AsyncGetNear()
         {
-            if (!udpGate.Connected && !mainPort.IsOpen) return;
+            if (!Options.anyInterface) return;
             BeginInvoke((MethodInvoker)(() => {
                 SerUdpPages.Enabled = false;
                 ManualGetNear.Enabled = false;
@@ -860,12 +890,11 @@ namespace RMDebugger
             }));
             offTabsExcept(RMData, GetNearPage);
 
-            Searching search = new Searching(mainPort, udpGate);
+            Searching search = new Searching(Options.deviceInterface);
 
             do
             {
-                if (!udpGate.Connected && !mainPort.IsOpen && PingButton.BackColor == Color.Red) break;
-                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, GET_RM_NUMBER(TargetSignID));
+                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
                 BeginInvoke((MethodInvoker)(() => { GetNearGrid.Rows.Clear(); }));
                 if (data != null)
                 {
@@ -887,7 +916,7 @@ namespace RMDebugger
                         if (MirrorBox.Checked && MirrorBox.Enabled)
                         {
                             Dictionary<int, int> mirror = null;
-                            try { mirror = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, GET_RM_NUMBER(key)); }
+                            try { mirror = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes()); }
                             catch
                             {
                                 BeginInvoke((MethodInvoker)(() => { GetNearGrid.Rows.Add($"{key}", (DevType)data[key]); }));
@@ -918,7 +947,7 @@ namespace RMDebugger
                 }
                 await Task.Delay(AutoGetNear.Text == "Stop" ? GetNeartimeout.Value : 50);
             }
-            while (AutoGetNear.Text == "Stop");
+            while (AutoGetNear.Text == "Stop" && Options.anyInterface);
             BackToDefaults();
         }
         async private Task AsyncDistTof()
@@ -932,11 +961,11 @@ namespace RMDebugger
             }));
             offTabsExcept(RMData, DistTofPage);
 
-            Searching search = new Searching(mainPort, udpGate);
+            Searching search = new Searching(Options.deviceInterface);
             do
             {
                 if (!udpGate.Connected && !mainPort.IsOpen && PingButton.BackColor == Color.Red) break;
-                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.ONLINE_DIST_TOF, GET_RM_NUMBER(TargetSignID));
+                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes());
                 BeginInvoke((MethodInvoker)(() => { DistTofGrid.Rows.Clear(); }));
 
                 if (data != null)
@@ -951,7 +980,7 @@ namespace RMDebugger
         {
             byte ix = 0x00;
             int iteration = 1;
-            byte[] rmThrough = GET_RM_NUMBER(ThroughSignID);
+            byte[] rmThrough = ThroughSignID.GetBytes();
             bool through = NeedThrough.Checked;
             Dictionary<int, int> dataReturn = new Dictionary<int, int>();
             try
@@ -1043,8 +1072,8 @@ namespace RMDebugger
                 HexPathButton.Enabled = false;
                 SignaturePanel.Enabled = false;
             }));
-            byte[] rmSign = GET_RM_NUMBER(TargetSignID);
-            byte[] rmThrough = GET_RM_NUMBER(ThroughSignID);
+            byte[] rmSign = TargetSignID.GetBytes();
+            byte[] rmThrough = ThroughSignID.GetBytes();
 
             byte[] cmdBootStart = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.START_BOOTLOADER);
             if (!await GetRequestUpload(boot, cmdBootStart, uploadData: false, aWait: 50, delay: true, delayMs: 25)) return;
@@ -1154,7 +1183,7 @@ namespace RMDebugger
         }
         private bool CheckButtonAndTime()
         {
-            if (StartTestRMButton.Text == "&Start Test") return false;
+            if (StartTestRMButton.Text == "&Start Test" || !Options.anyInterface) return false;
             if (TimerTestBox.Checked && setTimerTest == 0)
             {
                 StartTestRMButton.Text = "&Start Test";
@@ -1235,7 +1264,7 @@ namespace RMDebugger
                         continue;
                     }
                 }
-                task = Task.Run(() => RMStatusTestTask(new ForTests(mainPort, udpGate), dataFromGrid[devInterface]));
+                task = Task.Run(() => RMStatusTestTask(new ForTests(Options.deviceInterface), dataFromGrid[devInterface]));
                 tasks.Add(task);
             }
             ToInfoStatus($"Devices on test: {StatusRM485GridView.Rows.Count}");
@@ -1255,7 +1284,7 @@ namespace RMDebugger
                 mainPort.DataBits, mainPort.StopBits))
                 {
                     port.Open();
-                    await RMStatusTestTask(new ForTests(port, new Socket(SocketType.Dgram, ProtocolType.Udp)), data);
+                    await RMStatusTestTask(new ForTests(port), data);
                 }
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
@@ -1264,11 +1293,11 @@ namespace RMDebugger
         {
             try
             {
-                using (Socket sock = new Socket(SocketType.Dgram, ProtocolType.Udp))
+                using Socket sock = new Socket(SocketType.Dgram, ProtocolType.Udp);
                 if (IPAddress.TryParse(IPaddressBox.Text, out IPAddress address))
                 {
                     sock.Connect(address, port);
-                    await RMStatusTestTask(new ForTests(new SerialPort(), sock), data);
+                    await RMStatusTestTask(new ForTests(sock), data);
                 }
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
@@ -1283,16 +1312,16 @@ namespace RMDebugger
                     foreach (int key in dataGrid.Keys)
                     {
                         if (!CheckButtonAndTime()) return;
-                        byte[] rmSign = GET_RM_NUMBER(key);
+                        byte[] rmSign = key.GetBytes();
                         Enum.TryParse(StatusRM485GridView[(int)RS485Columns.Type, dataGrid[key].Item1].Value.ToString(), out DevType devType);
                         List<int> replyCodes;
 
-                        if (BufferTestBox.Checked)
+                        /*if (BufferTestBox.Checked)
                         {
                             if (test.Sock.Connected) Methods.FlushBuffer(test.Sock);
                             if (test.Port.IsOpen) Methods.FlushBuffer(test.Port);
-                        }
-                        
+                        }*/
+
                         switch (i)
                         {
                             case 0:
@@ -1340,7 +1369,7 @@ namespace RMDebugger
                 }
             }
             while (StartTestRMButton.Text == "&Stop Test"
-                && (test.Sock.Connected || test.Port.IsOpen)
+                /*&& (test.Sock.Connected || test.Port.IsOpen)*/
                 && CheckButtonAndTime());
         }
         private Dictionary<string, Dictionary<int, Tuple<int, int, DevType>>> GetGridInfo()
@@ -1379,7 +1408,7 @@ namespace RMDebugger
             
             return _data;
         }
-        private async Task<Dictionary<string, Dictionary<int, Tuple<int, DevType>>>> GetDevicesInfo(ForTests search, string devInterface, Dictionary<int, int> data)
+        private async Task<Dictionary<string, Dictionary<int, Tuple<int, DevType>>>> GetDevicesInfo(Searching search, string devInterface, Dictionary<int, int> data)
         {
             Dictionary<string, Dictionary<int, Tuple<int, DevType>>> _data = new Dictionary<string, Dictionary<int, Tuple<int, DevType>>>();
             Dictionary<int, Tuple<int, DevType>> extData = new Dictionary<int, Tuple<int, DevType>>();
@@ -1387,7 +1416,7 @@ namespace RMDebugger
             foreach (int key in data.Keys)
             {
                 Tuple<byte[], ProtocolReply> replyes;
-                byte[] cmdOut = search.FormatCmdOut(GET_RM_NUMBER(key), CmdOutput.STATUS, 0xff);
+                byte[] cmdOut = search.FormatCmdOut(key.GetBytes(), CmdOutput.STATUS, 0xff);
                 try
                 {
                     replyes = await search.GetData(cmdOut, (int)CmdMaxSize.STATUS);
@@ -1406,7 +1435,7 @@ namespace RMDebugger
             }
             return null;
         }
-        async private Task AddToStatusGrid(ForTests search)
+        async private Task AddToStatusGrid(Searching search)
         {
             BeginInvoke((MethodInvoker)(() =>
             {
@@ -1417,7 +1446,7 @@ namespace RMDebugger
             offTabsExcept(RMData, TestPage);
             offTabsExcept(TestPages, RS485Page);
 
-            Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, GET_RM_NUMBER(TargetSignID));
+            Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
             if (data is null)
             {
                 BackToDefaults();
@@ -1445,7 +1474,7 @@ namespace RMDebugger
             ToInfoStatus($"Added:{devicesAdded}");
             BackToDefaults();
         }
-        async private Task AddRangeToStatusGrid(ForTests search)
+        async private Task AddRangeToStatusGrid(Searching search)
         {
             BeginInvoke((MethodInvoker)(() =>
             {
@@ -1477,7 +1506,7 @@ namespace RMDebugger
                 {
                     ToInfoStatus($"Signature: {i}");
                     replyes = await search.GetData(
-                        search.FormatCmdOut(GET_RM_NUMBER(i),
+                        search.FormatCmdOut(i.GetBytes(),
                         CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 25);
                     if (dataFromGrid is null || !dataFromGrid.ContainsKey(devInterface) || !dataFromGrid[devInterface].ContainsKey(i))
                         AddToGridTest(devInterface, i,
@@ -1498,8 +1527,8 @@ namespace RMDebugger
             Dictionary<string, Dictionary<int, Tuple<int, int, DevType>>> dataFromGrid = GetGridInfo();
             if (dataFromGrid is null || !dataFromGrid.ContainsKey(devInterface) || !dataFromGrid[devInterface].ContainsKey((int)TargetSignID.Value))
             {
-                Searching search = new Searching(mainPort, udpGate);
-                byte[] cmdOut = search.FormatCmdOut(GET_RM_NUMBER(TargetSignID), CmdOutput.STATUS, 0xff);
+                Searching search = new Searching(Options.deviceInterface);
+                byte[] cmdOut = search.FormatCmdOut(TargetSignID.GetBytes(), CmdOutput.STATUS, 0xff);
                 Tuple<byte[], ProtocolReply> replyes = null;
                 try
                 {
@@ -1519,7 +1548,7 @@ namespace RMDebugger
 
         private void HexUpdateInAWindow_Click(object sender, EventArgs e)
         {
-            windowUpdate = new HexUpdate(this, udpGate, mainPort);
+            windowUpdate = new HexUpdate();
             HexUpdatePage.Enabled = false;
             windowUpdate.Show();
         }
@@ -1560,7 +1589,7 @@ namespace RMDebugger
             try { TargetSignID.Value = Convert.ToUInt16(e.Node.Text); }
             catch { }
             if (!dict.ContainsKey(e.Node.Name)) return;
-            Information info = new Information(mainPort, udpGate);
+            Information info = new Information(Options.deviceInterface);
             Invoke((MethodInvoker)(() => {
                 if (mainPort.IsOpen) Methods.FlushBuffer(mainPort);
                 if (udpGate.Connected) Methods.FlushBuffer(udpGate);
@@ -1579,7 +1608,7 @@ namespace RMDebugger
             {
                 if (dict[e.Node.Name] == CmdOutput.GRAPH_GET_NEAR)
                 {
-                    Dictionary<int, int> data = await GetDeviceListInfo(info, dict[e.Node.Name], GET_RM_NUMBER(TargetSignID));
+                    Dictionary<int, int> data = await GetDeviceListInfo(info, dict[e.Node.Name], TargetSignID.GetBytes());
                     BeginInvoke((MethodInvoker)(() => {
                         string radio = data is null || data.Count == 0 ? "Error" : "Ok";
                         TreeNode getnear = new TreeNode($"Radio: {radio}");
@@ -1608,8 +1637,8 @@ namespace RMDebugger
                 }
                 else
                 {
-                    byte[] cmdOut = !NeedThrough.Checked ? info.GetInfo(GET_RM_NUMBER(TargetSignID), dict[e.Node.Name]) :
-                    info.GetInfo(GET_RM_NUMBER(TargetSignID), GET_RM_NUMBER(ThroughSignID), dict[e.Node.Name]);
+                    byte[] cmdOut = !NeedThrough.Checked ? info.GetInfo(TargetSignID.GetBytes(), dict[e.Node.Name]) :
+                    info.GetInfo(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), dict[e.Node.Name]);
                     reply = await info.GetData(cmdOut, size, 100);
                     byte[] cmdIn = !NeedThrough.Checked ? reply.Item1 : info.ReturnWithoutThrough(reply.Item1);
                     Dictionary<string, string> data = info.CmdInParse(cmdIn);
@@ -1674,21 +1703,21 @@ namespace RMDebugger
             {
                 case CmdOutput.ONLINE:
                     {
-                        cmdOut = CO.FormatCmdOut(GET_RM_NUMBER(TargetSignID), cmdOutput, (byte)SetOnlineFreqNumeric.Value);
-                        if (NeedThrough.Checked) cmdOut = CO.CmdThroughRm(cmdOut, GET_RM_NUMBER(ThroughSignID), CmdOutput.ROUTING_THROUGH);
+                        cmdOut = CO.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, (byte)SetOnlineFreqNumeric.Value);
+                        if (NeedThrough.Checked) cmdOut = CO.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_THROUGH);
                         break;
                     }
                 case CmdOutput.START_BOOTLOADER:
                 case CmdOutput.STOP_BOOTLOADER:
                     {
-                        cmdOut = CO.FormatCmdOut(GET_RM_NUMBER(TargetSignID), cmdOutput, 0xff);
-                        if (NeedThrough.Checked) cmdOut = CO.CmdThroughRm(cmdOut, GET_RM_NUMBER(ThroughSignID), CmdOutput.ROUTING_PROG);
+                        cmdOut = CO.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, 0xff);
+                        if (NeedThrough.Checked) cmdOut = CO.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_PROG);
                         break;
                     }
                 default:
                     {
-                        cmdOut = CO.FormatCmdOut(GET_RM_NUMBER(TargetSignID), cmdOutput, 0xff);
-                        if (NeedThrough.Checked) cmdOut = CO.CmdThroughRm(cmdOut, GET_RM_NUMBER(ThroughSignID), CmdOutput.ROUTING_THROUGH);
+                        cmdOut = CO.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, 0xff);
+                        if (NeedThrough.Checked) cmdOut = CO.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_THROUGH);
                         break;
                     }
             }
@@ -1747,7 +1776,7 @@ namespace RMDebugger
             {
                 ScanTestRM.Text = "Cancel";
                 if (windowUpdate != null) windowUpdate.Enabled = false;
-                await Task.Run(() => AddRangeToStatusGrid(new ForTests(mainPort, udpGate)));
+                await Task.Run(() => AddRangeToStatusGrid(new Searching(Options.deviceInterface)));
             }
         }
         private ConfigCheckList GetFieldDict(string key) => fieldsDict.ContainsKey(key) ? fieldsDict[key] : ConfigCheckList.None;
@@ -1820,7 +1849,7 @@ namespace RMDebugger
             if (dict is null) return;
             offTabsExcept(RMData, null);
             OffControlsForConfig();
-            await Task.Run(() => LoadField(new Configuration(mainPort, udpGate), dict));
+            await Task.Run(() => LoadField(new Configuration(Options.deviceInterface), dict));
             BackToDefaults();
         }
         async private void UploadConfigButton_Click(object sender, EventArgs e)
@@ -1830,7 +1859,7 @@ namespace RMDebugger
             if (dict is null) return;
             offTabsExcept(RMData, null);
             OffControlsForConfig();
-            await Task.Run(() => UploadField(new Configuration(mainPort, udpGate), dict));
+            await Task.Run(() => UploadField(new Configuration(Options.deviceInterface), dict));
             BackToDefaults();
         }
         private Dictionary<string, int> GetEnabledFields()
@@ -1858,8 +1887,8 @@ namespace RMDebugger
             foreach (string key in fields.Keys)
             {
                 byte[] cmdOut = NeedThrough.Checked ?
-                    config.ConfigLoad(GET_RM_NUMBER(TargetSignID), GET_RM_NUMBER(ThroughSignID), key) :
-                    config.ConfigLoad(GET_RM_NUMBER(TargetSignID), key);
+                    config.ConfigLoad(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), key) :
+                    config.ConfigLoad(TargetSignID.GetBytes(), key);
 
                 int valueLength = fieldsDict.ContainsKey(key) ? (int)fieldsDict[key] + 1 : 17;
                 int fieldLength = key.Length + 1;
@@ -1918,8 +1947,8 @@ namespace RMDebugger
                     if (key == "addr") continue;
                 if (value is null && !factory) continue;
                 byte[] cmdOut = NeedThrough.Checked ?
-                    config.ConfigUploadNew(GET_RM_NUMBER(TargetSignID), GET_RM_NUMBER(ThroughSignID), key, value, maxSize, factory) :
-                    config.ConfigUploadNew(GET_RM_NUMBER(TargetSignID), key, value, maxSize, factory);
+                    config.ConfigUploadNew(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), key, value, maxSize, factory) :
+                    config.ConfigUploadNew(TargetSignID.GetBytes(), key, value, maxSize, factory);
 
                 Tuple<RmResult, ProtocolReply> replyes = null;
 
@@ -2097,10 +2126,10 @@ namespace RMDebugger
 
         private void openDebugWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (StaticSettings.debugForm is null)
+            if (Options.debugForm is null)
             {
-                StaticSettings.debugForm = new DataDebuggerForm();
-                StaticSettings.debugForm.Show();
+                Options.debugForm = new DataDebuggerForm();
+                Options.debugForm.Show();
             }
         }
 

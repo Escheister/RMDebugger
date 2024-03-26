@@ -10,18 +10,42 @@ using System;
 using ProtocolEnums;
 using StaticMethods;
 using CRC16;
+using StaticSettings;
 
 namespace RMDebugger
 {
     internal class CommandsOutput
     {
+        protected delegate Task SendDataDelegate(byte[] cmdOut);
+        protected delegate byte[] ReceiveDataDelegate(int length, int ms = 250);
+        public CommandsOutput(object sender) { GetTypeDevice(sender); }
+
+        protected SerialPort Port;
+        protected Socket Sock;
+        protected SendDataDelegate sendData;
+        protected ReceiveDataDelegate receiveData;
+
+        protected void GetTypeDevice(object sender)
+        {
+            if (sender is SerialPort ser)
+            {
+                Port = ser;
+                sendData = SendSerialData;
+                receiveData = SerialReceiveData;
+            }
+            else if (sender is Socket sock)
+            {
+                Sock = sock;
+                sendData = SendSocketData;
+                receiveData = SocketReceiveData;
+            }
+        }
+
         public CommandsOutput(SerialPort com, Socket sock)
         {
             Port = com;
             Sock = sock;
         }
-        private SerialPort Port;
-        private Socket Sock;
 
         public byte[] ReturnWithoutThrough(byte[] cmdIn)
         {
@@ -52,17 +76,50 @@ namespace RMDebugger
             cmdIn.CopyTo(cmdOut, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(cmdOut);
         }
-        async protected Task SendData(byte[] data) => await Task.Run(() => {
-            if (Port.IsOpen) Port.Write(data, 0, data.Length);
-            if (Sock.Connected) Sock.Send(data);
-        });
-        protected byte[] ReceiveData(int length, int ms = 250)
+        async private Task SendSerialData(byte[] data)
+             => await Task.Run(() => Port.Write(data, 0, data.Length));
+        async private Task SendSocketData(byte[] data)
+             => await Task.Run(() => Sock.Send(data));
+        private byte[] SocketReceiveData(int length, int ms = 250)
         {
-            if (Sock.Connected) return Methods.ReceiveData(Sock, length, ms);
-            else if (Port.IsOpen) return Methods.ReceiveData(Port, length, ms);
-            else return null;
+            DateTime t0 = DateTime.Now;
+            TimeSpan tstop;
+            int bytes;
+            do
+            {
+                bytes = Sock.Connected ? Sock.Available : 0;
+                tstop = DateTime.Now - t0;
+            }
+            while (bytes < length && tstop.Milliseconds <= ms);
+            if (bytes > 0)
+            {
+                byte[] buffer = new byte[bytes];
+                Sock.Receive(buffer);
+                return buffer;
+            }
+            return null;
         }
-        protected Tuple<CmdInput, byte[], CmdInput?, byte[]> ParseCmdSign(byte[] cmdOut)
+        private byte[] SerialReceiveData(int length, int ms = 250)
+        {
+            DateTime t0 = DateTime.Now;
+            TimeSpan tstop;
+            int bytes;
+            do
+            {
+                bytes = Port.IsOpen ? Port.BytesToRead : 0;
+                tstop = DateTime.Now - t0;
+            }
+            while (bytes < length && tstop.Milliseconds <= ms);
+            if (bytes > 0)
+            {
+                byte[] buffer = new byte[bytes];
+                Port.Read(buffer, 0, bytes);
+                return buffer;
+            }
+            return null;
+        }
+
+        public Tuple<CmdInput, byte[], CmdInput?, byte[]> ParseCmdSign(byte[] cmdOut)
         {
             CmdOutput cmdOne = (CmdOutput)((cmdOut[2] << 8) | cmdOut[3]);
 
@@ -82,62 +139,35 @@ namespace RMDebugger
                 return new Tuple<CmdInput, byte[], CmdInput?, byte[]>(cmdThrough, rmThrough, cmdMain, rmSign);
             }
         }
-        protected void ToLogger(byte[] cmdOut, byte[] cmdIn, ProtocolReply reply)
-        {
-            if (StaticSettings.debugForm is null) return;
-            try
-            {
-                StaticSettings.debugForm.BeginInvoke((MethodInvoker) delegate
-                {
-                    string stringOut = BitConverter.ToString(cmdOut).Replace("-", " ");
-                    string stringIn = cmdIn is null ? "" : BitConverter.ToString(cmdIn).Replace("-", " ");
-                    string msg = $"Send\t->  {stringOut}\n{reply}\t<-  {stringIn}\n";
-                    if (StaticSettings.debugForm.allToolStripMenuItem.Checked)
-                    {
-                        StaticSettings.debugForm.LogBox.AppendText(msg);
-                        StaticSettings.debugForm.LogBox.ScrollToCaret();
-                        return;
-                    }
-                    if (StaticSettings.debugForm.errorsToolStripMenuItem.Checked)
-                        if (reply != ProtocolReply.Ok)
-                        {
-                            StaticSettings.debugForm.LogBox.AppendText(msg);
-                            StaticSettings.debugForm.LogBox.ScrollToCaret();
-                            return;
-                        }
-                });
-            }
-            catch { }
-        }
         async public Task<Tuple<RmResult, ProtocolReply>> GetResult(byte[] cmdOut, int size, int ms = 50)
         {
-            if (!Sock.Connected && !Port.IsOpen) throw new Exception("No interface");
-            await SendData(cmdOut);
+            if (!Options.anyInterface) throw new Exception("No interface");
+            await sendData(cmdOut);
             Tuple<CmdInput, byte[], CmdInput?, byte[]> insideCmd = ParseCmdSign(cmdOut);
             if (insideCmd.Item3 != null && insideCmd.Item4 != null) ms *= 2;
-            byte[] cmdIn = ReceiveData(size, ms);
+            byte[] cmdIn = receiveData(size, ms);
             ProtocolReply reply;
             if (insideCmd.Item3 is null && insideCmd.Item4 is null) 
                 reply = Methods.GetReply(cmdIn, insideCmd.Item2, insideCmd.Item1);
             else
                 reply = Methods.GetReply(cmdIn, insideCmd.Item2, insideCmd.Item1, insideCmd.Item4, (CmdInput)insideCmd.Item3);
-            ToLogger(cmdOut, cmdIn, reply);
+            Methods.ToLogger(cmdOut, cmdIn, reply);
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
             return new Tuple<RmResult, ProtocolReply>(Methods.CheckResult(cmdIn), reply);
         }
         async public Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 50)
         {
-            if (!Sock.Connected && !Port.IsOpen) throw new Exception("No interface");
-            await SendData(cmdOut);
+            if (!Options.anyInterface) throw new Exception("No interface");
+            await sendData(cmdOut);
             Tuple<CmdInput, byte[], CmdInput?, byte[]> insideCmd = ParseCmdSign(cmdOut);
             if (insideCmd.Item3 != null && insideCmd.Item4 != null) ms *= 2;
-            byte[] cmdIn = ReceiveData(size, ms);
+            byte[] cmdIn = receiveData(size, ms);
             ProtocolReply reply;
             if (insideCmd.Item3 is null && insideCmd.Item4 is null)
                 reply = Methods.GetReply(cmdIn, insideCmd.Item2, insideCmd.Item1);
             else
                 reply = Methods.GetReply(cmdIn, insideCmd.Item2, insideCmd.Item1, insideCmd.Item4, (CmdInput)insideCmd.Item3);
-            ToLogger(cmdOut, cmdIn, reply);
+            Methods.ToLogger(cmdOut, cmdIn, reply);
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
         }

@@ -1,17 +1,14 @@
-﻿using System.Net.Sockets;
-using System.IO.Ports;
-
-using SearchProtocol;
+﻿using SearchProtocol;
 using ProtocolEnums;
 using StaticMethods;
 using CRC16;
-using RMDebugger;
 
 namespace ConfigurationProtocol
 {
     internal class Configuration : Searching
     {
-        public Configuration(SerialPort com, Socket sock) : base(com, sock) { }
+        public Configuration(object sender) : base(sender) { }
+
         private byte[] ValueToKOI8R(string value, int size, bool factory=false)
         {
             if (factory)
