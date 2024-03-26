@@ -462,20 +462,7 @@ namespace RMDebugger
         {
             bool through = NeedThrough.Checked;
             ThroughOrNot(through);
-
-            decimal targetID;
-            if (through)
-            {
-                targetID = ThroughSignID.Value;
-                ThroughSignID.Value = TargetSignID.Value;
-                TargetSignID.Value = targetID;
-            }
-            else
-            {
-                targetID = TargetSignID.Value;
-                TargetSignID.Value = ThroughSignID.Value;
-                ThroughSignID.Value = targetID;
-            }
+            (TargetSignID.Value, ThroughSignID.Value) = (ThroughSignID.Value, TargetSignID.Value);
         }
         private void ThroughOrNot(bool through)
         {
@@ -485,9 +472,6 @@ namespace RMDebugger
                 ExtFind.Enabled = !through;
             ThroughSignID.Enabled = through;
         }
-
-
-
 
 
 
