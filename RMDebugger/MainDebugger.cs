@@ -64,6 +64,8 @@ namespace RMDebugger
             PingButton.Click += PingButtonClick;
             Connect.Click += ConnectClick;
             NeedThrough.CheckedChanged += NeedThroughCheckedChanged;
+            ManualDistTof.Click += DistTofClick;
+            AutoDistTof.Click += DistTofClick;
         }
 
 
@@ -386,13 +388,21 @@ namespace RMDebugger
             comPort.Enabled =
                 RefreshSerial.Enabled =
                 UdpPage.Enabled = !sw;
-            Options.deviceInterface = sw ? mainPort : null;
+            Options.mainInterface = sw ? mainPort : null;
         }
         async private void PingButtonClick(object sender, EventArgs e)
         {
-            if (PingButton.BackColor == Color.Green)
-                PingButton.BackColor = Color.Red;
+            if (Options.pingOk)
+            {
+                PingSettings(!Options.pingOk);
+            }
             else await check_ip();
+        }
+        private void PingSettings(bool sw)
+        {
+            Options.pingOk = 
+                Connect.Enabled = sw;
+            PingButton.BackColor = sw ? Color.Green : Color.Red;
         }
         async private Task check_ip()
         {
@@ -402,11 +412,11 @@ namespace RMDebugger
             PingOptions pingOptions = new PingOptions(buffer.Length, true);
             if (!IPAddress.TryParse(IPaddressBox.Text, out IPAddress ip)) return;
             PingReply reply = await ping.SendPingAsync(ip, timeout, buffer, pingOptions);
+            PingSettings(reply.Status == IPStatus.Success);
             if (reply.Status != IPStatus.Success) return;
             try
             {
-                Invoke((MethodInvoker)(() => { Connect.Enabled = true; PingButton.BackColor = Color.Green; }));
-                for (int reconnect = 0; reconnect < 5 && PingButton.BackColor == Color.Green;)
+                for (int reconnect = 0; reconnect < 5 && Options.pingOk;)
                 {
                     reply = await ping.SendPingAsync(ip, timeout, buffer, pingOptions);
                     if (reply.Status != IPStatus.Success) reconnect++;
@@ -414,13 +424,9 @@ namespace RMDebugger
                 }
             }
             catch (Exception ex) { ToInfoStatus(ex.Message.ToString()); }
-            finally
-            {
-                Invoke((MethodInvoker)(() => {
-                    PingButton.BackColor = Color.Red;
-                    if (udpGate.Connected) ConnectClick(null, null);
-                    Connect.Enabled = PingButton.BackColor == Color.Green;
-                }));
+            finally {
+                if (udpGate.Connected) ConnectClick(null, null);
+                PingSettings(udpGate.Connected);
             }
         }
         private void ConnectClick(object sender, EventArgs e)
@@ -442,36 +448,74 @@ namespace RMDebugger
         private void AfterUdpEvent(bool sw)
         {
             SerialPage.Enabled = !sw;
-            Options.deviceInterface = sw ? udpGate : null;
+            Options.mainInterface = sw ? udpGate : null;
         }
         private void AfterAnyInterfaceEvent(bool sw)
         {
             RMData.Enabled =
                     ExtraButtonsGroup.Enabled = 
-                    Options.anyInterface = sw;
+                    Options.mainIsAvailable = sw;
             loadFromPCToolStripMenuItem.Enabled = 
                 clearSettingsToolStrip.Enabled = !sw;
         }
-        private string[] FileReader(string path)
-        {
-            using StreamReader file = new StreamReader(path);
-            Task<string> data = file.ReadToEndAsync();
-            return data.Result.Trim().Split('\n');
-        }
         private void NeedThroughCheckedChanged(object sender, EventArgs e)
         {
-            bool through = NeedThrough.Checked;
-            ThroughOrNot(through);
+            ThroughOrNot();
             (TargetSignID.Value, ThroughSignID.Value) = (ThroughSignID.Value, TargetSignID.Value);
         }
-        private void ThroughOrNot(bool through)
+        private void ThroughOrNot()
         {
+            bool through = NeedThrough.Checked;
             MirrorBox.Enabled = 
                 MirrorColorButton.Enabled = 
                 RS485Page.Enabled = 
                 ExtFind.Enabled = !through;
             ThroughSignID.Enabled = through;
         }
+        private void DistTofClick(object sender, EventArgs e)
+        {
+            Button btn = (Button) sender;
+            bool auto = btn == AutoDistTof;
+            
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+        async private Task AsyncDistTof()
+        {
+            if (!udpGate.Connected && !mainPort.IsOpen) return;
+            BeginInvoke((MethodInvoker)(() => {
+                SerUdpPages.Enabled = false;
+                ManualDistTof.Enabled = false;
+                if (AutoDistTof.Text == "Auto") AutoDistTof.Enabled = false;
+                if (windowUpdate != null) windowUpdate.Enabled = false;
+            }));
+            offTabsExcept(RMData, DistTofPage);
+
+            Searching search = new Searching(Options.mainInterface);
+            do
+            {
+                if (!udpGate.Connected && !mainPort.IsOpen && PingButton.BackColor == Color.Red) break;
+                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes());
+                BeginInvoke((MethodInvoker)(() => { DistTofGrid.Rows.Clear(); }));
+
+                if (data != null)
+                    foreach (int key in data.Keys)
+                        BeginInvoke((MethodInvoker)(() => { DistTofGrid.Rows.Add(key, data[key]); }));
+                await Task.Delay(AutoDistTof.Text == "Stop" ? DistToftimeout.Value : 50);
+            }
+            while (AutoDistTof.Text == "Stop");
+            BackToDefaults();
+        }
 
 
 
@@ -506,12 +550,17 @@ namespace RMDebugger
 
 
 
-
+        private string[] FileReader(string path)
+        {
+            using StreamReader file = new StreamReader(path);
+            Task<string> data = file.ReadToEndAsync();
+            return data.Result.Trim().Split('\n');
+        }
         private void TaskForChangedRows()
         {
             StartTestRMButton.Enabled =
-            SaveLogTestRS485.Enabled =
-            StatusRM485GridView.Rows.Count > 0;
+                SaveLogTestRS485.Enabled =
+                StatusRM485GridView.Rows.Count > 0;
             ToInfoStatus($"{StatusRM485GridView.Rows.Count} devices on RM Test.");
         }
         private void offTabsExcept(TabControl tab, TabPage exc)
@@ -551,12 +600,11 @@ namespace RMDebugger
             if (InvokeRequired) BeginInvoke(action);
             else action();
         }
-        private bool CheckInsidePaths(string path) => HexPathBox.Items.Contains(path);
         private void BackToDefaults()
         {
             BeginInvoke((MethodInvoker)(() =>
             {
-                RMData.Enabled = Options.anyInterface;
+                RMData.Enabled = Options.mainIsAvailable;
                 HexUploadButton.Text = "Upload";
                 HexUploadButton.Image = Resources.StatusRunning;
                 AutoDistTof.Text = "Auto";
@@ -620,7 +668,7 @@ namespace RMDebugger
                 {
                     HexUpdateInAWindow.Enabled = true;
                 }
-                ThroughOrNot(NeedThrough.Checked);
+                ThroughOrNot();
                 timerRmp.Stop();
             }));
         }
@@ -636,7 +684,7 @@ namespace RMDebugger
                 IPaddressBox.Text = Settings.Default.UDPGateIP;
                 HexPathBox.Items.Add(Settings.Default.LastPathToHex);
                 if (HexPathBox.Items.Count != 0) HexPathBox.SelectedItem = HexPathBox.Items[0];
-                ThroughOrNot(NeedThrough.Checked);
+                ThroughOrNot();
                 TypeFilterBox.SelectedIndex = 0;
                 if (Settings.Default.LastPortName != string.Empty && comPort.Items.Contains(Settings.Default.LastPortName))
                     comPort.Text = Settings.Default.LastPortName;
@@ -713,9 +761,9 @@ namespace RMDebugger
 
         private void DistTofTimeout_Scroll(object sender, EventArgs e) => Invoke((MethodInvoker)(() => { TimeForDistTof.Text = DistToftimeout.Value.ToString() + " ms"; }));
         private void GetNearTimeout_Scroll(object sender, EventArgs e) => Invoke((MethodInvoker)(() => { TimeForGetNear.Text = GetNeartimeout.Value.ToString() + " ms"; }));
-        async private void ManualDistTof_Click(object sender, EventArgs e) => await Task.Run(() => AsyncDistTof());
+/*        async private void ManualDistTof_Click(object sender, EventArgs e) => await Task.Run(() => AsyncDistTof());*/
         async private void ManualGetNear_Click(object sender, EventArgs e) => await Task.Run(() => AsyncGetNear());
-        private void AutoDistTof_Click(object sender, EventArgs e)
+/*        private void AutoDistTof_Click(object sender, EventArgs e)
         {
             if (AutoDistTof.Text == "Stop")
             {
@@ -728,7 +776,7 @@ namespace RMDebugger
                 AutoDistTof.Image = Resources.StatusStopped;
                 ManualDistTof_Click(null, null);
             }
-        }
+        }*/
         private void AutoGetNear_Click(object sender, EventArgs e)
         {
             if (AutoGetNear.Text == "Stop")
@@ -753,7 +801,7 @@ namespace RMDebugger
             if (HexPathBox.Text != string.Empty) file.InitialDirectory = Path.GetDirectoryName(HexPathBox.Text);
             if (file.ShowDialog() == DialogResult.OK)
             {
-                if (!CheckInsidePaths(file.FileName))
+                if (!HexPathBox.Items.Contains(file.FileName))
                     HexPathBox.Items.Add(file.FileName);
                 HexPathBox.SelectedItem = file.FileName;
             }
@@ -763,7 +811,7 @@ namespace RMDebugger
             string[] FilePath = (string[])e.Data.GetData(DataFormats.FileDrop);
             foreach (string path in FilePath)
             {
-                if (CheckInsidePaths(path)) continue;
+                if (HexPathBox.Items.Contains(path)) continue;
                 if (new FileInfo(path).Extension == ".hex") HexPathBox.Items.Add(path);
             }
             HexPathBox.SelectedItem = FilePath[0];
@@ -805,13 +853,13 @@ namespace RMDebugger
                 HexUploadButton.Text = "Stop";
                 HexUploadButton.Image = Resources.StatusStopped;
                 if (windowUpdate == null) HexUpdateInAWindow.Enabled = false;
-                await Task.Run(() => UploadDevice(new Bootloader(Options.deviceInterface)));
+                await Task.Run(() => UploadDevice(new Bootloader(Options.mainInterface)));
             }
         }
         async private void RefreshRMButton_Click(object sender, EventArgs e)
         {
             if (windowUpdate != null) windowUpdate.Enabled = false;
-            await Task.Run(() => AddToStatusGrid(new Searching(Options.deviceInterface)));
+            await Task.Run(() => AddToStatusGrid(new Searching(Options.mainInterface)));
         }
         
         private void StatusGridView_DoubleClick(object sender, EventArgs e) => StatusRM485GridView.ClearSelection();
@@ -865,7 +913,7 @@ namespace RMDebugger
         }
         async private Task AsyncGetNear()
         {
-            if (!Options.anyInterface) return;
+            if (!Options.mainIsAvailable) return;
             BeginInvoke((MethodInvoker)(() => {
                 SerUdpPages.Enabled = false;
                 ManualGetNear.Enabled = false;
@@ -874,7 +922,7 @@ namespace RMDebugger
             }));
             offTabsExcept(RMData, GetNearPage);
 
-            Searching search = new Searching(Options.deviceInterface);
+            Searching search = new Searching(Options.mainInterface);
 
             do
             {
@@ -931,35 +979,10 @@ namespace RMDebugger
                 }
                 await Task.Delay(AutoGetNear.Text == "Stop" ? GetNeartimeout.Value : 50);
             }
-            while (AutoGetNear.Text == "Stop" && Options.anyInterface);
+            while (AutoGetNear.Text == "Stop" && Options.mainIsAvailable);
             BackToDefaults();
         }
-        async private Task AsyncDistTof()
-        {
-            if (!udpGate.Connected && !mainPort.IsOpen) return;
-            BeginInvoke((MethodInvoker)(() => {
-                SerUdpPages.Enabled = false;
-                ManualDistTof.Enabled = false;
-                if (AutoDistTof.Text == "Auto") AutoDistTof.Enabled = false;
-                if (windowUpdate != null) windowUpdate.Enabled = false;
-            }));
-            offTabsExcept(RMData, DistTofPage);
 
-            Searching search = new Searching(Options.deviceInterface);
-            do
-            {
-                if (!udpGate.Connected && !mainPort.IsOpen && PingButton.BackColor == Color.Red) break;
-                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes());
-                BeginInvoke((MethodInvoker)(() => { DistTofGrid.Rows.Clear(); }));
-
-                if (data != null)
-                    foreach (int key in data.Keys)
-                        BeginInvoke((MethodInvoker)(() => { DistTofGrid.Rows.Add(key, data[key]); }));
-                await Task.Delay(AutoDistTof.Text == "Stop" ? DistToftimeout.Value : 50);
-            }
-            while (AutoDistTof.Text == "Stop");
-            BackToDefaults();
-        }
         async private Task<Dictionary<int, int>> GetDeviceListInfo(Searching search, CmdOutput cmdOutput, byte[] rmSign)
         {
             byte ix = 0x00;
@@ -1167,7 +1190,7 @@ namespace RMDebugger
         }
         private bool CheckButtonAndTime()
         {
-            if (StartTestRMButton.Text == "&Start Test" || !Options.anyInterface) return false;
+            if (StartTestRMButton.Text == "&Start Test" || !Options.mainIsAvailable) return false;
             if (TimerTestBox.Checked && setTimerTest == 0)
             {
                 StartTestRMButton.Text = "&Start Test";
@@ -1248,7 +1271,7 @@ namespace RMDebugger
                         continue;
                     }
                 }
-                task = Task.Run(() => RMStatusTestTask(new ForTests(Options.deviceInterface), dataFromGrid[devInterface]));
+                task = Task.Run(() => RMStatusTestTask(new ForTests(Options.mainInterface), dataFromGrid[devInterface]));
                 tasks.Add(task);
             }
             ToInfoStatus($"Devices on test: {StatusRM485GridView.Rows.Count}");
@@ -1511,7 +1534,7 @@ namespace RMDebugger
             Dictionary<string, Dictionary<int, Tuple<int, int, DevType>>> dataFromGrid = GetGridInfo();
             if (dataFromGrid is null || !dataFromGrid.ContainsKey(devInterface) || !dataFromGrid[devInterface].ContainsKey((int)TargetSignID.Value))
             {
-                Searching search = new Searching(Options.deviceInterface);
+                Searching search = new Searching(Options.mainInterface);
                 byte[] cmdOut = search.FormatCmdOut(TargetSignID.GetBytes(), CmdOutput.STATUS, 0xff);
                 Tuple<byte[], ProtocolReply> replyes = null;
                 try
@@ -1573,7 +1596,7 @@ namespace RMDebugger
             try { TargetSignID.Value = Convert.ToUInt16(e.Node.Text); }
             catch { }
             if (!dict.ContainsKey(e.Node.Name)) return;
-            Information info = new Information(Options.deviceInterface);
+            Information info = new Information(Options.mainInterface);
             Invoke((MethodInvoker)(() => {
                 if (mainPort.IsOpen) Methods.FlushBuffer(mainPort);
                 if (udpGate.Connected) Methods.FlushBuffer(udpGate);
@@ -1760,7 +1783,7 @@ namespace RMDebugger
             {
                 ScanTestRM.Text = "Cancel";
                 if (windowUpdate != null) windowUpdate.Enabled = false;
-                await Task.Run(() => AddRangeToStatusGrid(new Searching(Options.deviceInterface)));
+                await Task.Run(() => AddRangeToStatusGrid(new Searching(Options.mainInterface)));
             }
         }
         private ConfigCheckList GetFieldDict(string key) => fieldsDict.ContainsKey(key) ? fieldsDict[key] : ConfigCheckList.None;
@@ -1833,7 +1856,7 @@ namespace RMDebugger
             if (dict is null) return;
             offTabsExcept(RMData, null);
             OffControlsForConfig();
-            await Task.Run(() => LoadField(new Configuration(Options.deviceInterface), dict));
+            await Task.Run(() => LoadField(new Configuration(Options.mainInterface), dict));
             BackToDefaults();
         }
         async private void UploadConfigButton_Click(object sender, EventArgs e)
@@ -1843,7 +1866,7 @@ namespace RMDebugger
             if (dict is null) return;
             offTabsExcept(RMData, null);
             OffControlsForConfig();
-            await Task.Run(() => UploadField(new Configuration(Options.deviceInterface), dict));
+            await Task.Run(() => UploadField(new Configuration(Options.mainInterface), dict));
             BackToDefaults();
         }
         private Dictionary<string, int> GetEnabledFields()

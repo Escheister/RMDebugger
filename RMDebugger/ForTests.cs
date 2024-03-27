@@ -16,7 +16,7 @@ namespace RMDebugger
 
         async private Task<Tuple<byte[], ProtocolReply>> GetDataTest(byte[] cmdOut, int size, int ms = 250)
         {
-            if (!Options.anyInterface) throw new Exception("No interface");
+            if (!Options.mainIsAvailable) throw new Exception("No interface");
             await sendData(cmdOut);
             Tuple<CmdInput, byte[], CmdInput?, byte[]> insideCmd = ParseCmdSign(cmdOut);
             byte[] cmdIn = receiveData(size, ms);

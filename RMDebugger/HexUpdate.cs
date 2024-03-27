@@ -133,7 +133,7 @@ namespace RMDebugger
                 Options.debugger.SerUdpPages.Enabled = false;
                 HexUploadButton.Text = "Stop";
                 HexUploadButton.Image = Resources.StatusStopped;
-                await Task.Run(() => UploadDataToDevice(new Bootloader(Options.deviceInterface)));
+                await Task.Run(() => UploadDataToDevice(new Bootloader(Options.mainInterface)));
             }
         }
         private byte[] GetCmdThroughOrNot(Bootloader boot, byte[] rmSign, byte[] rmThrough, CmdOutput cmdOutput)

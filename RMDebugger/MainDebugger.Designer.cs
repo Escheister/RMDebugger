@@ -497,7 +497,6 @@
             this.AutoDistTof.TabIndex = 17;
             this.AutoDistTof.Text = "Auto";
             this.AutoDistTof.UseVisualStyleBackColor = false;
-            this.AutoDistTof.Click += new System.EventHandler(this.AutoDistTof_Click);
             // 
             // ManualDistTof
             // 
@@ -507,7 +506,6 @@
             this.ManualDistTof.TabIndex = 16;
             this.ManualDistTof.Text = "Manual";
             this.ManualDistTof.UseVisualStyleBackColor = true;
-            this.ManualDistTof.Click += new System.EventHandler(this.ManualDistTof_Click);
             // 
             // GetNearPage
             // 

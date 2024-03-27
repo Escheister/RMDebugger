@@ -141,7 +141,7 @@ namespace RMDebugger
         }
         async public Task<Tuple<RmResult, ProtocolReply>> GetResult(byte[] cmdOut, int size, int ms = 50)
         {
-            if (!Options.anyInterface) throw new Exception("No interface");
+            if (!Options.mainIsAvailable) throw new Exception("No interface");
             await sendData(cmdOut);
             Tuple<CmdInput, byte[], CmdInput?, byte[]> insideCmd = ParseCmdSign(cmdOut);
             if (insideCmd.Item3 != null && insideCmd.Item4 != null) ms *= 2;
@@ -157,7 +157,7 @@ namespace RMDebugger
         }
         async public Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 50)
         {
-            if (!Options.anyInterface) throw new Exception("No interface");
+            if (!Options.mainIsAvailable) throw new Exception("No interface");
             await sendData(cmdOut);
             Tuple<CmdInput, byte[], CmdInput?, byte[]> insideCmd = ParseCmdSign(cmdOut);
             if (insideCmd.Item3 != null && insideCmd.Item4 != null) ms *= 2;

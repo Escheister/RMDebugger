@@ -23,8 +23,8 @@ namespace StaticSettings
         public static StopBits stopBits { get; set; } = StopBits.One;
 
         //interfaces
-        public static object deviceInterface;
-        public static bool anyInterface = false;
+        public static object mainInterface;
+        public static bool mainIsAvailable = false;
 
 
         /// <summary>
@@ -33,7 +33,12 @@ namespace StaticSettings
         public static bool through {  get; set; } = false;
         public static ushort signatureID { get; set; } = 0;
         public static ushort signatureThrough { get; set; } = 1;
+        //distTof
+        public static bool autoDistTof { get; set; }
+        //GetNear
+        public static bool autoGetNear { get; set; }
 
+        public static string typeOf { get; set; } = "<Any>";
 
 
 
