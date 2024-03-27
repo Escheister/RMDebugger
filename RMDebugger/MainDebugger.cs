@@ -66,6 +66,7 @@ namespace RMDebugger
             NeedThrough.CheckedChanged += NeedThroughCheckedChanged;
             ManualDistTof.Click += DistTofClick;
             AutoDistTof.Click += DistTofClick;
+            Options.timeoutDistTof = DistToftimeout.Value;
         }
 
 
@@ -472,13 +473,56 @@ namespace RMDebugger
                 ExtFind.Enabled = !through;
             ThroughSignID.Enabled = through;
         }
-        private void DistTofClick(object sender, EventArgs e)
+        async private void DistTofClick(object sender, EventArgs e)
         {
             Button btn = (Button) sender;
             bool auto = btn == AutoDistTof;
-            
+            if (auto)
+            {
+                Options.autoDistTof = !Options.autoDistTof;
+                if (Options.autoDistTof)
+                    await DistTofAsync(auto);
+                else AutoDistTof.Enabled = false;
+            }
+            else await DistTofAsync(auto);
+        }
+        async private Task DistTofAsync(bool auto)
+        {
+            if (auto) AfterDistTofEvent(auto);
+            Searching search = new Searching(Options.mainInterface); 
+            do
+            {
+                if (!Options.mainIsAvailable) break;
+                List<DataGridViewRow> rows = new List<DataGridViewRow>();
+                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes());
+                if (data != null)
+                    foreach (int key in data.Keys)
+                    {
+                        rows.Add(new DataGridViewRow());
+                        rows[rows.Count - 1].CreateCells(DistTofGrid, key, data[key]);
+                        rows[rows.Count - 1].Height = 17;
+                    }
+                DistTofGrid.Rows.Clear();
+                DistTofGrid.Rows.AddRange(rows.ToArray());
+                await Task.Delay(auto ? Options.timeoutDistTof : 50);
+            }
+            while (Options.autoDistTof);
+            if (auto) AfterDistTofEvent(!auto);
+        }
 
-
+        private void DistTofTimeout_Scroll(object sender, EventArgs e)
+        {
+            Options.timeoutDistTof = DistToftimeout.Value;
+            TimeForDistTof.Text = $"{Options.timeoutDistTof} ms";
+        }
+        private void AfterDistTofEvent(bool sw)
+        {
+            SerUdpPages.Enabled = 
+                ManualDistTof.Enabled = !sw;
+            AutoDistTof.Text = sw ? "Stop" : "Auto";
+            AutoDistTof.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
+            if (windowUpdate != null) windowUpdate.Enabled = !sw;
+            if (!AutoDistTof.Enabled) AutoDistTof.Enabled = true;
         }
 
 
@@ -759,8 +803,7 @@ namespace RMDebugger
             Connect.Text = "Connect";
         }
 
-        private void DistTofTimeout_Scroll(object sender, EventArgs e) => Invoke((MethodInvoker)(() => { TimeForDistTof.Text = DistToftimeout.Value.ToString() + " ms"; }));
-        private void GetNearTimeout_Scroll(object sender, EventArgs e) => Invoke((MethodInvoker)(() => { TimeForGetNear.Text = GetNeartimeout.Value.ToString() + " ms"; }));
+        private void GetNearTimeout_Scroll(object sender, EventArgs e) => TimeForGetNear.Text = GetNeartimeout.Value.ToString() + " ms";
 /*        async private void ManualDistTof_Click(object sender, EventArgs e) => await Task.Run(() => AsyncDistTof());*/
         async private void ManualGetNear_Click(object sender, EventArgs e) => await Task.Run(() => AsyncGetNear());
 /*        private void AutoDistTof_Click(object sender, EventArgs e)
