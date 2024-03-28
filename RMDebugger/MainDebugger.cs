@@ -71,7 +71,6 @@ namespace RMDebugger
         }
 
 
-
         //********************
         private void MainFormLoad(object sender, EventArgs e)
         {
@@ -99,7 +98,10 @@ namespace RMDebugger
                 : 38400;
             Settings.Default.Save();
         }
-
+        private void ToInfoStatus(string msg) => BeginInvoke((MethodInvoker)(() => InfoStatus.Text = msg ));
+        
+        
+        //Update
         async private void CheckUpdates()
         {
             if (Internet())
@@ -331,6 +333,9 @@ namespace RMDebugger
             }
         }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+        
+        
+        //Serial config
         private void dataBitsForSerial(object sender, EventArgs e)
         {
             ToolStripMenuItem databits = (ToolStripMenuItem)sender;
@@ -392,6 +397,8 @@ namespace RMDebugger
                 UdpPage.Enabled = !sw;
             Options.mainInterface = sw ? mainPort : null;
         }
+        
+        //UDP config
         async private void PingButtonClick(object sender, EventArgs e)
         {
             if (Options.pingOk)
@@ -452,6 +459,8 @@ namespace RMDebugger
             SerialPage.Enabled = !sw;
             Options.mainInterface = sw ? udpGate : null;
         }
+        
+        //after any interface
         private void AfterAnyInterfaceEvent(bool sw)
         {
             RMData.Enabled =
@@ -460,6 +469,8 @@ namespace RMDebugger
             loadFromPCToolStripMenuItem.Enabled = 
                 clearSettingsToolStrip.Enabled = !sw;
         }
+        
+        //Through settings
         private void NeedThroughCheckedChanged(object sender, EventArgs e)
         {
             ThroughOrNot();
@@ -474,6 +485,8 @@ namespace RMDebugger
                 ExtFind.Enabled = !through;
             ThroughSignID.Enabled = through;
         }
+        
+        //DistTof
         async private void DistTofClick(object sender, EventArgs e)
         {
             Button btn = (Button) sender;
@@ -492,6 +505,19 @@ namespace RMDebugger
                 else AutoDistTof.Enabled = false;
             }
             else await DistTofAsync(auto);
+        }
+        private void DistTofTimeout_Scroll(object sender, EventArgs e)
+        {
+            Options.timeoutDistTof = DistToftimeout.Value;
+            TimeForDistTof.Text = $"{Options.timeoutDistTof} ms";
+        }
+        private void AfterDistTofEvent(bool sw)
+        {
+            AfterAnyAutoEvent(sw);
+            AutoDistTof.Text = sw ? "Stop" : "Auto";
+            AutoDistTof.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
+            if (windowUpdate != null) windowUpdate.Enabled = !sw;
+            if (!AutoDistTof.Enabled) AutoDistTof.Enabled = true;
         }
         async private Task DistTofAsync(bool auto)
         {
@@ -517,19 +543,6 @@ namespace RMDebugger
                 await Task.Delay(auto ? Options.timeoutDistTof : 50);
             }
             while (Options.autoDistTof);
-        }
-        private void DistTofTimeout_Scroll(object sender, EventArgs e)
-        {
-            Options.timeoutDistTof = DistToftimeout.Value;
-            TimeForDistTof.Text = $"{Options.timeoutDistTof} ms";
-        }
-        private void AfterDistTofEvent(bool sw)
-        {
-            AfterAnyAutoEvent(sw);
-            AutoDistTof.Text = sw ? "Stop" : "Auto";
-            AutoDistTof.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
-            if (windowUpdate != null) windowUpdate.Enabled = !sw;
-            if (!AutoDistTof.Enabled) AutoDistTof.Enabled = true;
         }
 
 
@@ -698,7 +711,6 @@ namespace RMDebugger
             }));
 
         }
-        private void ToInfoStatus(string msg) => BeginInvoke((MethodInvoker)(() => { InfoStatus.Text = msg; }));
         private void BaudRateSelectedIndexChanged(object sender, EventArgs e)
             => mainPort.BaudRate = Convert.ToInt32(BaudRate.SelectedItem);
 
