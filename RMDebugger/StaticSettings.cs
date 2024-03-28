@@ -1,5 +1,6 @@
 ﻿using System.IO.Ports;
 using System.Net;
+using System.Windows.Forms;
 using RMDebugger;
 
 namespace StaticSettings

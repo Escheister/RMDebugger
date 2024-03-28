@@ -67,6 +67,7 @@ namespace RMDebugger
             ManualDistTof.Click += DistTofClick;
             AutoDistTof.Click += DistTofClick;
             Options.timeoutDistTof = DistToftimeout.Value;
+
         }
 
 
@@ -481,15 +482,20 @@ namespace RMDebugger
             {
                 Options.autoDistTof = !Options.autoDistTof;
                 if (Options.autoDistTof)
-                    await DistTofAsync(auto);
+                {
+                    AfterDistTofEvent(auto);
+                    offTabsExcept(RMData, DistTofPage);
+                    await Task.Run(() => DistTofAsync(auto));
+                    AfterDistTofEvent(!auto);
+                    onTabPages(RMData);
+                }
                 else AutoDistTof.Enabled = false;
             }
             else await DistTofAsync(auto);
         }
         async private Task DistTofAsync(bool auto)
         {
-            if (auto) AfterDistTofEvent(auto);
-            Searching search = new Searching(Options.mainInterface); 
+            Searching search = new Searching(Options.mainInterface);
             do
             {
                 if (!Options.mainIsAvailable) break;
@@ -502,14 +508,16 @@ namespace RMDebugger
                         rows[rows.Count - 1].CreateCells(DistTofGrid, key, data[key]);
                         rows[rows.Count - 1].Height = 17;
                     }
-                DistTofGrid.Rows.Clear();
-                DistTofGrid.Rows.AddRange(rows.ToArray());
+                Action action = () => {
+                    DistTofGrid.Rows.Clear();
+                    DistTofGrid.Rows.AddRange(rows.ToArray());
+                };
+                if (InvokeRequired) BeginInvoke(action);
+                else action();
                 await Task.Delay(auto ? Options.timeoutDistTof : 50);
             }
             while (Options.autoDistTof);
-            if (auto) AfterDistTofEvent(!auto);
         }
-
         private void DistTofTimeout_Scroll(object sender, EventArgs e)
         {
             Options.timeoutDistTof = DistToftimeout.Value;
@@ -517,8 +525,7 @@ namespace RMDebugger
         }
         private void AfterDistTofEvent(bool sw)
         {
-            SerUdpPages.Enabled = 
-                ManualDistTof.Enabled = !sw;
+            AfterAnyAutoEvent(sw);
             AutoDistTof.Text = sw ? "Stop" : "Auto";
             AutoDistTof.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
             if (windowUpdate != null) windowUpdate.Enabled = !sw;
@@ -534,58 +541,19 @@ namespace RMDebugger
 
 
 
-        async private Task AsyncDistTof()
+
+
+
+        private void AfterAnyAutoEvent(bool sw)
         {
-            if (!udpGate.Connected && !mainPort.IsOpen) return;
-            BeginInvoke((MethodInvoker)(() => {
-                SerUdpPages.Enabled = false;
-                ManualDistTof.Enabled = false;
-                if (AutoDistTof.Text == "Auto") AutoDistTof.Enabled = false;
-                if (windowUpdate != null) windowUpdate.Enabled = false;
-            }));
-            offTabsExcept(RMData, DistTofPage);
-
-            Searching search = new Searching(Options.mainInterface);
-            do
-            {
-                if (!udpGate.Connected && !mainPort.IsOpen && PingButton.BackColor == Color.Red) break;
-                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes());
-                BeginInvoke((MethodInvoker)(() => { DistTofGrid.Rows.Clear(); }));
-
-                if (data != null)
-                    foreach (int key in data.Keys)
-                        BeginInvoke((MethodInvoker)(() => { DistTofGrid.Rows.Add(key, data[key]); }));
-                await Task.Delay(AutoDistTof.Text == "Stop" ? DistToftimeout.Value : 50);
-            }
-            while (AutoDistTof.Text == "Stop");
-            BackToDefaults();
+            SerUdpPages.Enabled =
+                ManualDistTof.Enabled =
+                ExtraButtonsGroup.Enabled = 
+                BaudRate.Enabled = 
+                dataBits.Enabled = 
+                Parity.Enabled = 
+                stopBits.Enabled = !sw;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -620,12 +588,6 @@ namespace RMDebugger
                     }
                     t.Enabled = false;
                 }
-                BaudRate.Enabled = false;
-                dataBits.Enabled = false;
-                Parity.Enabled = false;
-                stopBits.Enabled = false;
-                if (ExtraButtonsGroup.Enabled)
-                    ExtraButtonsGroup.Enabled = false;
             };
             if (InvokeRequired) BeginInvoke(action);
             else action();
@@ -1739,13 +1701,13 @@ namespace RMDebugger
             csv.WriteCsv(string.Join(";", list));
         }
         async private void SetOnlineButton_Click(object sender, EventArgs e) =>
-             await Task.Run(() => SendCommandFromButton(new CommandsOutput(mainPort, udpGate), CmdOutput.ONLINE));
+             await Task.Run(() => SendCommandFromButton(new CommandsOutput(Options.mainInterface), CmdOutput.ONLINE));
         async private void ResetButton_Click(object sender, EventArgs e) =>
-             await Task.Run(() => SendCommandFromButton(new CommandsOutput(mainPort, udpGate), CmdOutput.RESET));
+             await Task.Run(() => SendCommandFromButton(new CommandsOutput(Options.mainInterface), CmdOutput.RESET));
         async private void SetBootloaderStartButton_Click(object sender, EventArgs e) =>
-             await Task.Run(() => SendCommandFromButton(new CommandsOutput(mainPort, udpGate), CmdOutput.START_BOOTLOADER));
+             await Task.Run(() => SendCommandFromButton(new CommandsOutput(Options.mainInterface), CmdOutput.START_BOOTLOADER));
         async private void SetBootloaderStopButton_Click(object sender, EventArgs e) =>
-             await Task.Run(() => SendCommandFromButton(new CommandsOutput(mainPort, udpGate), CmdOutput.STOP_BOOTLOADER));
+             await Task.Run(() => SendCommandFromButton(new CommandsOutput(Options.mainInterface), CmdOutput.STOP_BOOTLOADER));
         async private Task SendCommandFromButton(CommandsOutput CO, CmdOutput cmdOutput)
         {
             byte[] cmdOut;

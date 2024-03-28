@@ -41,12 +41,6 @@ namespace RMDebugger
             }
         }
 
-        public CommandsOutput(SerialPort com, Socket sock)
-        {
-            Port = com;
-            Sock = sock;
-        }
-
         public byte[] ReturnWithoutThrough(byte[] cmdIn)
         {
             byte[] _buffer = new byte[cmdIn.Length - 4];
@@ -119,7 +113,7 @@ namespace RMDebugger
             return null;
         }
 
-        public Tuple<CmdInput, byte[], CmdInput?, byte[]> ParseCmdSign(byte[] cmdOut)
+        protected Tuple<CmdInput, byte[], CmdInput?, byte[]> ParseCmdSign(byte[] cmdOut)
         {
             CmdOutput cmdOne = (CmdOutput)((cmdOut[2] << 8) | cmdOut[3]);
 
