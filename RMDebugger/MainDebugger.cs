@@ -64,8 +64,22 @@ namespace RMDebugger
             PingButton.Click += PingButtonClick;
             Connect.Click += ConnectClick;
             NeedThrough.CheckedChanged += NeedThroughCheckedChanged;
+            DistToftimeout.Scroll += (s, e) => {
+                Options.timeoutDistTof = DistToftimeout.Value;
+                TimeForDistTof.Text = $"{Options.timeoutDistTof} ms";
+            };
+            GetNeartimeout.Scroll += (s, e) => {
+                Options.timeoutGetNear = GetNeartimeout.Value;
+                TimeForGetNear.Text = $"{Options.timeoutGetNear} ms";
+            };
             ManualDistTof.Click += DistTofClick;
             AutoDistTof.Click += DistTofClick;
+            ManualGetNear.Click += GetNearClick;
+            AutoGetNear.Click += GetNearClick;
+            TypeFilterBox.SelectedIndexChanged += (s, e) => Options.typeOfGetNear = TypeFilterBox.Text;
+/*            MirrorBox.CheckedChanged += (s, e) => Options.MirrorSearch = MirrorBox.Checked;
+            ExtendedBox.CheckedChanged += (s, e) => Options.ExtendedSearch = ExtendedBox.Checked;
+            KnockKnockBox.CheckedChanged += (s, e) => Options.KnockKnock = KnockKnockBox.Checked;*/
             Options.timeoutDistTof = DistToftimeout.Value;
 
         }
@@ -336,6 +350,8 @@ namespace RMDebugger
         
         
         //Serial config
+        private void BaudRateSelectedIndexChanged(object sender, EventArgs e)
+            => mainPort.BaudRate = Convert.ToInt32(BaudRate.SelectedItem);
         private void dataBitsForSerial(object sender, EventArgs e)
         {
             ToolStripMenuItem databits = (ToolStripMenuItem)sender;
@@ -482,7 +498,7 @@ namespace RMDebugger
             MirrorBox.Enabled = 
                 MirrorColorButton.Enabled = 
                 RS485Page.Enabled = 
-                ExtFind.Enabled = !through;
+                ExtendedBox.Enabled = !through;
             ThroughSignID.Enabled = through;
         }
         
@@ -506,11 +522,6 @@ namespace RMDebugger
             }
             else await DistTofAsync(auto);
         }
-        private void DistTofTimeout_Scroll(object sender, EventArgs e)
-        {
-            Options.timeoutDistTof = DistToftimeout.Value;
-            TimeForDistTof.Text = $"{Options.timeoutDistTof} ms";
-        }
         private void AfterDistTofEvent(bool sw)
         {
             AfterAnyAutoEvent(sw);
@@ -519,6 +530,7 @@ namespace RMDebugger
             if (windowUpdate != null) windowUpdate.Enabled = !sw;
             if (!AutoDistTof.Enabled) AutoDistTof.Enabled = true;
         }
+
         async private Task DistTofAsync(bool auto)
         {
             Searching search = new Searching(Options.mainInterface);
@@ -538,20 +550,200 @@ namespace RMDebugger
                     DistTofGrid.Rows.Clear();
                     DistTofGrid.Rows.AddRange(rows.ToArray());
                 };
-                if (InvokeRequired) BeginInvoke(action);
+                if (InvokeRequired) Invoke(action);
                 else action();
                 await Task.Delay(auto ? Options.timeoutDistTof : 50);
             }
             while (Options.autoDistTof);
         }
 
+        //GetNear
+        async private void GetNearClick(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+            bool auto = btn == AutoGetNear;
+            if (auto)
+            {
+                Options.autoGetNear = !Options.autoGetNear;
+                if (Options.autoGetNear)
+                {
+                    AfterGetNearEvent(auto);
+                    offTabsExcept(RMData, GetNearPage);
+                    await Task.Run(() => GetNearAsync(auto));
+                    AfterGetNearEvent(!auto);
+                    onTabPages(RMData);
+                }
+                else AutoGetNear.Enabled = false;
+            }
+            else await Task.Run(() => GetNearAsync(auto));
+        }
+        private void AfterGetNearEvent(bool sw)
+        {
+            AfterAnyAutoEvent(sw);
+            AutoGetNear.Text = sw ? "Stop" : "Auto";
+            AutoGetNear.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
+            if (windowUpdate != null) windowUpdate.Enabled = !sw;
+            if (!AutoGetNear.Enabled) AutoGetNear.Enabled = true;
+        }
+        async private Task GetNearAsync(bool auto)
+        {
+            Searching search = new Searching(Options.mainInterface);
+            do
+            {
+                if (!Options.mainIsAvailable) break;
+                List<DataGridViewRow> rows = new List<DataGridViewRow>();
+                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
+                if (data != null)
+                {
+
+                    List<int> inOneBus = new List<int>();
+                    List<int> outOfBus = new List<int>();
+                    List<int> mirrorList = new List<int>();
+
+                    if ((ExtendedBox.Checked && ExtendedBox.Enabled) 
+                        || (MirrorBox.Checked && MirrorBox.Enabled)) {
+                        foreach (int key in data.Keys)
+                            if (await ThisDeviceInOneBus(search, key)) inOneBus.Add(key); 
+                            else outOfBus.Add(key);
+
+                        foreach (int key in inOneBus)
+                        {
+                            Dictionary<int, int> tempData = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes());
+                            if (MirrorBox.Checked && tempData.ContainsKey((int)TargetSignID.Value)) mirrorList.Add(key);
+                            search.AddKeys(data, tempData);
+                        }
+                        data = data.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+                    }
+                    foreach (int key in data.Keys)
+                    {
+                        if (Options.typeOfGetNear != "<Any>" 
+                            && ((DevType)data[key]).ToString() != Options.typeOfGetNear || key == TargetSignID.Value) continue;
+                        rows.Add(new DataGridViewRow());
+                        rows[rows.Count - 1].CreateCells(DistTofGrid, key, (DevType)data[key]);
+                        rows[rows.Count - 1].Height = 17;
+                        rows[rows.Count - 1].DefaultCellStyle.BackColor = mirrorList.Contains(key) ? mirClr : Color.White;
+                    } 
+                }
+                Action action = () =>
+                {
+                    GetNearGrid.Rows.Clear();
+                    GetNearGrid.Rows.AddRange(rows.ToArray());
+                };
+                if (InvokeRequired) Invoke(action);
+                else action();
 
 
+                if (auto && rows.Count > 0 && KnockKnockBox.Checked)
+                {
+                    NotifyMessage.BalloonTipTitle = "Тук-тук!";
+                    NotifyMessage.BalloonTipText = $"Ответ получен!";
+                    NotifyMessage.ShowBalloonTip(10);
+                    break;
+                }
 
+                await Task.Delay(auto ? Options.timeoutGetNear : 50);
+            }
+            while (Options.autoGetNear);
+        }
 
+        async private Task<bool> ThisDeviceInOneBus(Searching search, int device) {
+            try {
+                return await search.GetData(search.FormatCmdOut(device.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50) != null;
+            }
+            catch { return false; }
+        }
+        async private Task<Tuple<List<int>, Dictionary<int, int>>> GetMoreDevices(Searching search, Dictionary<int, int> data)
+        {
+            Dictionary<int, int> extData = new Dictionary<int, int>();
+            List<int> exception = new List<int>();
+            search.AddKeys(extData, data);
+            int devices = 0;
+            Tuple<byte[], ProtocolReply> replyes;
+            foreach (int key in data.Keys)
+            {
+                try
+                {
+                    replyes = await search.GetData(search.FormatCmdOut(key.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50);
+                    Dictionary<int, int> tempData = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes());
+                    search.AddKeys(extData, tempData);
+                    devices++;
+                }
+                catch { exception.Add(key); continue; }
+            }
+            data = extData.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+            return new Tuple<List<int>, Dictionary<int, int>>(exception, data);
+        }
+        async private Task AsyncGetNear()
+        {
+            if (!Options.mainIsAvailable) return;
+            BeginInvoke((MethodInvoker)(() => {
+                SerUdpPages.Enabled = false;
+                ManualGetNear.Enabled = false;
+                if (AutoGetNear.Text == "Auto") AutoGetNear.Enabled = false;
+                if (windowUpdate != null) windowUpdate.Enabled = false;
+            }));
+            offTabsExcept(RMData, GetNearPage);
 
+            Searching search = new Searching(Options.mainInterface);
 
+            do
+            {
+                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
+                BeginInvoke((MethodInvoker)(() => { GetNearGrid.Rows.Clear(); }));
+                if (data != null)
+                {
+                    List<int> exception = new List<int>();
 
+                    if (ExtendedBox.Checked == true && ExtendedBox.Enabled)
+                    {
+                        Tuple<List<int>, Dictionary<int, int>> temp = await GetMoreDevices(search, data);
+                        exception = temp.Item1;
+                        data = temp.Item2;
+                    }
+
+                    /*data = RemoveOnType(data);*/
+
+                    foreach (int key in data.Keys)
+                    {
+                        BeginInvoke((MethodInvoker)(() => { GetNearGrid.ClearSelection(); }));
+                        if (key == (int)TargetSignID.Value) continue;
+                        if (MirrorBox.Checked && MirrorBox.Enabled)
+                        {
+                            Dictionary<int, int> mirror = null;
+                            try { mirror = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes()); }
+                            catch
+                            {
+                                BeginInvoke((MethodInvoker)(() => { GetNearGrid.Rows.Add($"{key}", (DevType)data[key]); }));
+                                continue;
+                            }
+                            if (mirror != null && !exception.Contains(key))
+                            {
+                                if (mirror.ContainsKey((int)TargetSignID.Value))
+                                {
+                                    BeginInvoke((MethodInvoker)(() =>
+                                    {
+                                        int row = GetNearGrid.Rows.Add(key, (DevType)data[key]);
+                                        GetNearGrid.Rows[row].DefaultCellStyle.BackColor = mirClr;
+                                    }));
+                                    continue;
+                                }
+                            }
+                        }
+                        BeginInvoke((MethodInvoker)(() => { GetNearGrid.Rows.Add($"{key}", (DevType)data[key]); }));
+                    }
+                }
+                if (KnockKnockBox.Checked && data != null && data.Count != 0 && AutoGetNear.Text == "Stop")
+                {
+                    NotifyMessage.BalloonTipTitle = "Тук-тук!";
+                    NotifyMessage.BalloonTipText = $"Ответ получен!";
+                    NotifyMessage.ShowBalloonTip(10);
+                    break;
+                }
+                await Task.Delay(AutoGetNear.Text == "Stop" ? GetNeartimeout.Value : 50);
+            }
+            while (AutoGetNear.Text == "Stop" && Options.mainIsAvailable);
+            BackToDefaults();
+        }
 
 
 
@@ -711,8 +903,6 @@ namespace RMDebugger
             }));
 
         }
-        private void BaudRateSelectedIndexChanged(object sender, EventArgs e)
-            => mainPort.BaudRate = Convert.ToInt32(BaudRate.SelectedItem);
 
         private void DefaultConfigGrid()
         {
@@ -750,7 +940,6 @@ namespace RMDebugger
             }));
         }
         
-        private void BaudRate_SelectedIndexChanged(object sender, EventArgs e) => mainPort.BaudRate = Convert.ToInt32(BaudRate.Text);
         private void IPaddressBox_TextChanged(object sender, EventArgs e)
         {
             try
@@ -775,38 +964,6 @@ namespace RMDebugger
         {
             PingButton.BackColor = Color.Red;
             Connect.Text = "Connect";
-        }
-
-        private void GetNearTimeout_Scroll(object sender, EventArgs e) => TimeForGetNear.Text = GetNeartimeout.Value.ToString() + " ms";
-/*        async private void ManualDistTof_Click(object sender, EventArgs e) => await Task.Run(() => AsyncDistTof());*/
-        async private void ManualGetNear_Click(object sender, EventArgs e) => await Task.Run(() => AsyncGetNear());
-/*        private void AutoDistTof_Click(object sender, EventArgs e)
-        {
-            if (AutoDistTof.Text == "Stop")
-            {
-                AutoDistTof.Enabled = false;
-                AutoDistTof.Text = "Auto";
-            }
-            else
-            {
-                AutoDistTof.Text = "Stop";
-                AutoDistTof.Image = Resources.StatusStopped;
-                ManualDistTof_Click(null, null);
-            }
-        }*/
-        private void AutoGetNear_Click(object sender, EventArgs e)
-        {
-            if (AutoGetNear.Text == "Stop")
-            {
-                AutoGetNear.Enabled = false;
-                AutoGetNear.Text = "Auto";
-            }
-            else
-            {
-                AutoGetNear.Text = "Stop";
-                AutoGetNear.Image = Resources.StatusStopped;
-                ManualGetNear_Click(null, null);
-            }
         }
         private void HexPathButton_Click(object sender, EventArgs e)
         {
@@ -894,111 +1051,9 @@ namespace RMDebugger
         }
 
         private void AboutButton_Click(object sender, EventArgs e) => new AboutInfo().ShowDialog();
-        async private Task<Tuple<List<int>, Dictionary<int, int>>> GetMoreDevices(Searching search, Dictionary<int, int> data)
-        {
-            Dictionary<int, int> extData = new Dictionary<int, int>();
-            List<int> exception = new List<int>();
-            search.AddKeys(extData, data);
-            int devices = 0;
-            Tuple<byte[], ProtocolReply> replyes;
-            foreach (int key in data.Keys)
-            {
-                try
-                {
-                    replyes = await search.GetData(search.FormatCmdOut(key.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50);
-                    Dictionary<int, int> tempData = new Dictionary<int, int>();
-                    tempData = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes());
-                    search.AddKeys(extData, tempData);
-                    devices++;
-                }
-                catch { exception.Add(key); continue; }
-            }
-            data = extData.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
-            return new Tuple<List<int>, Dictionary<int, int>>(exception, data);
-        }
-        private Dictionary<int, int> RemoveOnType(Dictionary<int, int> data)
-        {
-            if (TypeFilterBox.SelectedItem.ToString() == "<Any>") return data;
-            Dictionary<int, int> newData = new Dictionary<int, int>();
-            foreach (int key in data.Keys)
-            {
-                DevType type = (DevType)data[key];
-                if (type.ToString() == TypeFilterBox.SelectedItem.ToString())
-                    newData.Add(key, data[key]);
-            }
-            return newData;
-        }
-        async private Task AsyncGetNear()
-        {
-            if (!Options.mainIsAvailable) return;
-            BeginInvoke((MethodInvoker)(() => {
-                SerUdpPages.Enabled = false;
-                ManualGetNear.Enabled = false;
-                if (AutoGetNear.Text == "Auto") AutoGetNear.Enabled = false;
-                if (windowUpdate != null) windowUpdate.Enabled = false;
-            }));
-            offTabsExcept(RMData, GetNearPage);
 
-            Searching search = new Searching(Options.mainInterface);
 
-            do
-            {
-                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
-                BeginInvoke((MethodInvoker)(() => { GetNearGrid.Rows.Clear(); }));
-                if (data != null)
-                {
-                    List<int> exception = new List<int>();
-
-                    if (ExtFind.Checked == true && ExtFind.Enabled)
-                    {
-                        Tuple<List<int>, Dictionary<int, int>> temp = await GetMoreDevices(search, data);
-                        exception = temp.Item1;
-                        data = temp.Item2;
-                    }
-
-                    data = RemoveOnType(data);
-
-                    foreach (int key in data.Keys)
-                    {
-                        BeginInvoke((MethodInvoker)(() => { GetNearGrid.ClearSelection(); }));
-                        if (key == (int)TargetSignID.Value) continue;
-                        if (MirrorBox.Checked && MirrorBox.Enabled)
-                        {
-                            Dictionary<int, int> mirror = null;
-                            try { mirror = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes()); }
-                            catch
-                            {
-                                BeginInvoke((MethodInvoker)(() => { GetNearGrid.Rows.Add($"{key}", (DevType)data[key]); }));
-                                continue;
-                            }
-                            if (mirror != null && !exception.Contains(key))
-                            {
-                                if (mirror.ContainsKey((int)TargetSignID.Value))
-                                {
-                                    BeginInvoke((MethodInvoker)(() =>
-                                    {
-                                        int row = GetNearGrid.Rows.Add(key, (DevType)data[key]);
-                                        GetNearGrid.Rows[row].DefaultCellStyle.BackColor = mirClr;
-                                    }));
-                                    continue;
-                                }
-                            }
-                        }
-                        BeginInvoke((MethodInvoker)(() => { GetNearGrid.Rows.Add($"{key}", (DevType)data[key]); }));
-                    }
-                }
-                if (KnockBox.Checked && data != null && data.Count != 0 && AutoGetNear.Text == "Stop")
-                {
-                    NotifyMessage.BalloonTipTitle = "Тук-тук!";
-                    NotifyMessage.BalloonTipText = $"Ответ получен!";
-                    NotifyMessage.ShowBalloonTip(10);
-                    break;
-                }
-                await Task.Delay(AutoGetNear.Text == "Stop" ? GetNeartimeout.Value : 50);
-            }
-            while (AutoGetNear.Text == "Stop" && Options.mainIsAvailable);
-            BackToDefaults();
-        }
+        
 
         async private Task<Dictionary<int, int>> GetDeviceListInfo(Searching search, CmdOutput cmdOutput, byte[] rmSign)
         {

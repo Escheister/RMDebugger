@@ -40,7 +40,11 @@ namespace StaticSettings
         //GetNear
         public static bool autoGetNear { get; set; }
 
-        public static string typeOf { get; set; } = "<Any>";
+        public static int timeoutGetNear { get; set; }
+        public static bool MirrorSearch { get; set; }
+        public static bool ExtendedSearch { get; set; }
+        public static bool KnockKnock { get; set; }
+        public static string typeOfGetNear { get; set; } = "<Any>";
 
 
 
