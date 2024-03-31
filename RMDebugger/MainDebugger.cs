@@ -77,11 +77,7 @@ namespace RMDebugger
             ManualGetNear.Click += GetNearClick;
             AutoGetNear.Click += GetNearClick;
             TypeFilterBox.SelectedIndexChanged += (s, e) => Options.typeOfGetNear = TypeFilterBox.Text;
-/*            MirrorBox.CheckedChanged += (s, e) => Options.MirrorSearch = MirrorBox.Checked;
-            ExtendedBox.CheckedChanged += (s, e) => Options.ExtendedSearch = ExtendedBox.Checked;
-            KnockKnockBox.CheckedChanged += (s, e) => Options.KnockKnock = KnockKnockBox.Checked;*/
             Options.timeoutDistTof = DistToftimeout.Value;
-
         }
 
 
@@ -417,10 +413,7 @@ namespace RMDebugger
         //UDP config
         async private void PingButtonClick(object sender, EventArgs e)
         {
-            if (Options.pingOk)
-            {
-                PingSettings(!Options.pingOk);
-            }
+            if (Options.pingOk) PingSettings(!Options.pingOk);
             else await check_ip();
         }
         private void PingSettings(bool sw)
@@ -651,98 +644,6 @@ namespace RMDebugger
                 return await search.GetData(search.FormatCmdOut(device.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50) != null;
             }
             catch { return false; }
-        }
-        async private Task<Tuple<List<int>, Dictionary<int, int>>> GetMoreDevices(Searching search, Dictionary<int, int> data)
-        {
-            Dictionary<int, int> extData = new Dictionary<int, int>();
-            List<int> exception = new List<int>();
-            search.AddKeys(extData, data);
-            int devices = 0;
-            Tuple<byte[], ProtocolReply> replyes;
-            foreach (int key in data.Keys)
-            {
-                try
-                {
-                    replyes = await search.GetData(search.FormatCmdOut(key.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50);
-                    Dictionary<int, int> tempData = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes());
-                    search.AddKeys(extData, tempData);
-                    devices++;
-                }
-                catch { exception.Add(key); continue; }
-            }
-            data = extData.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
-            return new Tuple<List<int>, Dictionary<int, int>>(exception, data);
-        }
-        async private Task AsyncGetNear()
-        {
-            if (!Options.mainIsAvailable) return;
-            BeginInvoke((MethodInvoker)(() => {
-                SerUdpPages.Enabled = false;
-                ManualGetNear.Enabled = false;
-                if (AutoGetNear.Text == "Auto") AutoGetNear.Enabled = false;
-                if (windowUpdate != null) windowUpdate.Enabled = false;
-            }));
-            offTabsExcept(RMData, GetNearPage);
-
-            Searching search = new Searching(Options.mainInterface);
-
-            do
-            {
-                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
-                BeginInvoke((MethodInvoker)(() => { GetNearGrid.Rows.Clear(); }));
-                if (data != null)
-                {
-                    List<int> exception = new List<int>();
-
-                    if (ExtendedBox.Checked == true && ExtendedBox.Enabled)
-                    {
-                        Tuple<List<int>, Dictionary<int, int>> temp = await GetMoreDevices(search, data);
-                        exception = temp.Item1;
-                        data = temp.Item2;
-                    }
-
-                    /*data = RemoveOnType(data);*/
-
-                    foreach (int key in data.Keys)
-                    {
-                        BeginInvoke((MethodInvoker)(() => { GetNearGrid.ClearSelection(); }));
-                        if (key == (int)TargetSignID.Value) continue;
-                        if (MirrorBox.Checked && MirrorBox.Enabled)
-                        {
-                            Dictionary<int, int> mirror = null;
-                            try { mirror = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes()); }
-                            catch
-                            {
-                                BeginInvoke((MethodInvoker)(() => { GetNearGrid.Rows.Add($"{key}", (DevType)data[key]); }));
-                                continue;
-                            }
-                            if (mirror != null && !exception.Contains(key))
-                            {
-                                if (mirror.ContainsKey((int)TargetSignID.Value))
-                                {
-                                    BeginInvoke((MethodInvoker)(() =>
-                                    {
-                                        int row = GetNearGrid.Rows.Add(key, (DevType)data[key]);
-                                        GetNearGrid.Rows[row].DefaultCellStyle.BackColor = mirClr;
-                                    }));
-                                    continue;
-                                }
-                            }
-                        }
-                        BeginInvoke((MethodInvoker)(() => { GetNearGrid.Rows.Add($"{key}", (DevType)data[key]); }));
-                    }
-                }
-                if (KnockKnockBox.Checked && data != null && data.Count != 0 && AutoGetNear.Text == "Stop")
-                {
-                    NotifyMessage.BalloonTipTitle = "Тук-тук!";
-                    NotifyMessage.BalloonTipText = $"Ответ получен!";
-                    NotifyMessage.ShowBalloonTip(10);
-                    break;
-                }
-                await Task.Delay(AutoGetNear.Text == "Stop" ? GetNeartimeout.Value : 50);
-            }
-            while (AutoGetNear.Text == "Stop" && Options.mainIsAvailable);
-            BackToDefaults();
         }
 
 
