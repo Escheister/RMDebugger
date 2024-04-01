@@ -498,7 +498,7 @@ namespace RMDebugger
         //DistTof
         async private void DistTofClick(object sender, EventArgs e)
         {
-            Button btn = (Button) sender;
+            Button btn = (Button)sender;
             bool auto = btn == AutoDistTof;
             if (auto)
             {
@@ -518,12 +518,12 @@ namespace RMDebugger
         private void AfterDistTofEvent(bool sw)
         {
             AfterAnyAutoEvent(sw);
+            ManualDistTof.Enabled = !sw;
             AutoDistTof.Text = sw ? "Stop" : "Auto";
             AutoDistTof.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
             if (windowUpdate != null) windowUpdate.Enabled = !sw;
             if (!AutoDistTof.Enabled) AutoDistTof.Enabled = true;
         }
-
         async private Task DistTofAsync(bool auto)
         {
             Searching search = new Searching(Options.mainInterface);
@@ -573,6 +573,7 @@ namespace RMDebugger
         private void AfterGetNearEvent(bool sw)
         {
             AfterAnyAutoEvent(sw);
+            ManualGetNear.Enabled = !sw;
             AutoGetNear.Text = sw ? "Stop" : "Auto";
             AutoGetNear.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
             if (windowUpdate != null) windowUpdate.Enabled = !sw;
@@ -602,7 +603,8 @@ namespace RMDebugger
                         foreach (int key in inOneBus)
                         {
                             Dictionary<int, int> tempData = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes());
-                            if (MirrorBox.Checked && tempData.ContainsKey((int)TargetSignID.Value)) mirrorList.Add(key);
+                            if (tempData != null)
+                                if (MirrorBox.Checked && tempData.ContainsKey((int)TargetSignID.Value)) mirrorList.Add(key);
                             search.AddKeys(data, tempData);
                         }
                         data = data.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
@@ -631,14 +633,13 @@ namespace RMDebugger
                     NotifyMessage.BalloonTipTitle = "Тук-тук!";
                     NotifyMessage.BalloonTipText = $"Ответ получен!";
                     NotifyMessage.ShowBalloonTip(10);
-                    break;
+                    Options.autoGetNear = false;
                 }
 
                 await Task.Delay(auto ? Options.timeoutGetNear : 50);
             }
             while (Options.autoGetNear);
         }
-
         async private Task<bool> ThisDeviceInOneBus(Searching search, int device) {
             try {
                 return await search.GetData(search.FormatCmdOut(device.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50) != null;
@@ -646,20 +647,19 @@ namespace RMDebugger
             catch { return false; }
         }
 
-
-
-
-
+        //Get near and Dist Tof events
         private void AfterAnyAutoEvent(bool sw)
         {
             SerUdpPages.Enabled =
-                ManualDistTof.Enabled =
                 ExtraButtonsGroup.Enabled = 
                 BaudRate.Enabled = 
                 dataBits.Enabled = 
                 Parity.Enabled = 
                 stopBits.Enabled = !sw;
         }
+        /////////////////////////////////////
+
+
 
 
 
