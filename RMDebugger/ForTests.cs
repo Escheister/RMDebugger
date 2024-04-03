@@ -17,7 +17,7 @@ namespace RMDebugger
         async private Task<Tuple<byte[], ProtocolReply>> GetDataTest(byte[] cmdOut, int size, int ms = 250)
         {
             if (!Options.mainIsAvailable) throw new Exception("No interface");
-            await sendData(cmdOut);
+            sendData(cmdOut);
             Tuple<CmdInput, byte[], CmdInput?, byte[]> insideCmd = ParseCmdSign(cmdOut);
             byte[] cmdIn = receiveData(size, ms);
             ProtocolReply reply = Methods.GetReply(cmdIn, insideCmd.Item2, insideCmd.Item1, true);

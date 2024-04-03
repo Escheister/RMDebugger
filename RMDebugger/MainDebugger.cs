@@ -78,6 +78,7 @@ namespace RMDebugger
             AutoGetNear.Click += GetNearClick;
             TypeFilterBox.SelectedIndexChanged += (s, e) => Options.typeOfGetNear = TypeFilterBox.Text;
             Options.timeoutDistTof = DistToftimeout.Value;
+            HexUploadButton.Click += HexUploadButtonClick;
         }
 
 
@@ -108,9 +109,10 @@ namespace RMDebugger
                 : 38400;
             Settings.Default.Save();
         }
-        private void ToInfoStatus(string msg) => BeginInvoke((MethodInvoker)(() => InfoStatus.Text = msg ));
-        
-        
+        private void ToMessageStatus(string msg) => BeginInvoke((MethodInvoker)(() => MessageStatus.Text = msg ));
+        private void ToReplyStatus(string msg) => BeginInvoke((MethodInvoker)(() => ReplyStatus.Text = msg));
+
+
         //Update
         async private void CheckUpdates()
         {
@@ -395,7 +397,7 @@ namespace RMDebugger
             if (OpenCom.Text == "Open")
             {
                 try { mainPort.Open(); }
-                catch (Exception ex) { ToInfoStatus(ex.Message); }
+                catch (Exception ex) { ToMessageStatus(ex.Message); }
             }
             else mainPort.Close();
             OpenCom.Text = mainPort.IsOpen ? "Close" : "Open";
@@ -441,7 +443,7 @@ namespace RMDebugger
                     await Task.Delay(timeout);
                 }
             }
-            catch (Exception ex) { ToInfoStatus(ex.Message.ToString()); }
+            catch (Exception ex) { ToMessageStatus(ex.Message.ToString()); }
             finally {
                 if (udpGate.Connected) ConnectClick(null, null);
                 PingSettings(udpGate.Connected);
@@ -531,7 +533,7 @@ namespace RMDebugger
             {
                 if (!Options.mainIsAvailable) break;
                 List<DataGridViewRow> rows = new List<DataGridViewRow>();
-                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes());
+                Dictionary<int, int> data = GetDeviceListInfo(search, CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes());
                 if (data != null)
                     foreach (int key in data.Keys)
                     {
@@ -586,38 +588,34 @@ namespace RMDebugger
             {
                 if (!Options.mainIsAvailable) break;
                 List<DataGridViewRow> rows = new List<DataGridViewRow>();
-                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
-                if (data != null)
+                Dictionary<int, int> data = GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
+                List<int> inOneBus = new List<int>();
+                List<int> outOfBus = new List<int>();
+                List<int> mirrorList = new List<int>();
+
+                if ((ExtendedBox.Checked && ExtendedBox.Enabled)
+                    || (MirrorBox.Checked && MirrorBox.Enabled))
                 {
-
-                    List<int> inOneBus = new List<int>();
-                    List<int> outOfBus = new List<int>();
-                    List<int> mirrorList = new List<int>();
-
-                    if ((ExtendedBox.Checked && ExtendedBox.Enabled) 
-                        || (MirrorBox.Checked && MirrorBox.Enabled)) {
-                        foreach (int key in data.Keys)
-                            if (await ThisDeviceInOneBus(search, key)) inOneBus.Add(key); 
-                            else outOfBus.Add(key);
-
-                        foreach (int key in inOneBus)
-                        {
-                            Dictionary<int, int> tempData = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes());
-                            if (tempData != null)
-                                if (MirrorBox.Checked && tempData.ContainsKey((int)TargetSignID.Value)) mirrorList.Add(key);
-                            search.AddKeys(data, tempData);
-                        }
-                        data = data.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
-                    }
                     foreach (int key in data.Keys)
+                        if (ThisDeviceInOneBus(search, key)) inOneBus.Add(key);
+                        else outOfBus.Add(key);
+
+                    foreach (int key in inOneBus)
                     {
-                        if (Options.typeOfGetNear != "<Any>" 
-                            && ((DevType)data[key]).ToString() != Options.typeOfGetNear || key == TargetSignID.Value) continue;
-                        rows.Add(new DataGridViewRow());
-                        rows[rows.Count - 1].CreateCells(DistTofGrid, key, (DevType)data[key]);
-                        rows[rows.Count - 1].Height = 17;
-                        rows[rows.Count - 1].DefaultCellStyle.BackColor = mirrorList.Contains(key) ? mirClr : Color.White;
-                    } 
+                        Dictionary<int, int> tempData = GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes());
+                        if (MirrorBox.Checked && tempData.ContainsKey((int)TargetSignID.Value)) mirrorList.Add(key);
+                        if (ExtendedBox.Checked) search.AddKeys(data, tempData);
+                    }
+                    data = data.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+                }
+                foreach (int key in data.Keys)
+                {
+                    if (Options.typeOfGetNear != "<Any>"
+                        && ((DevType)data[key]).ToString() != Options.typeOfGetNear || key == TargetSignID.Value) continue;
+                    rows.Add(new DataGridViewRow());
+                    rows[rows.Count - 1].CreateCells(DistTofGrid, key, (DevType)data[key]);
+                    rows[rows.Count - 1].Height = 17;
+                    rows[rows.Count - 1].DefaultCellStyle.BackColor = mirrorList.Contains(key) ? mirClr : Color.White;
                 }
                 Action action = () =>
                 {
@@ -627,22 +625,23 @@ namespace RMDebugger
                 if (InvokeRequired) Invoke(action);
                 else action();
 
-
                 if (auto && rows.Count > 0 && KnockKnockBox.Checked)
                 {
+                    Options.autoGetNear = false;
                     NotifyMessage.BalloonTipTitle = "Тук-тук!";
                     NotifyMessage.BalloonTipText = $"Ответ получен!";
                     NotifyMessage.ShowBalloonTip(10);
-                    Options.autoGetNear = false;
                 }
 
                 await Task.Delay(auto ? Options.timeoutGetNear : 50);
             }
             while (Options.autoGetNear);
         }
-        async private Task<bool> ThisDeviceInOneBus(Searching search, int device) {
+        private bool ThisDeviceInOneBus(Searching search, int device) {
             try {
-                return await search.GetData(search.FormatCmdOut(device.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50) != null;
+                return 
+                    search.GetData(
+                        search.FormatCmdOut(device.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50) != null;
             }
             catch { return false; }
         }
@@ -658,6 +657,175 @@ namespace RMDebugger
                 stopBits.Enabled = !sw;
         }
         /////////////////////////////////////
+
+        //Hex uploader
+        async private void HexUploadButtonClick(object sender, EventArgs e)
+        {
+            Options.HexUploadStarted = !Options.HexUploadStarted;
+            if (Options.HexUploadStarted)
+            {
+                AfterHexUploadEvent(true);
+                offTabsExcept(RMData, HexUpdatePage);
+                await Task.Run(() => HexUploadAsync());
+                Options.HexUploadStarted = false;
+                AfterHexUploadEvent(false);
+                onTabPages(RMData);
+            }
+            else return;
+        }
+        private void AfterHexUploadEvent(bool sw)
+        {
+            AfterAnyAutoEvent(sw);
+            HexPathBox.Enabled = 
+                HexPageSize.Enabled = 
+                HexPathButton.Enabled =
+                HexUpdateInAWindow.Enabled = 
+                SignaturePanel.Enabled = !sw;
+            HexUploadButton.Text = sw ? "Stop" : "Upload";
+            HexUploadButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
+            UpdateBar.Value = 0; 
+            BytesStart.Text = "0";
+            if (windowUpdate != null) windowUpdate.Enabled = !sw;
+            if (!HexUploadButton.Enabled) HexUploadButton.Enabled = true;
+
+
+            Invoke((MethodInvoker)(() =>
+            {
+                HexPathBox.Enabled = false;
+                HexPageSize.Enabled = false;
+                HexPathButton.Enabled = false;
+                SignaturePanel.Enabled = false;
+            }));
+
+        }
+        async private Task HexUploadAsync()
+        {
+            Bootloader boot = NeedThrough.Checked 
+                ? new Bootloader(Options.mainInterface, ThroughSignID.GetBytes()) 
+                : new Bootloader(Options.mainInterface);
+
+            byte[] cmdBootStart = boot.FormatCmdOut(TargetSignID.GetBytes(), CmdOutput.START_BOOTLOADER, 0xff);
+            byte[] cmdBootStop = boot.FormatCmdOut(TargetSignID.GetBytes(), CmdOutput.STOP_BOOTLOADER, 0xff);
+            byte[] cmdConfirmData = boot.FormatCmdOut(TargetSignID.GetBytes(), CmdOutput.UPDATE_DATA_PAGE, 0xff);
+
+            byte[][] hex;
+            try { hex = boot.GetByteDataFromFile(HexPathBox.Text); }
+            catch (Exception ex) { ToMessageStatus(ex.Message); return; }
+
+
+
+
+
+            /*byte[][] hex;
+            try { hex = boot.GetByteDataFromFile(HexPathBox.Text); }
+            catch (Exception ex) { ToMessageStatus(ex.Message); return; }
+            byte[] rmSign = TargetSignID.GetBytes();
+            byte[] rmThrough = NeedThrough.Checked ? ThroughSignID.GetBytes() : null;
+            byte[] rmThrough = ThroughSignID.GetBytes();
+
+            byte[] cmdBootStart = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.START_BOOTLOADER);
+            if (!await GetRequestUpload(boot, cmdBootStart, uploadData: false, aWait: 50, delay: true, delayMs: 25)) return;
+            ToMessageStatus("Bootloader OK");
+            byte[] cmdUpdateData = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.UPDATE_DATA_PAGE);
+            byte[] cmdBootStop = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.STOP_BOOTLOADER);
+
+            DateTime t0 = DateTime.Now;
+            TimeSpan tstop;
+            Tuple<byte[], int> tuple;
+            for (int i = 0; i <= hex.Length - 1 && Options.HexUploadStarted;)
+            {
+                tuple = boot.GetDataForUpload(hex, (int)HexPageSize.Value, i);
+                i = tuple.Item2;
+                if (tuple.Item1 is null) continue;
+                else
+                {
+                    byte[] cmdLoadData = GetCmdThroughOrNot(boot, rmSign, rmThrough, tuple.Item1);
+                    if (!await GetRequestUpload(boot, cmdLoadData, uploadData: true, aWait: 200)) return;
+                    if (!await GetRequestUpload(boot, cmdUpdateData, delay: true, delayMs: 50)) return;
+                    BeginInvoke((MethodInvoker)(() => { UpdateBar.Value = i; BytesStart.Text = i.ToString(); }));
+                }
+            }
+            if (!await GetRequestUpload(boot, cmdBootStop, delay: true, delayMs: 50)) return;
+            tstop = DateTime.Now - t0;
+            BeginInvoke((MethodInvoker)(() =>
+            {
+                MessageStatus.Text = $"Firmware OK | Uploaded for {tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
+                NotifyMessage.BalloonTipTitle = "Прошивка устройства";
+                NotifyMessage.BalloonTipText = $"Файл {Path.GetFileName(HexPathBox.Text)} успешно загружен на устройство за " +
+                $"{tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
+                NotifyMessage.ShowBalloonTip(10);
+            }));*/
+        }
+        async private Task UploadDevice(Bootloader boot)
+        {
+            byte[][] hex;
+            try { hex = boot.GetByteDataFromFile(HexPathBox.Text); }
+            catch (Exception ex)
+            {
+                ToMessageStatus(ex.Message);
+                BackToDefaults();
+                return;
+            }
+            byte[] rmSign = TargetSignID.GetBytes();
+            byte[] rmThrough = ThroughSignID.GetBytes();
+
+            byte[] cmdBootStart = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.START_BOOTLOADER);
+            if (!await GetRequestUpload(boot, cmdBootStart, uploadData: false, aWait: 50, delay: true, delayMs: 25)) return;
+            ToMessageStatus("Bootloader OK");
+            byte[] cmdUpdateData = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.UPDATE_DATA_PAGE);
+            byte[] cmdBootStop = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.STOP_BOOTLOADER);
+
+            DateTime t0 = DateTime.Now;
+            TimeSpan tstop;
+            Tuple<byte[], int> tuple;
+            for (int i = 0; i <= hex.Length - 1 && Options.HexUploadStarted;)
+            {
+                tuple = boot.GetDataForUpload(hex, (int)HexPageSize.Value, i);
+                i = tuple.Item2;
+                if (tuple.Item1 is null) continue;
+                else
+                {
+                    byte[] cmdLoadData = GetCmdThroughOrNot(boot, rmSign, rmThrough, tuple.Item1);
+                    if (!await GetRequestUpload(boot, cmdLoadData, uploadData: true, aWait: 200)) return;
+                    if (!await GetRequestUpload(boot, cmdUpdateData, delay: true, delayMs: 50)) return;
+                    BeginInvoke((MethodInvoker)(() => { UpdateBar.Value = i; BytesStart.Text = i.ToString(); }));
+                }
+            }
+            if (!await GetRequestUpload(boot, cmdBootStop, delay: true, delayMs: 50)) return;
+            tstop = DateTime.Now - t0;
+            BeginInvoke((MethodInvoker)(() => {
+                MessageStatus.Text = $"Uploaded for {tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
+                NotifyMessage.BalloonTipTitle = "Прошивка устройства";
+                NotifyMessage.BalloonTipText = $"Файл {Path.GetFileName(HexPathBox.Text)} успешно загружен на устройство за " +
+                $"{tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
+                NotifyMessage.ShowBalloonTip(10);
+            }));
+
+            BackToDefaults();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -679,7 +847,7 @@ namespace RMDebugger
             StartTestRMButton.Enabled =
                 SaveLogTestRS485.Enabled =
                 StatusRM485GridView.Rows.Count > 0;
-            ToInfoStatus($"{StatusRM485GridView.Rows.Count} devices on RM Test.");
+            ToMessageStatus($"{StatusRM485GridView.Rows.Count} devices on RM Test.");
         }
         private void offTabsExcept(TabControl tab, TabPage exc)
         {
@@ -918,19 +1086,7 @@ namespace RMDebugger
             }));
         }
         private void TargetSignID_ValueChanged(object sender, EventArgs e) => NeedThrough.Enabled = TargetSignID.Value == 0 ? false : true;
-        async private void Upload_button_Click(object sender, EventArgs e)
-        {
-            if (HexUploadButton.Text == "Stop")
-                HexUploadButton.Text = "Upload";
-            else
-            {
-                offTabsExcept(RMData, HexUpdatePage);
-                HexUploadButton.Text = "Stop";
-                HexUploadButton.Image = Resources.StatusStopped;
-                if (windowUpdate == null) HexUpdateInAWindow.Enabled = false;
-                await Task.Run(() => UploadDevice(new Bootloader(Options.mainInterface)));
-            }
-        }
+
         async private void RefreshRMButton_Click(object sender, EventArgs e)
         {
             if (windowUpdate != null) windowUpdate.Enabled = false;
@@ -940,10 +1096,10 @@ namespace RMDebugger
         private void StatusGridView_DoubleClick(object sender, EventArgs e) => StatusRM485GridView.ClearSelection();
         private void StatusGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e) => TaskForChangedRows();
         private void StatusGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e) => TaskForChangedRows();
-        private void GetNearGrid_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e) => ToInfoStatus($"{GetNearGrid.Rows.Count} devices on Get Near.");
-        private void GetNearGrid_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e) => ToInfoStatus($"{GetNearGrid.Rows.Count} devices on Get Near.");
-        private void DistTofGrid_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e) => ToInfoStatus($"{DistTofGrid.Rows.Count} devices on Dist tof.");
-        private void DistTofGrid_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e) => ToInfoStatus($"{DistTofGrid.Rows.Count} devices on Dist tof.");
+        private void GetNearGrid_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e) => ToMessageStatus($"{GetNearGrid.Rows.Count} devices on Get Near.");
+        private void GetNearGrid_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e) => ToMessageStatus($"{GetNearGrid.Rows.Count} devices on Get Near.");
+        private void DistTofGrid_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e) => ToMessageStatus($"{DistTofGrid.Rows.Count} devices on Dist tof.");
+        private void DistTofGrid_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e) => ToMessageStatus($"{DistTofGrid.Rows.Count} devices on Dist tof.");
         private void ClearDataStatusRM_Click(object sender, EventArgs e)
         {
             StatusRM485GridView.Rows.Clear();
@@ -956,7 +1112,7 @@ namespace RMDebugger
 
         
 
-        async private Task<Dictionary<int, int>> GetDeviceListInfo(Searching search, CmdOutput cmdOutput, byte[] rmSign)
+        private Dictionary<int, int> GetDeviceListInfo(Searching search, CmdOutput cmdOutput, byte[] rmSign)
         {
             byte ix = 0x00;
             int iteration = 1;
@@ -967,18 +1123,16 @@ namespace RMDebugger
             {
                 do
                 {
-                    Tuple<byte, Dictionary<int, int>> data = await search.RequestAndParseNew(cmdOutput, ix, rmSign, rmThrough, through) 
-                        ?? throw new Exception(ProtocolReply.Null.ToString());
+                    Tuple<byte, Dictionary<int, int>> data = search.RequestAndParseNew(cmdOutput, ix, rmSign, rmThrough, through);
+                    ToReplyStatus("Ok");
                     ix = data.Item1;
                     iteration++;
                     search.AddKeys(dataReturn, data.Item2);
                 }
                 while (ix != 0x00 && iteration <= 5);
             }
-            catch (Exception ex) { ToInfoStatus(ex.Message); }
-            return dataReturn.Count == 0
-                ? null
-                : dataReturn.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+            catch (Exception ex)  { ToReplyStatus(ex.Message); }
+            return dataReturn.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
         }
         private byte[] GetCmdThroughOrNot(Bootloader boot, byte[] rmSign, byte[] rmThrough, CmdOutput cmdOutput)
             => !NeedThrough.Checked ? boot.SendCommand(rmSign, cmdOutput) : boot.SendCommand(rmSign, rmThrough, cmdOutput);
@@ -986,43 +1140,34 @@ namespace RMDebugger
             => !NeedThrough.Checked ? boot.SendCommand(rmSign, data) : boot.SendCommand(rmSign, rmThrough, data);
         async private Task<bool> GetRequestUpload(Bootloader boot, byte[] cmdOut, bool uploadData = false, int aWait = 100, bool delay = false, int delayMs = 25)
         {
-            Tuple<byte[], ProtocolReply> replyes = null;
             DateTime t0 = DateTime.Now;
             TimeSpan tstop = DateTime.Now - t0;
             do
             {
-                if (HexUploadButton.Text == "Upload")
-                {
-                    BackToDefaults();
-                    return false;
-                }
+                if (!Options.HexUploadStarted) return false;
                 try
                 {
-                    replyes = await boot.GetData(cmdOut, cmdOut.Length, aWait);
+                    Tuple<byte[], ProtocolReply> replyes = boot.GetData(cmdOut, cmdOut.Length, aWait);
                     if (uploadData)
                     {
                         ProtocolReply reply = Methods.GetDataReply(cmdOut, replyes.Item1, NeedThrough.Checked);
-                        ToInfoStatus(reply.ToString());
+                        ToReplyStatus(reply.ToString());
                         if (reply == ProtocolReply.Ok) break;
                     }
                     else
                     {
-                        ToInfoStatus(replyes.Item2.ToString());
+                        ToReplyStatus(replyes.Item2.ToString());
                         if (replyes.Item2 == ProtocolReply.Ok) break;
                     }
                 }
                 catch (Exception ex)
                 {
-                    ToInfoStatus(ex.Message);
+                    ToReplyStatus(ex.Message);
                     tstop = DateTime.Now - t0;
                     if (tstop.Seconds >= 20)
                     {
                         DialogResult message = MessageBox.Show(this, "Timeout", "Something wrong...", MessageBoxButtons.RetryCancel);
-                        if (message == DialogResult.Cancel)
-                        {
-                            BackToDefaults();
-                            return false;
-                        }
+                        if (message == DialogResult.Cancel) return false;
                         else
                         {
                             t0 = DateTime.Now;
@@ -1035,60 +1180,7 @@ namespace RMDebugger
             while (tstop.Seconds < 20);
             return true;
         }
-        async private Task UploadDevice(Bootloader boot)
-        {
-            byte[][] hex;
-            try { hex = boot.GetByteDataFromFile(HexPathBox.Text); }
-            catch (Exception ex)
-            {
-                ToInfoStatus(ex.Message);
-                BackToDefaults();
-                return;
-            }
-            Invoke((MethodInvoker)(() =>
-            {
-                HexPathBox.Enabled = false;
-                HexPageSize.Enabled = false;
-                HexPathButton.Enabled = false;
-                SignaturePanel.Enabled = false;
-            }));
-            byte[] rmSign = TargetSignID.GetBytes();
-            byte[] rmThrough = ThroughSignID.GetBytes();
-
-            byte[] cmdBootStart = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.START_BOOTLOADER);
-            if (!await GetRequestUpload(boot, cmdBootStart, uploadData: false, aWait: 50, delay: true, delayMs: 25)) return;
-            BeginInvoke((MethodInvoker)(() => { SerUdpPages.Enabled = false; }));
-            byte[] cmdUpdateData = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.UPDATE_DATA_PAGE);
-            byte[] cmdBootStop = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.STOP_BOOTLOADER);
-
-            DateTime t0 = DateTime.Now;
-            TimeSpan tstop;
-            Tuple<byte[], int> tuple;
-            for (int i = 0; i <= hex.Length - 1;)
-            {
-                tuple = boot.GetDataForUpload(hex, (int)HexPageSize.Value, i);
-                i = tuple.Item2;
-                if (tuple.Item1 is null) continue;
-                else
-                {
-                    byte[] cmdLoadData = GetCmdThroughOrNot(boot, rmSign, rmThrough, tuple.Item1);
-                    if (!await GetRequestUpload(boot, cmdLoadData, uploadData: true, aWait: 200)) return;
-                    if (!await GetRequestUpload(boot, cmdUpdateData, delay: true, delayMs: 50)) return;
-                    BeginInvoke((MethodInvoker)(() => { UpdateBar.Value = i; BytesStart.Text = i.ToString(); }));
-                }
-            }
-            if (!await GetRequestUpload(boot, cmdBootStop, delay: true, delayMs: 25)) return;
-            tstop = DateTime.Now - t0;
-            BeginInvoke((MethodInvoker)(() => {
-                InfoStatus.Text = $"Uploaded for {tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
-                NotifyMessage.BalloonTipTitle = "Прошивка устройства";
-                NotifyMessage.BalloonTipText = $"Файл {Path.GetFileName(HexPathBox.Text)} успешно загружен на устройство за " +
-                $"{tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
-                NotifyMessage.ShowBalloonTip(10);
-            }));
-
-            BackToDefaults();
-        }
+ 
         private void ClearStatusStatusRM_Click(object sender, EventArgs e)
             => BeginInvoke((MethodInvoker)(() =>
             {
@@ -1247,7 +1339,7 @@ namespace RMDebugger
                 task = Task.Run(() => RMStatusTestTask(new ForTests(Options.mainInterface), dataFromGrid[devInterface]));
                 tasks.Add(task);
             }
-            ToInfoStatus($"Devices on test: {StatusRM485GridView.Rows.Count}");
+            ToMessageStatus($"Devices on test: {StatusRM485GridView.Rows.Count}");
             await Task.WhenAll(tasks);
             StartTestRMButton.Text = "&Start Test";
             StartTestRMButton.Image = Resources.StatusRunning;
@@ -1399,7 +1491,7 @@ namespace RMDebugger
                 byte[] cmdOut = search.FormatCmdOut(key.GetBytes(), CmdOutput.STATUS, 0xff);
                 try
                 {
-                    replyes = await search.GetData(cmdOut, (int)CmdMaxSize.STATUS);
+                    replyes = search.GetData(cmdOut, (int)CmdMaxSize.STATUS);
                     extData.Add(
                         key,
                         new Tuple<int, DevType>(
@@ -1426,7 +1518,7 @@ namespace RMDebugger
             offTabsExcept(RMData, TestPage);
             offTabsExcept(TestPages, RS485Page);
 
-            Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
+            Dictionary<int, int> data = GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
             if (data is null)
             {
                 BackToDefaults();
@@ -1451,7 +1543,7 @@ namespace RMDebugger
                 else AddToGridTest(devInterface, key, dataPassed[devInterface][key].Item2, dataPassed[devInterface][key].Item1);
                 devicesAdded++;
             }
-            ToInfoStatus($"Added:{devicesAdded}");
+            ToMessageStatus($"Added:{devicesAdded}");
             BackToDefaults();
         }
         async private Task AddRangeToStatusGrid(Searching search)
@@ -1484,8 +1576,8 @@ namespace RMDebugger
                 Tuple<byte[], ProtocolReply> replyes = null;
                 try
                 {
-                    ToInfoStatus($"Signature: {i}");
-                    replyes = await search.GetData(
+                    ToMessageStatus($"Signature: {i}");
+                    replyes = search.GetData(
                         search.FormatCmdOut(i.GetBytes(),
                         CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 25);
                     if (dataFromGrid is null || !dataFromGrid.ContainsKey(devInterface) || !dataFromGrid[devInterface].ContainsKey(i))
@@ -1512,12 +1604,12 @@ namespace RMDebugger
                 Tuple<byte[], ProtocolReply> replyes = null;
                 try
                 {
-                    replyes = await search.GetData(cmdOut, (int)CmdMaxSize.STATUS, 50);
+                    replyes = search.GetData(cmdOut, (int)CmdMaxSize.STATUS, 50);
                     AddToGridTest(devInterface, (int)TargetSignID.Value,
                         search.GetType(replyes.Item1),
                         search.GetVersion(replyes.Item1));
                 }
-                catch (Exception ex) { ToInfoStatus(ex.Message); }
+                catch (Exception ex) { ToMessageStatus(ex.Message); }
             }
         }
 
@@ -1588,7 +1680,7 @@ namespace RMDebugger
             {
                 if (dict[e.Node.Name] == CmdOutput.GRAPH_GET_NEAR)
                 {
-                    Dictionary<int, int> data = await GetDeviceListInfo(info, dict[e.Node.Name], TargetSignID.GetBytes());
+                    Dictionary<int, int> data = GetDeviceListInfo(info, dict[e.Node.Name], TargetSignID.GetBytes());
                     BeginInvoke((MethodInvoker)(() => {
                         string radio = data is null || data.Count == 0 ? "Error" : "Ok";
                         TreeNode getnear = new TreeNode($"Radio: {radio}");
@@ -1619,10 +1711,10 @@ namespace RMDebugger
                 {
                     byte[] cmdOut = !NeedThrough.Checked ? info.GetInfo(TargetSignID.GetBytes(), dict[e.Node.Name]) :
                     info.GetInfo(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), dict[e.Node.Name]);
-                    reply = await info.GetData(cmdOut, size, 100);
+                    reply = info.GetData(cmdOut, size, 100);
                     byte[] cmdIn = !NeedThrough.Checked ? reply.Item1 : info.ReturnWithoutThrough(reply.Item1);
                     Dictionary<string, string> data = info.CmdInParse(cmdIn);
-                    ToInfoStatus(reply.Item2.ToString());
+                    ToMessageStatus(reply.Item2.ToString());
                     BeginInvoke((MethodInvoker)(() => {
                         data.Add("Date", DateTime.Now.ToString("dd-MM-yy HH:mm"));
                         foreach (string str in data.Keys)
@@ -1635,7 +1727,7 @@ namespace RMDebugger
                     }));
                 }
             }
-            catch (Exception ex) { ToInfoStatus(ex.Message); }
+            catch (Exception ex) { ToMessageStatus(ex.Message); }
             finally { BackToDefaults(); }
         }
         private void OpenCloseMenuInfoTree_Click(object sender, EventArgs e)
@@ -1716,12 +1808,12 @@ namespace RMDebugger
             {
                 try
                 {
-                    reply = await CO.GetData(cmdOut, size, 50);
-                    ToInfoStatus($"{reply.Item2}");
+                    reply = CO.GetData(cmdOut, size, 50);
+                    ToMessageStatus($"{reply.Item2}");
                     if (cmdOutput == CmdOutput.ONLINE
                         && Methods.CheckResult(reply.Item1) != RmResult.Ok)
                     {
-                        ToInfoStatus($"{Methods.CheckResult(reply.Item1)}");
+                        ToMessageStatus($"{Methods.CheckResult(reply.Item1)}");
                         continue;
                     }
 
@@ -1731,7 +1823,7 @@ namespace RMDebugger
 
                     break;
                 }
-                catch (Exception ex) { ToInfoStatus(ex.Message); }
+                catch (Exception ex) { ToMessageStatus(ex.Message); }
                 finally { await Task.Delay((int)AutoExtraButtonsTimeout.Value); }
             }
             while (AutoExtraButtons.Checked);
@@ -1883,14 +1975,14 @@ namespace RMDebugger
                     tstop = DateTime.Now - t0;
                     try
                     {
-                        replyes = await config.GetData(cmdOut, dataCount);
+                        replyes = config.GetData(cmdOut, dataCount);
                         cmdIn = replyes.Item1;
-                        ToInfoStatus($"{key} : {replyes.Item2}");
+                        ToMessageStatus($"{key} : {replyes.Item2}");
                         break;
                     }
                     catch (Exception ex)
                     {
-                        ToInfoStatus(ex.Message);
+                        ToMessageStatus(ex.Message);
                         if (ex.Message == "No interface")
                         {
                             BackToDefaults();
@@ -1937,8 +2029,8 @@ namespace RMDebugger
                     tstop = DateTime.Now - t0;
                     try
                     {
-                        replyes = await config.GetResult(cmdOut, NeedThrough.Checked ? (int)CmdMaxSize.ONLINE + 4 : (int)CmdMaxSize.ONLINE);
-                        ToInfoStatus($"{key} : {replyes.Item1}");
+                        replyes = config.GetResult(cmdOut, NeedThrough.Checked ? (int)CmdMaxSize.ONLINE + 4 : (int)CmdMaxSize.ONLINE);
+                        ToMessageStatus($"{key} : {replyes.Item1}");
                         if (replyes.Item1 == RmResult.Ok)
                         {
                             ColoredRow(fields[key], ConfigDataGrid, Color.GreenYellow);
@@ -1952,7 +2044,7 @@ namespace RMDebugger
                     }
                     catch (Exception ex)
                     {
-                        ToInfoStatus(ex.Message);
+                        ToMessageStatus(ex.Message);
                         if (ex.Message == "No interface")
                         {
                             BackToDefaults();

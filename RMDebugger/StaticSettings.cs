@@ -1,7 +1,4 @@
-﻿using System.IO.Ports;
-using System.Net;
-using System.Windows.Forms;
-using RMDebugger;
+﻿using RMDebugger;
 
 namespace StaticSettings
 {
@@ -45,6 +42,10 @@ namespace StaticSettings
         public static bool ExtendedSearch { get; set; }
         public static bool KnockKnock { get; set; }
         public static string typeOfGetNear { get; set; } = "<Any>";
+        //Hex uploader
+        public static bool HexUploadStarted { get; set; }
+        public static int timeoutHexUpload { get; set; } = 50;
+        public static int awaitCorrectHexUpload { get; set; } = 20;
 
 
 

@@ -1,32 +1,58 @@
 ﻿using System.Collections.Generic;
-using System.Net.Sockets;
-using System.IO.Ports;
+using System.Threading.Tasks;
 using ProtocolEnums;
 using System.Linq;
 using System.IO;
 using System;
 
 using StaticMethods;
-using CRC16;
 using RMDebugger;
+using CRC16;
 
 namespace BootloaderProtocol
 {
     internal class Bootloader : CommandsOutput
+        //Прописать делегаты для отправки через RM485 и до конечной сигнатуры
     {
+        public delegate bool UploadDataDelegate(byte[] cmdOut);
+        public delegate bool ChangeStageDelegate(byte[] cmdOut);
         public Bootloader(object sender) : base(sender)
         {
             addrHex = new byte[2];
             addrElar = new byte[2];
         }
+        public Bootloader(object sender, byte[] through) : base(sender)
+        {
+            addrHex = new byte[2];
+            addrElar = new byte[2];
+            throughRM = through;
+        }
         private byte[] addrHex;
         private byte[] addrElar;
+        private byte[] throughRM;
+
+        public UploadDataDelegate uploadDataDelegate;
+        public ChangeStageDelegate changeStageDelegate;
+
+        private bool SendCommandToDevice(byte[] cmdOut)
+        {
+
+        }
+        private bool SendCommandToDeviceThrough(byte[] cmdOut)
+        {
+
+        }
+
+
+
+
+
+
         private string[] GetStringsFromFile(string path)
         {
-            StreamReader file = new StreamReader(path);
-            string text = file.ReadToEnd();
-            file.Close();
-            return text.Trim().Split('\n');
+            using StreamReader file = new StreamReader(path);
+                Task<string> data = file.ReadToEndAsync();
+                return data.Result.Trim().Split('\n');
         }
         private byte[] GetBytesFromString(string line) => StringToByteArray(line.Replace(":", string.Empty).Replace("\r", string.Empty));
         private byte[] StringToByteArray(string hex) => Enumerable.Range(0, hex.Length)

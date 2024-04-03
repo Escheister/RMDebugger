@@ -1,8 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Windows.Forms;
 using BootloaderProtocol;
-using System.Net.Sockets;
-using System.IO.Ports;
 using ProtocolEnums;
 using StaticMethods;
 using System.IO;
@@ -160,7 +158,7 @@ namespace RMDebugger
                 }
                 try
                 {
-                    replyes = await boot.GetData(cmdOut, cmdOut.Length, 100);
+                    replyes = boot.GetData(cmdOut, cmdOut.Length, 100);
                     BeginInvoke((MethodInvoker)(() => { InfoStatus.Text = replyes.Item2.ToString(); }));
                     if (replyes.Item2 == ProtocolReply.Ok) break;
                 }
@@ -202,7 +200,7 @@ namespace RMDebugger
                 }
                 try
                 {
-                    replyes = await boot.GetData(cmdOut, cmdOut.Length, 150);
+                    replyes = boot.GetData(cmdOut, cmdOut.Length, 150);
                     ProtocolReply reply = Methods.GetDataReply(cmdOut, replyes.Item1, NeedThrough.Checked);
                     BeginInvoke((MethodInvoker)(() => { InfoStatus.Text = reply.ToString(); }));
                     if (reply == ProtocolReply.Ok) break;

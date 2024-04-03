@@ -53,10 +53,9 @@ namespace StaticMethods
         }
         public static ProtocolReply GetReply(byte[] bufferIn, byte[] rmSign, CmdInput cmdMain, bool crc=false)
         {
-            if (bufferIn is null) return ProtocolReply.Null;
-            /*if (crc) //Убрана временная проверка контрольной суммы
-                if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc; */
-            if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;
+            if (bufferIn.Length == 0) return ProtocolReply.Null;
+            if (crc) //Убрана временная проверка контрольной суммы
+                if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;
             if (!SignatureEqual(bufferIn, rmSign)) return ProtocolReply.WSign;
             if (!CmdInputEqual(bufferIn, cmdMain)) return ProtocolReply.WCmd;
             return ProtocolReply.Ok;
@@ -64,7 +63,7 @@ namespace StaticMethods
         public static ProtocolReply GetReply(byte[] bufferIn, byte[] rmThrough, CmdInput cmdThrough, byte[] rmSign, CmdInput cmdMain)
         {
             if (bufferIn is null) return ProtocolReply.Null;
-            if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc; //Убрана временная проверка контрольной суммы
+            /*if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;*/ //Убрана временная проверка контрольной суммы
             if (!SignatureEqual(bufferIn, rmThrough, rmSign)) return ProtocolReply.WSign;
             if (!CmdInputEqual(bufferIn, cmdThrough, cmdMain)) return ProtocolReply.WCmd;
             return ProtocolReply.Ok;

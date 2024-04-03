@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Net.Sockets;
 using System.IO.Ports;
 using System.Text;
@@ -16,7 +14,7 @@ namespace RMDebugger
 {
     internal class CommandsOutput
     {
-        protected delegate Task SendDataDelegate(byte[] cmdOut);
+        protected delegate void SendDataDelegate(byte[] cmdOut);
         protected delegate byte[] ReceiveDataDelegate(int length, int ms = 250);
         public CommandsOutput(object sender) { GetTypeDevice(sender); }
 
@@ -56,8 +54,8 @@ namespace RMDebugger
         public byte[] FormatCmdOut(byte[] rmSign, CmdOutput cmd, byte ix = 0x00, bool crc = true)
         {
             List<byte> data = new List<byte>();
-            foreach (byte b in rmSign) data.Add(b);
-            foreach (byte b in BitConverter.GetBytes((ushort)cmd).Reverse().ToArray()) data.Add(b);
+            data.AddRange(rmSign);
+            data.AddRange(BitConverter.GetBytes((ushort)cmd).Reverse());
             if (ix != 0xff) data.Add(ix);
             if (crc) return new CRC16_CCITT_FALSE().CRC_calc(data.ToArray());
             return data.ToArray();
@@ -70,10 +68,8 @@ namespace RMDebugger
             cmdIn.CopyTo(cmdOut, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(cmdOut);
         }
-        async private Task SendSerialData(byte[] data)
-             => await Task.Run(() => Port.Write(data, 0, data.Length));
-        async private Task SendSocketData(byte[] data)
-             => await Task.Run(() => Sock.Send(data));
+        private void SendSerialData(byte[] data) => Port.Write(data, 0, data.Length);
+        private void SendSocketData(byte[] data) => Sock.Send(data);
         private byte[] SocketReceiveData(int length, int ms = 250)
         {
             DateTime t0 = DateTime.Now;
@@ -85,13 +81,9 @@ namespace RMDebugger
                 tstop = DateTime.Now - t0;
             }
             while (bytes < length && tstop.Milliseconds <= ms);
-            if (bytes > 0)
-            {
-                byte[] buffer = new byte[bytes];
-                Sock.Receive(buffer);
-                return buffer;
-            }
-            return null;
+            byte[] buffer = new byte[bytes];
+            if (buffer.Length > 0) Sock.Receive(buffer);
+            return buffer;
         }
         private byte[] SerialReceiveData(int length, int ms = 250)
         {
@@ -104,13 +96,9 @@ namespace RMDebugger
                 tstop = DateTime.Now - t0;
             }
             while (bytes < length && tstop.Milliseconds <= ms);
-            if (bytes > 0)
-            {
-                byte[] buffer = new byte[bytes];
-                Port.Read(buffer, 0, bytes);
-                return buffer;
-            }
-            return null;
+            byte[] buffer = new byte[bytes];
+            if (buffer.Length > 0) Port.Read(buffer, 0, bytes); 
+            return buffer;
         }
 
         protected Tuple<CmdInput, byte[], CmdInput?, byte[]> ParseCmdSign(byte[] cmdOut)
@@ -133,10 +121,10 @@ namespace RMDebugger
                 return new Tuple<CmdInput, byte[], CmdInput?, byte[]>(cmdThrough, rmThrough, cmdMain, rmSign);
             }
         }
-        async public Task<Tuple<RmResult, ProtocolReply>> GetResult(byte[] cmdOut, int size, int ms = 50)
+        public Tuple<RmResult, ProtocolReply> GetResult(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("No interface");
-            await sendData(cmdOut);
+            sendData(cmdOut);
             Tuple<CmdInput, byte[], CmdInput?, byte[]> insideCmd = ParseCmdSign(cmdOut);
             if (insideCmd.Item3 != null && insideCmd.Item4 != null) ms *= 2;
             byte[] cmdIn = receiveData(size, ms);
@@ -149,10 +137,10 @@ namespace RMDebugger
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
             return new Tuple<RmResult, ProtocolReply>(Methods.CheckResult(cmdIn), reply);
         }
-        async public Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 50)
+        public Tuple<byte[], ProtocolReply> GetData(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("No interface");
-            await sendData(cmdOut);
+            sendData(cmdOut);
             Tuple<CmdInput, byte[], CmdInput?, byte[]> insideCmd = ParseCmdSign(cmdOut);
             if (insideCmd.Item3 != null && insideCmd.Item4 != null) ms *= 2;
             byte[] cmdIn = receiveData(size, ms);
