@@ -131,10 +131,10 @@ namespace RMDebugger
                 Options.debugger.SerUdpPages.Enabled = false;
                 HexUploadButton.Text = "Stop";
                 HexUploadButton.Image = Resources.StatusStopped;
-                await Task.Run(() => UploadDataToDevice(new Bootloader(Options.mainInterface)));
+                /*await Task.Run(() => UploadDataToDevice(new Bootloader(Options.mainInterface)));*/
             }
         }
-        private byte[] GetCmdThroughOrNot(Bootloader boot, byte[] rmSign, byte[] rmThrough, CmdOutput cmdOutput)
+/*        private byte[] GetCmdThroughOrNot(Bootloader boot, byte[] rmSign, byte[] rmThrough, CmdOutput cmdOutput)
         {
             if (!NeedThrough.Checked) return boot.SendCommand(rmSign, cmdOutput);
             else return boot.SendCommand(rmSign, rmThrough, cmdOutput);
@@ -143,7 +143,7 @@ namespace RMDebugger
         {
             if (!NeedThrough.Checked) return boot.SendCommand(rmSign, data);
             else return boot.SendCommand(rmSign, rmThrough, data);
-        }
+        }*/
         async private Task<bool> SendCommand(Bootloader boot, byte[] cmdOut, bool delay = false, int delayMs = 25)
         {
             Tuple<byte[], ProtocolReply> replyes = null;
@@ -228,7 +228,7 @@ namespace RMDebugger
             while (tstop.Seconds < 20);
             return true;
         }
-        async private Task UploadDataToDevice(Bootloader boot)
+        /*async private Task UploadDataToDevice(Bootloader boot)
         {
             byte[][] hex;
             try { hex = boot.GetByteDataFromFile(HexPathBox.Text); }
@@ -275,7 +275,7 @@ namespace RMDebugger
                 InfoStatus.Text = $"Uploaded for {tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
             }));
             After_Uploaded();
-        }
+        }*/
         private void HexUpdate_FormClosed(object sender, FormClosedEventArgs e)
         {
             Options.debugger.windowUpdate = null;

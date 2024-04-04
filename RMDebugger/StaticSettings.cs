@@ -44,7 +44,7 @@ namespace StaticSettings
         public static string typeOfGetNear { get; set; } = "<Any>";
         //Hex uploader
         public static bool HexUploadStarted { get; set; }
-        public static int timeoutHexUpload { get; set; } = 50;
+        public static int timeoutRequestAgain { get; set; } = 50;
         public static int awaitCorrectHexUpload { get; set; } = 20;
 
 

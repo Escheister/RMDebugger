@@ -62,6 +62,7 @@ namespace RMDebugger
             foreach (ToolStripDropDownItem item in stopBits.DropDownItems) item.Click += StopBitsForSerial;
             OpenCom.Click += OpenComClick;
             PingButton.Click += PingButtonClick;
+            numericPort.ValueChanged += (s, e) => { if (Options.pingOk) Options.pingOk = !Options.pingOk; };
             Connect.Click += ConnectClick;
             NeedThrough.CheckedChanged += NeedThroughCheckedChanged;
             DistToftimeout.Scroll += (s, e) => {
@@ -686,31 +687,84 @@ namespace RMDebugger
             UpdateBar.Value = 0; 
             BytesStart.Text = "0";
             if (windowUpdate != null) windowUpdate.Enabled = !sw;
-            if (!HexUploadButton.Enabled) HexUploadButton.Enabled = true;
-
-
-            Invoke((MethodInvoker)(() =>
-            {
-                HexPathBox.Enabled = false;
-                HexPageSize.Enabled = false;
-                HexPathButton.Enabled = false;
-                SignaturePanel.Enabled = false;
-            }));
 
         }
+        /*async private Task<bool> GetRequestUpload(Bootloader boot, byte[] cmdOut, bool uploadData = false, int aWait = 100, bool delay = false, int delayMs = 25)
+        {
+            do
+            {
+                if (!Options.HexUploadStarted) return false;
+                try
+                {
+                    Tuple<byte[], ProtocolReply> replyes = boot.GetData(cmdOut, cmdOut.Length, aWait);
+                    if (uploadData)
+                    {
+                        ProtocolReply reply = Methods.GetDataReply(cmdOut, replyes.Item1, NeedThrough.Checked);
+                        ToReplyStatus(reply.ToString());
+                        if (reply == ProtocolReply.Ok) break;
+                    }
+                    else
+                    {
+                        ToReplyStatus(replyes.Item2.ToString());
+                        if (replyes.Item2 == ProtocolReply.Ok) break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ToReplyStatus(ex.Message);
+                    tstop = DateTime.Now - t0;
+                    if (tstop.Seconds >= 20)
+                    {
+                        DialogResult message = MessageBox.Show(this, "Timeout", "Something wrong...", MessageBoxButtons.RetryCancel);
+                        if (message == DialogResult.Cancel) return false;
+                        else
+                        {
+                            t0 = DateTime.Now;
+                            tstop = DateTime.Now - t0;
+                        }
+                    }
+                    if (delay) await Task.Delay(delayMs);
+                }
+            }
+            while (tstop.Seconds < 20);
+            return true;
+        }*/
+
+        async private Task<bool> GetReplyFromDevice(byte[] cmdOut)
+        {
+            DateTime t0 = DateTime.Now;
+            TimeSpan tstop = DateTime.Now - t0;
+            do
+            {
+                try
+                {
+
+                }
+                catch (Exception ex)
+                {
+                    tstop = DateTime.Now - t0;
+                    ToReplyStatus(ex.Message);
+
+                }
+            }
+            while (tstop.Seconds < Options.awaitCorrectHexUpload);
+        }
+
         async private Task HexUploadAsync()
         {
             Bootloader boot = NeedThrough.Checked 
-                ? new Bootloader(Options.mainInterface, ThroughSignID.GetBytes()) 
-                : new Bootloader(Options.mainInterface);
+                ? new Bootloader(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes()) 
+                : new Bootloader(Options.mainInterface, TargetSignID.GetBytes());
 
-            byte[] cmdBootStart = boot.FormatCmdOut(TargetSignID.GetBytes(), CmdOutput.START_BOOTLOADER, 0xff);
-            byte[] cmdBootStop = boot.FormatCmdOut(TargetSignID.GetBytes(), CmdOutput.STOP_BOOTLOADER, 0xff);
-            byte[] cmdConfirmData = boot.FormatCmdOut(TargetSignID.GetBytes(), CmdOutput.UPDATE_DATA_PAGE, 0xff);
+            byte[] cmdBootStart = boot.buildCmdDelegate(CmdOutput.START_BOOTLOADER);
+            byte[] cmdBootStop = boot.buildCmdDelegate(CmdOutput.STOP_BOOTLOADER);
+            byte[] cmdConfirmData = boot.buildCmdDelegate(CmdOutput.UPDATE_DATA_PAGE);
 
             byte[][] hex;
             try { hex = boot.GetByteDataFromFile(HexPathBox.Text); }
             catch (Exception ex) { ToMessageStatus(ex.Message); return; }
+
+
 
 
 
@@ -756,7 +810,7 @@ namespace RMDebugger
                 NotifyMessage.ShowBalloonTip(10);
             }));*/
         }
-        async private Task UploadDevice(Bootloader boot)
+        /*async private Task UploadDevice(Bootloader boot)
         {
             byte[][] hex;
             try { hex = boot.GetByteDataFromFile(HexPathBox.Text); }
@@ -802,7 +856,7 @@ namespace RMDebugger
             }));
 
             BackToDefaults();
-        }
+        }*/
 
 
 
@@ -1029,11 +1083,6 @@ namespace RMDebugger
                 Connect.Enabled = false;
             }
         }
-        private void numericPort_ValueChanged(object sender, EventArgs e)
-        {
-            PingButton.BackColor = Color.Red;
-            Connect.Text = "Connect";
-        }
         private void HexPathButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog file = new OpenFileDialog
@@ -1134,52 +1183,11 @@ namespace RMDebugger
             catch (Exception ex)  { ToReplyStatus(ex.Message); }
             return dataReturn.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
         }
-        private byte[] GetCmdThroughOrNot(Bootloader boot, byte[] rmSign, byte[] rmThrough, CmdOutput cmdOutput)
+/*        private byte[] GetCmdThroughOrNot(Bootloader boot, byte[] rmSign, byte[] rmThrough, CmdOutput cmdOutput)
             => !NeedThrough.Checked ? boot.SendCommand(rmSign, cmdOutput) : boot.SendCommand(rmSign, rmThrough, cmdOutput);
         private byte[] GetCmdThroughOrNot(Bootloader boot, byte[] rmSign, byte[] rmThrough, byte[] data)
-            => !NeedThrough.Checked ? boot.SendCommand(rmSign, data) : boot.SendCommand(rmSign, rmThrough, data);
-        async private Task<bool> GetRequestUpload(Bootloader boot, byte[] cmdOut, bool uploadData = false, int aWait = 100, bool delay = false, int delayMs = 25)
-        {
-            DateTime t0 = DateTime.Now;
-            TimeSpan tstop = DateTime.Now - t0;
-            do
-            {
-                if (!Options.HexUploadStarted) return false;
-                try
-                {
-                    Tuple<byte[], ProtocolReply> replyes = boot.GetData(cmdOut, cmdOut.Length, aWait);
-                    if (uploadData)
-                    {
-                        ProtocolReply reply = Methods.GetDataReply(cmdOut, replyes.Item1, NeedThrough.Checked);
-                        ToReplyStatus(reply.ToString());
-                        if (reply == ProtocolReply.Ok) break;
-                    }
-                    else
-                    {
-                        ToReplyStatus(replyes.Item2.ToString());
-                        if (replyes.Item2 == ProtocolReply.Ok) break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ToReplyStatus(ex.Message);
-                    tstop = DateTime.Now - t0;
-                    if (tstop.Seconds >= 20)
-                    {
-                        DialogResult message = MessageBox.Show(this, "Timeout", "Something wrong...", MessageBoxButtons.RetryCancel);
-                        if (message == DialogResult.Cancel) return false;
-                        else
-                        {
-                            t0 = DateTime.Now;
-                            tstop = DateTime.Now - t0;
-                        }
-                    }
-                    if (delay) await Task.Delay(delayMs);
-                }
-            }
-            while (tstop.Seconds < 20);
-            return true;
-        }
+            => !NeedThrough.Checked ? boot.SendCommand(rmSign, data) : boot.SendCommand(rmSign, rmThrough, data);*/
+        
  
         private void ClearStatusStatusRM_Click(object sender, EventArgs e)
             => BeginInvoke((MethodInvoker)(() =>

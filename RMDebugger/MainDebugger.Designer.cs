@@ -2263,7 +2263,6 @@
             this.numericPort.Name = "numericPort";
             this.numericPort.Size = new System.Drawing.Size(51, 20);
             this.numericPort.TabIndex = 29;
-            this.numericPort.ValueChanged += new System.EventHandler(this.numericPort_ValueChanged);
             // 
             // Connect
             // 

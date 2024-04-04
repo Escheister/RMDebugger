@@ -12,42 +12,62 @@ using CRC16;
 namespace BootloaderProtocol
 {
     internal class Bootloader : CommandsOutput
-        //Прописать делегаты для отправки через RM485 и до конечной сигнатуры
     {
-        public delegate bool UploadDataDelegate(byte[] cmdOut);
-        public delegate bool ChangeStageDelegate(byte[] cmdOut);
-        public Bootloader(object sender) : base(sender)
+        public delegate byte[] BuildCmdDelegate(CmdOutput cmdOutput);
+        public delegate byte[] BuildDataCmdDelegate(byte[] data);
+
+
+        public Bootloader(object sender, byte[] targetSign) : base(sender)
         {
-            addrHex = new byte[2];
-            addrElar = new byte[2];
+            _addrHex = new byte[2];
+            _addrElar = new byte[2];
+            _targetSign = targetSign;
+            buildCmdDelegate += BuildCmd;
+            buildDataCmdDelegate += BuildDataCmd;
         }
-        public Bootloader(object sender, byte[] through) : base(sender)
+        public Bootloader(object sender, byte[] targetSign, byte[] throughSign) : base(sender)
         {
-            addrHex = new byte[2];
-            addrElar = new byte[2];
-            throughRM = through;
-        }
-        private byte[] addrHex;
-        private byte[] addrElar;
-        private byte[] throughRM;
-
-        public UploadDataDelegate uploadDataDelegate;
-        public ChangeStageDelegate changeStageDelegate;
-
-        private bool SendCommandToDevice(byte[] cmdOut)
-        {
-
-        }
-        private bool SendCommandToDeviceThrough(byte[] cmdOut)
-        {
-
+            _addrHex = new byte[2];
+            _addrElar = new byte[2];
+            _targetSign = targetSign;
+            _throughSign = throughSign;
+            buildCmdDelegate += BuildCmdThrough;
+            buildDataCmdDelegate += BuildDataCmdThrough;
         }
 
 
+        private byte[] _addrHex;
+        private byte[] _addrElar;
+        private byte[] _throughSign;
+        private byte[] _targetSign;
+
+
+        public BuildCmdDelegate buildCmdDelegate;
+        public BuildDataCmdDelegate buildDataCmdDelegate;
+
+
+        private byte[] BuildCmd(CmdOutput cmdOutput) => FormatCmdOut(_targetSign, cmdOutput, 0xff);
+        private byte[] BuildCmdThrough(CmdOutput cmdOutput) => CmdThroughRm(FormatCmdOut(_targetSign, cmdOutput, 0xff), _throughSign, CmdOutput.ROUTING_PROG);
+
+        private byte[] BuildDataCmd(byte[] data) => FormatUploadData(data);
+        private byte[] BuildDataCmdThrough(byte[] data) => CmdThroughRm(FormatUploadData(data), _throughSign, CmdOutput.ROUTING_PROG);
+
+        public bool GetReplyFromDevice(byte[] cmdOut, out ProtocolReply reply)
+        {
+            
+        }
 
 
 
 
+        private byte[] FormatUploadData(byte[] data)
+        {
+            byte[] loadField = new byte[4 + data.Length];
+            _targetSign.CopyTo(loadField, 0);
+            Methods.uShortToTwoBytes((ushort)CmdOutput.LOAD_DATA_PAGE).CopyTo(loadField, 2);
+            data.CopyTo(loadField, 4);
+            return new CRC16_CCITT_FALSE().CRC_calc(loadField);
+        }
         private string[] GetStringsFromFile(string path)
         {
             using StreamReader file = new StreamReader(path);
@@ -63,8 +83,7 @@ namespace BootloaderProtocol
         {
             byte hex = 0;
             for (int i = 0; i < array.Length; i++) hex += array[i];
-            if (hex == 0) return true;
-            return false;
+            return hex == 0;
         }
         public byte[][] GetByteDataFromFile(string filename)
         {
@@ -88,22 +107,6 @@ namespace BootloaderProtocol
             }
             return stringBytes.ToArray();
         }
-        public byte[] SendCommand(byte[] rmSign, CmdOutput cmdOutput)
-            => FormatCmdOut(rmSign, cmdOutput, 0xff);
-        public byte[] SendCommand(byte[] rmSign, byte[] rmThrough, CmdOutput cmdOutput)
-            => CmdThroughRm(FormatCmdOut(rmSign, cmdOutput, 0xff), rmThrough, CmdOutput.ROUTING_PROG);
-        private byte[] FormatUploadData(byte[] rmSign, byte[] data)
-        {
-            byte[] loadField = new byte[4 + data.Length];
-            rmSign.CopyTo(loadField, 0);
-            Methods.uShortToTwoBytes((ushort)CmdOutput.LOAD_DATA_PAGE).CopyTo(loadField, 2);
-            data.CopyTo(loadField, 4);
-            return new CRC16_CCITT_FALSE().CRC_calc(loadField);
-        }
-        public byte[] SendCommand(byte[] rmSign, byte[] data)
-            => FormatUploadData(rmSign, data);
-        public byte[] SendCommand(byte[] rmSign, byte[] rmThrough, byte[] data)
-            => CmdThroughRm(SendCommand(rmSign, data), rmThrough, CmdOutput.ROUTING_PROG);
         public Tuple<byte[], int> GetDataForUpload(byte[][] hexFile, int pageSize, int indexZero)
         {
             List<byte> data = new List<byte>();
@@ -111,14 +114,14 @@ namespace BootloaderProtocol
             RecordType type = (RecordType)hexFile[indexZero][3];
             if (type == RecordType.ELAR)
             {
-                addrElar = new byte[2] { hexFile[indexZero][5], hexFile[indexZero][4] };
+                _addrElar = new byte[2] { hexFile[indexZero][5], hexFile[indexZero][4] };
                 indexZero++;
                 return new Tuple<byte[], int>(null, indexZero);
             }
             else
             {
                 byte[] sizePack = new byte[2];
-                addrHex = new byte[2] { hexFile[indexZero][2], hexFile[indexZero][1] };
+                _addrHex = new byte[2] { hexFile[indexZero][2], hexFile[indexZero][1] };
                 int size = 0;
                 for (;size <= pageSize;)
                 {
@@ -147,8 +150,8 @@ namespace BootloaderProtocol
                 }
                 sizePack[0] = (byte)size;
                 cmd.AddRange(sizePack);
-                cmd.AddRange(addrHex);
-                cmd.AddRange(addrElar);
+                cmd.AddRange(_addrHex);
+                cmd.AddRange(_addrElar);
                 cmd.AddRange(data);
                 return new Tuple<byte[], int>(cmd.ToArray(), indexZero);
             }

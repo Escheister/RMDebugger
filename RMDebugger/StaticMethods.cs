@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System;
 
-using ProtocolEnums;
-using CRC16;
 using System.Windows.Forms;
 using StaticSettings;
+using ProtocolEnums;
+using CRC16;
 
 namespace StaticMethods
 {
@@ -44,10 +44,7 @@ namespace StaticMethods
         {
             string text = "";
             foreach (byte b in array)
-            {
-                if (b == 0xff) { text += string.Empty; continue; }
-                text += Encoding.GetEncoding("koi8r").GetString(new byte[] { b });
-            }
+                text += b == 0xff ? string.Empty : Encoding.GetEncoding("koi8r").GetString(new byte[] { b });
             if (text == string.Empty) return "Empty";
             return text;
         }

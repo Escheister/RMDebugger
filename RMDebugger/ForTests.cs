@@ -6,6 +6,7 @@ using SearchProtocol;
 using StaticMethods;
 using ProtocolEnums;
 using StaticSettings;
+using CRC16;
 
 namespace RMDebugger
 {
@@ -20,7 +21,8 @@ namespace RMDebugger
             sendData(cmdOut);
             Tuple<CmdInput, byte[], CmdInput?, byte[]> insideCmd = ParseCmdSign(cmdOut);
             byte[] cmdIn = receiveData(size, ms);
-            ProtocolReply reply = Methods.GetReply(cmdIn, insideCmd.Item2, insideCmd.Item1, true);
+            ProtocolReply reply = Methods.GetReply(cmdIn, insideCmd.Item2, insideCmd.Item1);
+            if (!CRC16_CCITT_FALSE.CRC_check(cmdIn)) reply = ProtocolReply.WCrc;
             Methods.ToLogger(cmdOut, cmdIn, reply);
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
         }
