@@ -121,6 +121,40 @@ namespace RMDebugger
                 return new Tuple<CmdInput, byte[], CmdInput?, byte[]>(cmdThrough, rmThrough, cmdMain, rmSign);
             }
         }
+
+        public byte[] GetDataNew(byte[] cmdOut, int size, out ProtocolReply reply, int ms = 50)
+        {
+            if (!Options.mainIsAvailable) throw new Exception("devNull");
+            sendData(cmdOut);
+            CmdOutput cmdOne = (CmdOutput)((cmdOut[2] << 8) | cmdOut[3]);
+            CmdInput cmdThrough;
+            CmdInput cmdMain;
+            byte[] cmdIn = receiveData(size, ms);
+            switch (cmdOne)
+            {
+                case CmdOutput.ROUTING_THROUGH: 
+                case CmdOutput.ROUTING_PROG:
+                    CmdOutput cmdTwo = (CmdOutput)((cmdOut[6] << 8) | cmdOut[7]);
+                    Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOne), out cmdThrough);
+                    Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdTwo), out cmdMain);
+                    reply = Methods.GetReply(cmdIn,
+                        new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
+                        new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain);
+                    reply = cmdMain == CmdInput.LOAD_DATA_PAGE ? Methods.GetDataReply(cmdIn, cmdOut, true) : reply;
+                    break;
+                default:
+                    Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOne), out cmdMain);
+                    reply = Methods.GetReply(receiveData(size, ms),
+                        new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
+                    reply = cmdMain == CmdInput.LOAD_DATA_PAGE ? Methods.GetDataReply(cmdIn, cmdOut, false) : reply;
+                    break;
+            }
+            return cmdOut;
+        }
+
+
+
+
         public Tuple<RmResult, ProtocolReply> GetResult(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("No interface");

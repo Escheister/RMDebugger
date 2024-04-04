@@ -22,7 +22,8 @@ namespace StaticMethods
                 {
                     string stringOut = BitConverter.ToString(cmdOut).Replace("-", " ");
                     string stringIn = cmdIn is null ? "" : BitConverter.ToString(cmdIn).Replace("-", " ");
-                    string msg = $"Send\t->  {stringOut}\n{reply}\t<-  {stringIn}\n";
+                    string msg = $"Send\t->  {stringOut}\n" +
+                                 $"{reply}\t<-  {stringIn}\n";
                     if (Options.debugForm.allToolStripMenuItem.Checked)
                     {
                         Options.debugForm.LogBox.AppendText(msg);
@@ -45,22 +46,20 @@ namespace StaticMethods
             string text = "";
             foreach (byte b in array)
                 text += b == 0xff ? string.Empty : Encoding.GetEncoding("koi8r").GetString(new byte[] { b });
-            if (text == string.Empty) return "Empty";
-            return text;
+            return text == string.Empty ? "Empty" : text;
         }
-        public static ProtocolReply GetReply(byte[] bufferIn, byte[] rmSign, CmdInput cmdMain, bool crc=false)
+        public static ProtocolReply GetReply(byte[] bufferIn, byte[] rmSign, CmdInput cmdMain)
         {
             if (bufferIn.Length == 0) return ProtocolReply.Null;
-            if (crc) //Убрана временная проверка контрольной суммы
-                if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;
+            if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;
             if (!SignatureEqual(bufferIn, rmSign)) return ProtocolReply.WSign;
             if (!CmdInputEqual(bufferIn, cmdMain)) return ProtocolReply.WCmd;
             return ProtocolReply.Ok;
         }
         public static ProtocolReply GetReply(byte[] bufferIn, byte[] rmThrough, CmdInput cmdThrough, byte[] rmSign, CmdInput cmdMain)
         {
-            if (bufferIn is null) return ProtocolReply.Null;
-            /*if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;*/ //Убрана временная проверка контрольной суммы
+            if (bufferIn.Length == 0) return ProtocolReply.Null;
+            if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;
             if (!SignatureEqual(bufferIn, rmThrough, rmSign)) return ProtocolReply.WSign;
             if (!CmdInputEqual(bufferIn, cmdThrough, cmdMain)) return ProtocolReply.WCmd;
             return ProtocolReply.Ok;
