@@ -17,6 +17,7 @@
         WSign = 3,
         WCmd = 4, 
         WData = 5,
+        Error = 404,
     }
     enum CmdOutput : ushort // Request
     {

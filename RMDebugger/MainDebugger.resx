@@ -127,26 +127,6 @@
     <value>347, 17</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="MirrorColorButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
-        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAA/0lE
-        QVQ4T8WPPQrCQBCF02jjAUQh2SSNkNKg2HgIwTY38BAhsfIMEgQvYApB0kquoViKXsBqfRNm/QlZjFUG
-        HrPz873dNf4Nz/PaQogZZW7VC0A2QY7j7GzbviGnLxM0LmhIjVaAJ9i545wjZ9CA63lhQIuWZfV0Mk2z
-        77ruFnsPgAHyAXnv+37rpwHBmMcAEuQFmxxhaBUwBRmUhaUTDIY4FzB/I6GXINPzR4xXv4BvDgFuGF5D
-        S+6PoSnj1QboRZ83o44JVnP0roxrDXIFq5tLc8m41iAlEygqwzx/G5SHdfRlkHe6kqSGIhSSpGojyCRJ
-        1aTmDAhknRlvNAzjCTxtnKHlXdZSAAAAAElFTkSuQmCC
-</value>
-  </data>
-  <metadata name="ToolTipHelper.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>347, 17</value>
-  </metadata>
-  <metadata name="SignGetNear.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="TypeGetNear.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <data name="HexPathButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
@@ -158,6 +138,29 @@
         McgAoFePAl0QD9UKATPyGe5BXUEQA9U+7i1k4IRqHXDAwAAANSDaAOvc+eMAAAAASUVORK5CYII=
 </value>
   </data>
+  <metadata name="ToolTipHelper.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>347, 17</value>
+  </metadata>
+  <metadata name="ToolTipHelper.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>347, 17</value>
+  </metadata>
+  <data name="MirrorColorButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAA/0lE
+        QVQ4T8WPPQrCQBCF02jjAUQh2SSNkNKg2HgIwTY38BAhsfIMEgQvYApB0kquoViKXsBqfRNm/QlZjFUG
+        HrPz873dNf4Nz/PaQogZZW7VC0A2QY7j7GzbviGnLxM0LmhIjVaAJ9i545wjZ9CA63lhQIuWZfV0Mk2z
+        77ruFnsPgAHyAXnv+37rpwHBmMcAEuQFmxxhaBUwBRmUhaUTDIY4FzB/I6GXINPzR4xXv4BvDgFuGF5D
+        S+6PoSnj1QboRZ83o44JVnP0roxrDXIFq5tLc8m41iAlEygqwzx/G5SHdfRlkHe6kqSGIhSSpGojyCRJ
+        1aTmDAhknRlvNAzjCTxtnKHlXdZSAAAAAElFTkSuQmCC
+</value>
+  </data>
+  <metadata name="SignGetNear.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="TypeGetNear.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <metadata name="FieldsColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>

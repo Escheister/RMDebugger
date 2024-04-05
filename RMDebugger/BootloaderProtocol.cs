@@ -16,7 +16,6 @@ namespace BootloaderProtocol
         public delegate byte[] BuildCmdDelegate(CmdOutput cmdOutput);
         public delegate byte[] BuildDataCmdDelegate(byte[] data);
 
-
         public Bootloader(object sender, byte[] targetSign) : base(sender)
         {
             _addrHex = new byte[2];
@@ -35,30 +34,19 @@ namespace BootloaderProtocol
             buildDataCmdDelegate += BuildDataCmdThrough;
         }
 
-
         private byte[] _addrHex;
         private byte[] _addrElar;
         private byte[] _throughSign;
         private byte[] _targetSign;
 
-
         public BuildCmdDelegate buildCmdDelegate;
         public BuildDataCmdDelegate buildDataCmdDelegate;
-
 
         private byte[] BuildCmd(CmdOutput cmdOutput) => FormatCmdOut(_targetSign, cmdOutput, 0xff);
         private byte[] BuildCmdThrough(CmdOutput cmdOutput) => CmdThroughRm(FormatCmdOut(_targetSign, cmdOutput, 0xff), _throughSign, CmdOutput.ROUTING_PROG);
 
         private byte[] BuildDataCmd(byte[] data) => FormatUploadData(data);
         private byte[] BuildDataCmdThrough(byte[] data) => CmdThroughRm(FormatUploadData(data), _throughSign, CmdOutput.ROUTING_PROG);
-
-        public bool GetReplyFromDevice(byte[] cmdOut, out ProtocolReply reply)
-        {
-            
-        }
-
-
-
 
         private byte[] FormatUploadData(byte[] data)
         {

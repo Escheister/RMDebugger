@@ -64,9 +64,9 @@ namespace StaticMethods
             if (!CmdInputEqual(bufferIn, cmdThrough, cmdMain)) return ProtocolReply.WCmd;
             return ProtocolReply.Ok;
         }
-        public static ProtocolReply GetDataReply(byte[] bufferIn, byte[] bufferOut, bool through)
+        public static ProtocolReply GetDataReply(byte[] bufferIn, byte[] bufferOut)
         {
-            if (!DataEqual(bufferIn, bufferOut, through)) return ProtocolReply.WData;
+            if (!DataEqual(bufferIn, bufferOut)) return ProtocolReply.WData;
             return ProtocolReply.Ok;
         }
         private static bool SignatureEqual(byte[] bufferIn, byte[] rmSign)
@@ -103,13 +103,13 @@ namespace StaticMethods
             }
             catch { return false; }
         }
-        private static bool DataEqual(byte[] bufferIn, byte[] bufferOut, bool through = false)
+        private static bool DataEqual(byte[] bufferIn, byte[] bufferOut)
         {
             try
             {
                 int start = 4;
                 int crap = 6;
-                if (through)
+                if (Options.through)
                 {
                     start += 8;
                     crap += 12;

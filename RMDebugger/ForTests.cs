@@ -19,13 +19,14 @@ namespace RMDebugger
         {
             if (!Options.mainIsAvailable) throw new Exception("No interface");
             sendData(cmdOut);
-            Tuple<CmdInput, byte[], CmdInput?, byte[]> insideCmd = ParseCmdSign(cmdOut);
-            byte[] cmdIn = receiveData(size, ms);
-            ProtocolReply reply = Methods.GetReply(cmdIn, insideCmd.Item2, insideCmd.Item1);
+            Enum.TryParse(Enum.GetName(typeof(CmdOutput), (CmdOutput)((cmdOut[2] << 8) | cmdOut[3])), out CmdInput cmdMain);
+            byte[] cmdIn = await receiveData(size, ms);
+            ProtocolReply reply = Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
             if (!CRC16_CCITT_FALSE.CRC_check(cmdIn)) reply = ProtocolReply.WCrc;
             Methods.ToLogger(cmdOut, cmdIn, reply);
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
         }
+
         private bool CheckIn(Dictionary<int, Tuple<int, int, DevType>> mainDict, Dictionary<int, int> secondDict)
         {
             foreach (int key in secondDict.Keys)

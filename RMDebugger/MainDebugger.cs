@@ -65,6 +65,7 @@ namespace RMDebugger
             numericPort.ValueChanged += (s, e) => { if (Options.pingOk) Options.pingOk = !Options.pingOk; };
             Connect.Click += ConnectClick;
             NeedThrough.CheckedChanged += NeedThroughCheckedChanged;
+            TargetSignID.ValueChanged += (s, e) => NeedThrough.Enabled = TargetSignID.Value != 0;
             DistToftimeout.Scroll += (s, e) => {
                 Options.timeoutDistTof = DistToftimeout.Value;
                 TimeForDistTof.Text = $"{Options.timeoutDistTof} ms";
@@ -81,6 +82,7 @@ namespace RMDebugger
             Options.timeoutDistTof = DistToftimeout.Value;
             HexUploadButton.Click += HexUploadButtonClick;
         }
+
 
 
         //********************
@@ -191,7 +193,6 @@ namespace RMDebugger
             OpenCom.Enabled = ports.Length > 0;
         }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Переделать чтение реестра
         /// Публичные контролы вернуть в приватные, перенести в статический класс
@@ -345,7 +346,6 @@ namespace RMDebugger
                 this.Enabled = true;
             }
         }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
         
         
         //Serial config
@@ -419,6 +419,16 @@ namespace RMDebugger
             if (Options.pingOk) PingSettings(!Options.pingOk);
             else await check_ip();
         }
+        private void IPaddressBox_TextChanged(object sender, EventArgs e)
+        {
+            Options.pingOk = false;
+            bool ipCorrect = IPAddress.TryParse(IPaddressBox.Text, out IPAddress ipAddr);
+            PingButton.Enabled =
+                Connect.Enabled = ipCorrect;
+            if (ipCorrect) ErrorMessage.Clear();
+            else ErrorMessage.SetError(label13, $"Неверно задан параметр IP Address");
+            Connect.Text = "Connect";
+        }
         private void PingSettings(bool sw)
         {
             Options.pingOk = 
@@ -490,12 +500,12 @@ namespace RMDebugger
         }
         private void ThroughOrNot()
         {
-            bool through = NeedThrough.Checked;
+            Options.through = NeedThrough.Checked;
             MirrorBox.Enabled = 
                 MirrorColorButton.Enabled = 
                 RS485Page.Enabled = 
-                ExtendedBox.Enabled = !through;
-            ThroughSignID.Enabled = through;
+                ExtendedBox.Enabled = !Options.through;
+            ThroughSignID.Enabled = Options.through;
         }
         
         //DistTof
@@ -534,7 +544,7 @@ namespace RMDebugger
             {
                 if (!Options.mainIsAvailable) break;
                 List<DataGridViewRow> rows = new List<DataGridViewRow>();
-                Dictionary<int, int> data = GetDeviceListInfo(search, CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes());
+                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes());
                 if (data != null)
                     foreach (int key in data.Keys)
                     {
@@ -589,7 +599,7 @@ namespace RMDebugger
             {
                 if (!Options.mainIsAvailable) break;
                 List<DataGridViewRow> rows = new List<DataGridViewRow>();
-                Dictionary<int, int> data = GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
+                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
                 List<int> inOneBus = new List<int>();
                 List<int> outOfBus = new List<int>();
                 List<int> mirrorList = new List<int>();
@@ -603,7 +613,7 @@ namespace RMDebugger
 
                     foreach (int key in inOneBus)
                     {
-                        Dictionary<int, int> tempData = GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes());
+                        Dictionary<int, int> tempData = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes());
                         if (MirrorBox.Checked && tempData.ContainsKey((int)TargetSignID.Value)) mirrorList.Add(key);
                         if (ExtendedBox.Checked) search.AddKeys(data, tempData);
                     }
@@ -657,7 +667,6 @@ namespace RMDebugger
                 Parity.Enabled = 
                 stopBits.Enabled = !sw;
         }
-        /////////////////////////////////////
 
         //Hex uploader
         async private void HexUploadButtonClick(object sender, EventArgs e)
@@ -689,67 +698,6 @@ namespace RMDebugger
             if (windowUpdate != null) windowUpdate.Enabled = !sw;
 
         }
-        /*async private Task<bool> GetRequestUpload(Bootloader boot, byte[] cmdOut, bool uploadData = false, int aWait = 100, bool delay = false, int delayMs = 25)
-        {
-            do
-            {
-                if (!Options.HexUploadStarted) return false;
-                try
-                {
-                    Tuple<byte[], ProtocolReply> replyes = boot.GetData(cmdOut, cmdOut.Length, aWait);
-                    if (uploadData)
-                    {
-                        ProtocolReply reply = Methods.GetDataReply(cmdOut, replyes.Item1, NeedThrough.Checked);
-                        ToReplyStatus(reply.ToString());
-                        if (reply == ProtocolReply.Ok) break;
-                    }
-                    else
-                    {
-                        ToReplyStatus(replyes.Item2.ToString());
-                        if (replyes.Item2 == ProtocolReply.Ok) break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ToReplyStatus(ex.Message);
-                    tstop = DateTime.Now - t0;
-                    if (tstop.Seconds >= 20)
-                    {
-                        DialogResult message = MessageBox.Show(this, "Timeout", "Something wrong...", MessageBoxButtons.RetryCancel);
-                        if (message == DialogResult.Cancel) return false;
-                        else
-                        {
-                            t0 = DateTime.Now;
-                            tstop = DateTime.Now - t0;
-                        }
-                    }
-                    if (delay) await Task.Delay(delayMs);
-                }
-            }
-            while (tstop.Seconds < 20);
-            return true;
-        }*/
-
-        async private Task<bool> GetReplyFromDevice(byte[] cmdOut)
-        {
-            DateTime t0 = DateTime.Now;
-            TimeSpan tstop = DateTime.Now - t0;
-            do
-            {
-                try
-                {
-
-                }
-                catch (Exception ex)
-                {
-                    tstop = DateTime.Now - t0;
-                    ToReplyStatus(ex.Message);
-
-                }
-            }
-            while (tstop.Seconds < Options.awaitCorrectHexUpload);
-        }
-
         async private Task HexUploadAsync()
         {
             Bootloader boot = NeedThrough.Checked 
@@ -761,27 +709,38 @@ namespace RMDebugger
             byte[] cmdConfirmData = boot.buildCmdDelegate(CmdOutput.UPDATE_DATA_PAGE);
 
             byte[][] hex;
-            try { hex = boot.GetByteDataFromFile(HexPathBox.Text); }
+            try { hex = boot.GetByteDataFromFile(Options.hexPath); }
             catch (Exception ex) { ToMessageStatus(ex.Message); return; }
 
-
-
-
-
-
-
-            /*byte[][] hex;
-            try { hex = boot.GetByteDataFromFile(HexPathBox.Text); }
-            catch (Exception ex) { ToMessageStatus(ex.Message); return; }
-            byte[] rmSign = TargetSignID.GetBytes();
-            byte[] rmThrough = NeedThrough.Checked ? ThroughSignID.GetBytes() : null;
-            byte[] rmThrough = ThroughSignID.GetBytes();
-
-            byte[] cmdBootStart = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.START_BOOTLOADER);
-            if (!await GetRequestUpload(boot, cmdBootStart, uploadData: false, aWait: 50, delay: true, delayMs: 25)) return;
-            ToMessageStatus("Bootloader OK");
-            byte[] cmdUpdateData = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.UPDATE_DATA_PAGE);
-            byte[] cmdBootStop = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.STOP_BOOTLOADER);
+            async Task<bool> GetReplyFromDevice(byte[] cmdOut, int receiveDelay = 50, bool taskDelay = false, int delayMs = 50)
+            {
+                DateTime t0 = DateTime.Now;
+                TimeSpan tstop = DateTime.Now - t0;
+                while (tstop.Seconds < Options.awaitCorrectHexUpload && Options.HexUploadStarted)
+                {
+                    try
+                    {
+                        Tuple<byte[], ProtocolReply> replyes = await boot.GetData(cmdOut, cmdOut.Length, receiveDelay);
+                        ToReplyStatus(replyes.Item2.ToString());
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        ToReplyStatus(ex.Message);
+                        if (ex.Message == "devNull") return false;
+                        if ((DateTime.Now - t0).Seconds >= Options.awaitCorrectHexUpload)
+                        {
+                            DialogResult message = MessageBox.Show(this, "Timeout", "Something wrong...", MessageBoxButtons.RetryCancel);
+                            if (message == DialogResult.Cancel) break;
+                            else t0 = DateTime.Now;
+                        }
+                        if (taskDelay) await Task.Delay(delayMs);
+                    }
+                }
+                return false;
+            }
+            if (await GetReplyFromDevice(cmdBootStart, taskDelay: true, delayMs:25)) ToMessageStatus("Bootload OK");
+            else return;
 
             DateTime t0 = DateTime.Now;
             TimeSpan tstop;
@@ -793,109 +752,114 @@ namespace RMDebugger
                 if (tuple.Item1 is null) continue;
                 else
                 {
-                    byte[] cmdLoadData = GetCmdThroughOrNot(boot, rmSign, rmThrough, tuple.Item1);
-                    if (!await GetRequestUpload(boot, cmdLoadData, uploadData: true, aWait: 200)) return;
-                    if (!await GetRequestUpload(boot, cmdUpdateData, delay: true, delayMs: 50)) return;
-                    BeginInvoke((MethodInvoker)(() => { UpdateBar.Value = i; BytesStart.Text = i.ToString(); }));
+                    if (!await GetReplyFromDevice(boot.buildDataCmdDelegate(tuple.Item1), receiveDelay: 200)) return;
+                    if (!await GetReplyFromDevice(cmdConfirmData, taskDelay:true)) return;
+                    Invoke((MethodInvoker)(() => {
+                        UpdateBar.Value = 100 * i / hex.Length;
+                        BytesStart.Text = i.ToString();
+                    }));
                 }
             }
-            if (!await GetRequestUpload(boot, cmdBootStop, delay: true, delayMs: 50)) return;
+            await GetReplyFromDevice(cmdBootStop, taskDelay: true, delayMs: 25);
             tstop = DateTime.Now - t0;
-            BeginInvoke((MethodInvoker)(() =>
+            string timeUplod = $" {tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
+            if (Options.HexUploadStarted)
             {
-                MessageStatus.Text = $"Firmware OK | Uploaded for {tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
-                NotifyMessage.BalloonTipTitle = "Прошивка устройства";
-                NotifyMessage.BalloonTipText = $"Файл {Path.GetFileName(HexPathBox.Text)} успешно загружен на устройство за " +
-                $"{tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
-                NotifyMessage.ShowBalloonTip(10);
-            }));*/
+                Invoke((MethodInvoker)(() => { MessageStatus.Text = $"Firmware OK | Uploaded for" + timeUplod; }));
+                NotifyMessage.ShowBalloonTip(5, "Прошивка устройства", 
+                    $"Файл {Path.GetFileName(Options.hexPath)} успешно загружен на устройство за" + timeUplod, ToolTipIcon.Info);
+            }
         }
-        /*async private Task UploadDevice(Bootloader boot)
-        {
-            byte[][] hex;
-            try { hex = boot.GetByteDataFromFile(HexPathBox.Text); }
-            catch (Exception ex)
-            {
-                ToMessageStatus(ex.Message);
-                BackToDefaults();
-                return;
-            }
-            byte[] rmSign = TargetSignID.GetBytes();
-            byte[] rmThrough = ThroughSignID.GetBytes();
-
-            byte[] cmdBootStart = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.START_BOOTLOADER);
-            if (!await GetRequestUpload(boot, cmdBootStart, uploadData: false, aWait: 50, delay: true, delayMs: 25)) return;
-            ToMessageStatus("Bootloader OK");
-            byte[] cmdUpdateData = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.UPDATE_DATA_PAGE);
-            byte[] cmdBootStop = GetCmdThroughOrNot(boot, rmSign, rmThrough, CmdOutput.STOP_BOOTLOADER);
-
-            DateTime t0 = DateTime.Now;
-            TimeSpan tstop;
-            Tuple<byte[], int> tuple;
-            for (int i = 0; i <= hex.Length - 1 && Options.HexUploadStarted;)
-            {
-                tuple = boot.GetDataForUpload(hex, (int)HexPageSize.Value, i);
-                i = tuple.Item2;
-                if (tuple.Item1 is null) continue;
-                else
-                {
-                    byte[] cmdLoadData = GetCmdThroughOrNot(boot, rmSign, rmThrough, tuple.Item1);
-                    if (!await GetRequestUpload(boot, cmdLoadData, uploadData: true, aWait: 200)) return;
-                    if (!await GetRequestUpload(boot, cmdUpdateData, delay: true, delayMs: 50)) return;
-                    BeginInvoke((MethodInvoker)(() => { UpdateBar.Value = i; BytesStart.Text = i.ToString(); }));
-                }
-            }
-            if (!await GetRequestUpload(boot, cmdBootStop, delay: true, delayMs: 50)) return;
-            tstop = DateTime.Now - t0;
-            BeginInvoke((MethodInvoker)(() => {
-                MessageStatus.Text = $"Uploaded for {tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
-                NotifyMessage.BalloonTipTitle = "Прошивка устройства";
-                NotifyMessage.BalloonTipText = $"Файл {Path.GetFileName(HexPathBox.Text)} успешно загружен на устройство за " +
-                $"{tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
-                NotifyMessage.ShowBalloonTip(10);
-            }));
-
-            BackToDefaults();
-        }*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         private string[] FileReader(string path)
         {
             using StreamReader file = new StreamReader(path);
             Task<string> data = file.ReadToEndAsync();
             return data.Result.Trim().Split('\n');
         }
+        private void HexPathButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog file = new OpenFileDialog
+            {
+                Filter = "Hex файл (*.hex)|*.hex",
+                Title = "Укажите файл с расширением *.hex"
+            };
+            if (HexPathBox.Text != string.Empty) file.InitialDirectory = Path.GetDirectoryName(HexPathBox.Text);
+            if (file.ShowDialog() == DialogResult.OK)
+            {
+                if (!HexPathBox.Items.Contains(file.FileName))
+                    HexPathBox.Items.Add(file.FileName);
+                HexPathBox.SelectedItem = file.FileName;
+            }
+        }
+        private void Hex_Box_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] FilePath = (string[])e.Data.GetData(DataFormats.FileDrop);
+            foreach (string path in FilePath)
+            {
+                if (HexPathBox.Items.Contains(path)) continue;
+                if (new FileInfo(path).Extension == ".hex") HexPathBox.Items.Add(path);
+            }
+            HexPathBox.SelectedItem = FilePath[0];
+        }
+        private void Hex_Box_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Copy;
+        }
+        private void Hex_Box_TextChanged(object sender, EventArgs e)
+        {
+            BeginInvoke((MethodInvoker)(() =>
+            {
+                if (File.Exists(HexPathBox.Text))
+                {
+                    Options.hexPath = HexPathBox.Text;
+                    HexUploadFilename.Text = $"Filename: {Path.GetFileName(HexPathBox.Text)}";
+                    HexUploadButton.Enabled = true;
+                    string[] len = FileReader(HexPathBox.Text);
+                    BytesEnd.Text = len.Length.ToString();
+                    UpdateBar.Value = 0;
+                    BytesStart.Text = 0.ToString();
+                }
+                else
+                {
+                    HexUploadButton.Enabled = false;
+                    HexUploadFilename.Text = string.Empty;
+                }
+            }));
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         private void TaskForChangedRows()
         {
             StartTestRMButton.Enabled =
@@ -1063,78 +1027,6 @@ namespace RMDebugger
             }));
         }
         
-        private void IPaddressBox_TextChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                IPAddress addr = IPAddress.Parse(IPaddressBox.Text);
-                PingButton.Enabled = true;
-                ErrorMessage.Clear();
-            }
-            catch (Exception ex)
-            {
-                PingButton.Enabled = false;
-                ErrorMessage.SetError(label13, ex.Message);
-            }
-            finally
-            {
-                PingButton.BackColor = Color.Red;
-                Connect.Text = "Connect";
-                Connect.Enabled = false;
-            }
-        }
-        private void HexPathButton_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog file = new OpenFileDialog
-            {
-                Filter = "Hex файл (*.hex)|*.hex",
-                Title = "Укажите файл с расширением *.hex"
-            };
-            if (HexPathBox.Text != string.Empty) file.InitialDirectory = Path.GetDirectoryName(HexPathBox.Text);
-            if (file.ShowDialog() == DialogResult.OK)
-            {
-                if (!HexPathBox.Items.Contains(file.FileName))
-                    HexPathBox.Items.Add(file.FileName);
-                HexPathBox.SelectedItem = file.FileName;
-            }
-        }
-        private void Hex_Box_DragDrop(object sender, DragEventArgs e)
-        {
-            string[] FilePath = (string[])e.Data.GetData(DataFormats.FileDrop);
-            foreach (string path in FilePath)
-            {
-                if (HexPathBox.Items.Contains(path)) continue;
-                if (new FileInfo(path).Extension == ".hex") HexPathBox.Items.Add(path);
-            }
-            HexPathBox.SelectedItem = FilePath[0];
-        }
-        private void Hex_Box_DragEnter(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-                e.Effect = DragDropEffects.Copy;
-        }
-        private void Hex_Box_TextChanged(object sender, EventArgs e)
-        {
-            BeginInvoke((MethodInvoker)(() =>
-            {
-                if (File.Exists(HexPathBox.Text))
-                {
-                    HexUploadFilename.Text = $"Filename: {Path.GetFileName(HexPathBox.Text)}";
-                    HexUploadButton.Enabled = true;
-                    string[] len = FileReader(HexPathBox.Text);
-                    UpdateBar.Maximum = len.Length;
-                    BytesEnd.Text = len.Length.ToString();
-                    UpdateBar.Value = 0;
-                    BytesStart.Text = 0.ToString();
-                }
-                else
-                {
-                    HexUploadButton.Enabled = false;
-                    HexUploadFilename.Text = string.Empty;
-                }
-            }));
-        }
-        private void TargetSignID_ValueChanged(object sender, EventArgs e) => NeedThrough.Enabled = TargetSignID.Value == 0 ? false : true;
 
         async private void RefreshRMButton_Click(object sender, EventArgs e)
         {
@@ -1161,7 +1053,7 @@ namespace RMDebugger
 
         
 
-        private Dictionary<int, int> GetDeviceListInfo(Searching search, CmdOutput cmdOutput, byte[] rmSign)
+        async private Task<Dictionary<int, int>> GetDeviceListInfo(Searching search, CmdOutput cmdOutput, byte[] rmSign)
         {
             byte ix = 0x00;
             int iteration = 1;
@@ -1172,7 +1064,7 @@ namespace RMDebugger
             {
                 do
                 {
-                    Tuple<byte, Dictionary<int, int>> data = search.RequestAndParseNew(cmdOutput, ix, rmSign, rmThrough, through);
+                    Tuple<byte, Dictionary<int, int>> data = await search.RequestAndParseNew(cmdOutput, ix, rmSign, rmThrough, through);
                     ToReplyStatus("Ok");
                     ix = data.Item1;
                     iteration++;
@@ -1180,13 +1072,9 @@ namespace RMDebugger
                 }
                 while (ix != 0x00 && iteration <= 5);
             }
-            catch (Exception ex)  { ToReplyStatus(ex.Message); }
+            catch (Exception ex) { ToReplyStatus(ex.Message); }
             return dataReturn.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
         }
-/*        private byte[] GetCmdThroughOrNot(Bootloader boot, byte[] rmSign, byte[] rmThrough, CmdOutput cmdOutput)
-            => !NeedThrough.Checked ? boot.SendCommand(rmSign, cmdOutput) : boot.SendCommand(rmSign, rmThrough, cmdOutput);
-        private byte[] GetCmdThroughOrNot(Bootloader boot, byte[] rmSign, byte[] rmThrough, byte[] data)
-            => !NeedThrough.Checked ? boot.SendCommand(rmSign, data) : boot.SendCommand(rmSign, rmThrough, data);*/
         
  
         private void ClearStatusStatusRM_Click(object sender, EventArgs e)
@@ -1499,7 +1387,7 @@ namespace RMDebugger
                 byte[] cmdOut = search.FormatCmdOut(key.GetBytes(), CmdOutput.STATUS, 0xff);
                 try
                 {
-                    replyes = search.GetData(cmdOut, (int)CmdMaxSize.STATUS);
+                    replyes = await search.GetData(cmdOut, (int)CmdMaxSize.STATUS);
                     extData.Add(
                         key,
                         new Tuple<int, DevType>(
@@ -1526,7 +1414,7 @@ namespace RMDebugger
             offTabsExcept(RMData, TestPage);
             offTabsExcept(TestPages, RS485Page);
 
-            Dictionary<int, int> data = GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
+            Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
             if (data is null)
             {
                 BackToDefaults();
@@ -1585,7 +1473,7 @@ namespace RMDebugger
                 try
                 {
                     ToMessageStatus($"Signature: {i}");
-                    replyes = search.GetData(
+                    replyes = await search.GetData(
                         search.FormatCmdOut(i.GetBytes(),
                         CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 25);
                     if (dataFromGrid is null || !dataFromGrid.ContainsKey(devInterface) || !dataFromGrid[devInterface].ContainsKey(i))
@@ -1612,7 +1500,7 @@ namespace RMDebugger
                 Tuple<byte[], ProtocolReply> replyes = null;
                 try
                 {
-                    replyes = search.GetData(cmdOut, (int)CmdMaxSize.STATUS, 50);
+                    replyes = await search.GetData(cmdOut, (int)CmdMaxSize.STATUS, 50);
                     AddToGridTest(devInterface, (int)TargetSignID.Value,
                         search.GetType(replyes.Item1),
                         search.GetVersion(replyes.Item1));
@@ -1688,7 +1576,7 @@ namespace RMDebugger
             {
                 if (dict[e.Node.Name] == CmdOutput.GRAPH_GET_NEAR)
                 {
-                    Dictionary<int, int> data = GetDeviceListInfo(info, dict[e.Node.Name], TargetSignID.GetBytes());
+                    Dictionary<int, int> data = await GetDeviceListInfo(info, dict[e.Node.Name], TargetSignID.GetBytes());
                     BeginInvoke((MethodInvoker)(() => {
                         string radio = data is null || data.Count == 0 ? "Error" : "Ok";
                         TreeNode getnear = new TreeNode($"Radio: {radio}");
@@ -1719,7 +1607,7 @@ namespace RMDebugger
                 {
                     byte[] cmdOut = !NeedThrough.Checked ? info.GetInfo(TargetSignID.GetBytes(), dict[e.Node.Name]) :
                     info.GetInfo(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), dict[e.Node.Name]);
-                    reply = info.GetData(cmdOut, size, 100);
+                    reply = await info.GetData(cmdOut, size, 100);
                     byte[] cmdIn = !NeedThrough.Checked ? reply.Item1 : info.ReturnWithoutThrough(reply.Item1);
                     Dictionary<string, string> data = info.CmdInParse(cmdIn);
                     ToMessageStatus(reply.Item2.ToString());
@@ -1816,7 +1704,7 @@ namespace RMDebugger
             {
                 try
                 {
-                    reply = CO.GetData(cmdOut, size, 50);
+                    reply = await CO.GetData(cmdOut, size, 50);
                     ToMessageStatus($"{reply.Item2}");
                     if (cmdOutput == CmdOutput.ONLINE
                         && Methods.CheckResult(reply.Item1) != RmResult.Ok)
@@ -1983,7 +1871,7 @@ namespace RMDebugger
                     tstop = DateTime.Now - t0;
                     try
                     {
-                        replyes = config.GetData(cmdOut, dataCount);
+                        replyes = await config.GetData(cmdOut, dataCount);
                         cmdIn = replyes.Item1;
                         ToMessageStatus($"{key} : {replyes.Item2}");
                         break;
@@ -2037,7 +1925,7 @@ namespace RMDebugger
                     tstop = DateTime.Now - t0;
                     try
                     {
-                        replyes = config.GetResult(cmdOut, NeedThrough.Checked ? (int)CmdMaxSize.ONLINE + 4 : (int)CmdMaxSize.ONLINE);
+                        replyes = await config.GetResult(cmdOut, NeedThrough.Checked ? (int)CmdMaxSize.ONLINE + 4 : (int)CmdMaxSize.ONLINE);
                         ToMessageStatus($"{key} : {replyes.Item1}");
                         if (replyes.Item1 == RmResult.Ok)
                         {

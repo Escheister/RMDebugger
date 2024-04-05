@@ -3,6 +3,7 @@ using System;
 
 using ProtocolEnums;
 using RMDebugger;
+using System.Threading.Tasks;
 
 namespace SearchProtocol
 {
@@ -10,7 +11,7 @@ namespace SearchProtocol
     {
         public Searching(object sender) : base(sender) { }
 
-        public Tuple<byte, Dictionary<int, int>> RequestAndParseNew(CmdOutput cmdOutput, byte ix, byte[] rmSign, byte[] rmThrough, bool through)
+        async public Task<Tuple<byte, Dictionary<int, int>>> RequestAndParseNew(CmdOutput cmdOutput, byte ix, byte[] rmSign, byte[] rmThrough, bool through)
         {
             Dictionary<int, int> values = new Dictionary<int, int>();
             Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out CmdMaxSize cmdOutSize);
@@ -22,7 +23,7 @@ namespace SearchProtocol
             int cmdInSize = through
                 ? (int)cmdOutSize + 4
                 : (int)cmdOutSize;
-            Tuple<byte[], ProtocolReply> requestData = GetData(cmdOut, cmdInSize, 50);
+            Tuple<byte[], ProtocolReply> requestData = await GetData(cmdOut, cmdInSize, 50);
 
             requestData = through 
                 ? new Tuple<byte[], ProtocolReply>(ReturnWithoutThrough(requestData.Item1), requestData.Item2) 

@@ -158,7 +158,7 @@ namespace RMDebugger
                 }
                 try
                 {
-                    replyes = boot.GetData(cmdOut, cmdOut.Length, 100);
+                    replyes = await boot.GetData(cmdOut, cmdOut.Length, 100);
                     BeginInvoke((MethodInvoker)(() => { InfoStatus.Text = replyes.Item2.ToString(); }));
                     if (replyes.Item2 == ProtocolReply.Ok) break;
                 }
@@ -200,8 +200,8 @@ namespace RMDebugger
                 }
                 try
                 {
-                    replyes = boot.GetData(cmdOut, cmdOut.Length, 150);
-                    ProtocolReply reply = Methods.GetDataReply(cmdOut, replyes.Item1, NeedThrough.Checked);
+                    replyes = await boot.GetData(cmdOut, cmdOut.Length, 150);
+                    ProtocolReply reply = Methods.GetDataReply(cmdOut, replyes.Item1);
                     BeginInvoke((MethodInvoker)(() => { InfoStatus.Text = reply.ToString(); }));
                     if (reply == ProtocolReply.Ok) break;
                 }
