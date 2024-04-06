@@ -753,8 +753,8 @@ namespace RMDebugger
                 else
                 {
                     if (!await GetReplyFromDevice(boot.buildDataCmdDelegate(tuple.Item1), receiveDelay: 200)) return;
-                    if (!await GetReplyFromDevice(cmdConfirmData, taskDelay:true)) return;
-                    Invoke((MethodInvoker)(() => {
+                    if (!await GetReplyFromDevice(cmdConfirmData, taskDelay:true, delayMs:10)) return;
+                    BeginInvoke((MethodInvoker)(() => {
                         UpdateBar.Value = 100 * i / hex.Length;
                         BytesStart.Text = i.ToString();
                     }));
