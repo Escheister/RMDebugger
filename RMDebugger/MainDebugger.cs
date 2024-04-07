@@ -30,7 +30,7 @@ namespace RMDebugger
         Socket udpGate = new Socket(SocketType.Dgram, ProtocolType.Udp);
         public HexUpdate windowUpdate = null;
         Color mirClr = Color.PaleGreen;
-        const string mainName = "RM Debugger";
+        private readonly string mainName = Assembly.GetEntryAssembly().GetName().Name;
         string ver;
         private readonly Dictionary<string, ConfigCheckList> fieldsDict = new Dictionary<string, ConfigCheckList>()
         {
@@ -54,10 +54,16 @@ namespace RMDebugger
         {
             Load += MainFormLoad;
             FormClosed += MainFormClosed;
+            PinButton.Click += (s, e) =>
+            {
+                this.TopMost = PinButton.Checked;
+                PinButton.ToolTipText = PinButton.Checked ? "Поверх других окон." : "Обычное состояние окна.";
+                PinButton.Image = PinButton.Checked ? Resources.Pin : Resources.Unpin;
+            };
             comPort.SelectedIndexChanged += (s, e) => mainPort.PortName = comPort.SelectedItem.ToString();
             BaudRate.SelectedIndexChanged += (s, e) => BaudRateSelectedIndexChanged(s, e);
             RefreshSerial.Click += (s, e) => AddPorts(comPort);
-            foreach (ToolStripDropDownItem item in dataBits.DropDownItems) item.Click += dataBitsForSerial;
+            foreach (ToolStripDropDownItem item in dataBits.DropDownItems) item.Click += DataBitsForSerial;
             foreach (ToolStripDropDownItem item in Parity.DropDownItems) item.Click += ParityForSerial;
             foreach (ToolStripDropDownItem item in stopBits.DropDownItems) item.Click += StopBitsForSerial;
             OpenCom.Click += OpenComClick;
@@ -78,12 +84,15 @@ namespace RMDebugger
             AutoDistTof.Click += DistTofClick;
             ManualGetNear.Click += GetNearClick;
             AutoGetNear.Click += GetNearClick;
+            MirrorColorButton.Click += (s, e) =>
+            {
+                if (MirrorColor.ShowDialog() == DialogResult.OK)
+                    mirClr = MirrorColor.Color;
+            };
             TypeFilterBox.SelectedIndexChanged += (s, e) => Options.typeOfGetNear = TypeFilterBox.Text;
             Options.timeoutDistTof = DistToftimeout.Value;
             HexUploadButton.Click += HexUploadButtonClick;
         }
-
-
 
         //********************
         private void MainFormLoad(object sender, EventArgs e)
@@ -175,7 +184,7 @@ namespace RMDebugger
             mainPort.WriteTimeout =
                 mainPort.ReadTimeout = 500;
             BaudRate.SelectedItem = "38400";
-            dataBitsForSerial(dataBits8, null);
+            DataBitsForSerial(dataBits8, null);
             ParityForSerial(ParityNone, null);
             StopBitsForSerial(stopBits1, null);
             BaudRateSelectedIndexChanged(null, null);
@@ -351,7 +360,7 @@ namespace RMDebugger
         //Serial config
         private void BaudRateSelectedIndexChanged(object sender, EventArgs e)
             => mainPort.BaudRate = Convert.ToInt32(BaudRate.SelectedItem);
-        private void dataBitsForSerial(object sender, EventArgs e)
+        private void DataBitsForSerial(object sender, EventArgs e)
         {
             ToolStripMenuItem databits = (ToolStripMenuItem)sender;
             foreach (ToolStripMenuItem item in dataBits.DropDownItems) item.CheckState = CheckState.Unchecked;
@@ -657,7 +666,7 @@ namespace RMDebugger
             catch { return false; }
         }
 
-        //Get near and Dist Tof events
+        //Any events
         private void AfterAnyAutoEvent(bool sw)
         {
             SerUdpPages.Enabled =
@@ -712,7 +721,7 @@ namespace RMDebugger
             try { hex = boot.GetByteDataFromFile(Options.hexPath); }
             catch (Exception ex) { ToMessageStatus(ex.Message); return; }
 
-            async Task<bool> GetReplyFromDevice(byte[] cmdOut, int receiveDelay = 50, bool taskDelay = false, int delayMs = 50)
+            async Task<bool> GetReplyFromDevice(byte[] cmdOut, int receiveDelay = 50, bool taskDelay = false, int delayMs = 25)
             {
                 DateTime t0 = DateTime.Now;
                 TimeSpan tstop = DateTime.Now - t0;
@@ -739,7 +748,7 @@ namespace RMDebugger
                 }
                 return false;
             }
-            if (await GetReplyFromDevice(cmdBootStart, taskDelay: true, delayMs:25)) ToMessageStatus("Bootload OK");
+            if (await GetReplyFromDevice(cmdBootStart, taskDelay: true)) ToMessageStatus("Bootload OK");
             else return;
 
             DateTime t0 = DateTime.Now;
@@ -760,7 +769,7 @@ namespace RMDebugger
                     }));
                 }
             }
-            await GetReplyFromDevice(cmdBootStop, taskDelay: true, delayMs: 25);
+            await GetReplyFromDevice(cmdBootStop, taskDelay: true);
             tstop = DateTime.Now - t0;
             string timeUplod = $" {tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
             if (Options.HexUploadStarted)
@@ -769,12 +778,6 @@ namespace RMDebugger
                 NotifyMessage.ShowBalloonTip(5, "Прошивка устройства", 
                     $"Файл {Path.GetFileName(Options.hexPath)} успешно загружен на устройство за" + timeUplod, ToolTipIcon.Info);
             }
-        }
-        private string[] FileReader(string path)
-        {
-            using StreamReader file = new StreamReader(path);
-            Task<string> data = file.ReadToEndAsync();
-            return data.Result.Trim().Split('\n');
         }
         private void HexPathButton_Click(object sender, EventArgs e)
         {
@@ -808,25 +811,17 @@ namespace RMDebugger
         }
         private void Hex_Box_TextChanged(object sender, EventArgs e)
         {
-            BeginInvoke((MethodInvoker)(() =>
+            bool exists = File.Exists(HexPathBox.Text);
+            if (exists)
             {
-                if (File.Exists(HexPathBox.Text))
-                {
-                    Options.hexPath = HexPathBox.Text;
-                    HexUploadFilename.Text = $"Filename: {Path.GetFileName(HexPathBox.Text)}";
-                    HexUploadButton.Enabled = true;
-                    string[] len = FileReader(HexPathBox.Text);
-                    BytesEnd.Text = len.Length.ToString();
-                    UpdateBar.Value = 0;
-                    BytesStart.Text = 0.ToString();
-                }
-                else
-                {
-                    HexUploadButton.Enabled = false;
-                    HexUploadFilename.Text = string.Empty;
-                }
-            }));
+                Options.hexPath = HexPathBox.Text;
+                int linesCount = File.ReadLines(HexPathBox.Text).Count();
+                BytesEnd.Text = linesCount.ToString();
+            }
+            HexUploadButton.Enabled = exists;
+            HexUploadFilename.Text = exists ? $"Filename: {Path.GetFileName(HexPathBox.Text)}" : string.Empty;
         }
+
 
 
 
@@ -1520,11 +1515,6 @@ namespace RMDebugger
             HexUpdatePage.Enabled = false;
             windowUpdate.Show();
         }
-        private void MirrorColorButton_Click(object sender, EventArgs e)
-        {
-            if (MirrorColor.ShowDialog() == DialogResult.OK)
-                mirClr = MirrorColor.Color;
-        }
         
         
  
@@ -1540,12 +1530,7 @@ namespace RMDebugger
             timerLabel.Text = RMPTimeout.Value.ToString();
         }
         private void NotifyMessage_Click(object sender, EventArgs e) => this.WindowState = FormWindowState.Normal;
-        private void PinButton_Click(object sender, EventArgs e)
-        {
-            this.TopMost = PinButton.Checked;
-            PinButton.ToolTipText = PinButton.Checked ? "Поверх других окон." : "Обычное состояние окна.";
-            PinButton.Image = PinButton.Checked ? Resources.Pin : Resources.Unpin;
-        }
+
         async private void InfoTree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             Dictionary<string, CmdOutput> dict = new Dictionary<string, CmdOutput>()

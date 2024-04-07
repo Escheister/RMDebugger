@@ -579,7 +579,6 @@
             this.MirrorColorButton.TabIndex = 26;
             this.ToolTipHelper.SetToolTip(this.MirrorColorButton, "Выбрать цвет выделения");
             this.MirrorColorButton.UseVisualStyleBackColor = true;
-            this.MirrorColorButton.Click += new System.EventHandler(this.MirrorColorButton_Click);
             // 
             // ExtendedBox
             // 
@@ -2573,7 +2572,6 @@
             this.PinButton.Name = "PinButton";
             this.PinButton.Size = new System.Drawing.Size(22, 22);
             this.PinButton.ToolTipText = "Обычное состояние окна.";
-            this.PinButton.Click += new System.EventHandler(this.PinButton_Click);
             // 
             // SignaturePanel
             // 
