@@ -29,17 +29,16 @@ namespace RMDebugger
             if (sender is SerialPort ser)
             {
                 Port = ser;
-                sendData = SendSerialData;
+                sendData += (byte[] data) => Port.Write(data, 0, data.Length);
                 receiveData = SerialReceiveData;
             }
             else if (sender is Socket sock)
             {
                 Sock = sock;
-                sendData = SendSocketData;
+                sendData += (byte[] data) => Sock.Send(data);
                 receiveData = SocketReceiveData;
             }
         }
-
         public byte[] ReturnWithoutThrough(byte[] cmdIn)
         {
             byte[] _buffer = new byte[cmdIn.Length - 4];
@@ -69,8 +68,6 @@ namespace RMDebugger
             cmdIn.CopyTo(cmdOut, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(cmdOut);
         }
-        private void SendSerialData(byte[] data) => Port.Write(data, 0, data.Length);
-        private void SendSocketData(byte[] data) => Sock.Send(data);
         async private Task<byte[]> SocketReceiveData(int length, int ms = 250)
         {
             DateTime t0 = DateTime.Now;
