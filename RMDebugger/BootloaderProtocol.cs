@@ -43,10 +43,10 @@ namespace BootloaderProtocol
         public BuildDataCmdDelegate buildDataCmdDelegate;
 
         private byte[] BuildCmd(CmdOutput cmdOutput) => FormatCmdOut(_targetSign, cmdOutput, 0xff);
-        private byte[] BuildCmdThrough(CmdOutput cmdOutput) => CmdThroughRm(FormatCmdOut(_targetSign, cmdOutput, 0xff), _throughSign, CmdOutput.ROUTING_PROG);
+        private byte[] BuildCmdThrough(CmdOutput cmdOutput) => CmdThroughRm(BuildCmd(cmdOutput), _throughSign, CmdOutput.ROUTING_PROG);
 
         private byte[] BuildDataCmd(byte[] data) => FormatUploadData(data);
-        private byte[] BuildDataCmdThrough(byte[] data) => CmdThroughRm(FormatUploadData(data), _throughSign, CmdOutput.ROUTING_PROG);
+        private byte[] BuildDataCmdThrough(byte[] data) => CmdThroughRm(BuildDataCmd(data), _throughSign, CmdOutput.ROUTING_PROG);
 
         private byte[] FormatUploadData(byte[] data)
         {

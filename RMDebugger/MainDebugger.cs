@@ -109,7 +109,7 @@ namespace RMDebugger
             };
             AboutFromToolStrip.Click += (s, e) => new AboutInfo().ShowDialog();
 
-
+            LoadConfigButton.Click += LoadConfigButtonClick;
         }
 
 
@@ -848,16 +848,92 @@ namespace RMDebugger
 
 
          */
-        async private void ConfigLoadButtonClick(object sender, EventArgs e)
+        // //Load
+        async private void LoadConfigButtonClick(object sender, EventArgs e)
         {
             Options.ConfigLoadState = !Options.ConfigLoadState;
-            if (Options.ConfigLoadState)
+            if (Options.ConfigLoadState && GetEnabledFields(out Dictionary<string, int> fields))
             {
-
+                AfterLoadConfigEvent(true);
+                offTabsExcept(RMData, ConfigPage);
+                await Task.Run(() => LoadField(fields));
+                Options.ConfigLoadState = false;
+                AfterLoadConfigEvent(false);
+                onTabPages(RMData);
             }
         }
+        private void AfterLoadConfigEvent(bool sw)
+        {
+            AfterAnyAutoEvent(sw);
+            ConfigDataGrid.Enabled =
+                SignaturePanel.Enabled =
+                UploadConfigButton.Enabled =
+                ConfigFactoryCheck.Enabled = !sw;
+            LoadConfigButton.Text = sw ? "Stop" : "Load from device";
+            LoadConfigButton.Image = sw ? Resources.StatusStopped : Resources.CloudDownload;
+        }
+
+        async private Task LoadField(Dictionary<string, int> fields)
+        {
+             
 
 
+
+            /*DateTime t0 = DateTime.Now;
+            TimeSpan tstop = DateTime.Now - t0;
+            foreach (string key in fields.Keys)
+            {
+                byte[] cmdOut = NeedThrough.Checked ?
+                    config.ConfigLoad(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), key) :
+                    config.ConfigLoad(TargetSignID.GetBytes(), key);
+
+                int valueLength = fieldsDict.ContainsKey(key) ? (int)fieldsDict[key] + 1 : 17;
+                int fieldLength = key.Length + 1;
+                int dataCount = valueLength + fieldLength + 6;
+                dataCount = NeedThrough.Checked ? dataCount + 4 : dataCount;
+
+                Tuple<byte[], ProtocolReply> replyes = null;
+                byte[] cmdIn = null;
+
+                while (tstop.Seconds < RMPTimeout.Value)
+                {
+                    tstop = DateTime.Now - t0;
+                    try
+                    {
+                        replyes = await config.GetData(cmdOut, dataCount);
+                        cmdIn = replyes.Item1;
+                        ToMessageStatus($"{key} : {replyes.Item2}");
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        ToMessageStatus(ex.Message);
+                        if (ex.Message == "No interface")
+                        {
+                            BackToDefaults();
+                            return;
+                        }
+                    }
+                    finally { await Task.Delay(50); }
+                }
+                try
+                {
+                    byte[] data = new byte[cmdIn.Length - (NeedThrough.Checked ? 10 : 6) - fieldLength];
+                    Array.Copy(cmdIn, 9 + key.Length, data, 0, data.Length);
+                    BeginInvoke((MethodInvoker)(() => {
+                        ConfigDataGrid[(int)ConfigColumns.ConfigLoad, fields[key]].Value = Methods.CheckSymbols(data);
+                        ColoredRow(fields[key], ConfigDataGrid, Color.GreenYellow);
+                    }));
+                }
+                catch
+                {
+                    BeginInvoke((MethodInvoker)(() => {
+                        ConfigDataGrid[(int)ConfigColumns.ConfigLoad, fields[key]].Value = "Error";
+                        ColoredRow(fields[key], ConfigDataGrid, Color.Red);
+                    }));
+                }
+            }*/
+        }
 
 
         private ConfigCheckList GetFieldDict(string key) => fieldsDict.ContainsKey(key) ? fieldsDict[key] : ConfigCheckList.None;
@@ -921,7 +997,7 @@ namespace RMDebugger
                     }
             }
         }
-        async private void LoadConfigButton_Click(object sender, EventArgs e)
+/*        async private void LoadConfigButton_Click(object sender, EventArgs e)
         {
             Dictionary<string, int> dict = GetEnabledFields();
             if (dict is null) return;
@@ -929,25 +1005,31 @@ namespace RMDebugger
             OffControlsForConfig();
             await Task.Run(() => LoadField(new Configuration(Options.mainInterface), dict));
             BackToDefaults();
-        }
+        }*/
         async private void UploadConfigButton_Click(object sender, EventArgs e)
         {
-            Dictionary<string, int> dict = GetEnabledFields();
-            if (dict is null) return;
+            /*Dictionary<string, int> dict = GetEnabledFields();*/
+            /*if (dict is null) return;*/
             offTabsExcept(RMData, null);
             OffControlsForConfig();
-            await Task.Run(() => UploadField(new Configuration(Options.mainInterface), dict));
+            /*await Task.Run(() => UploadField(new Configuration(dict));*/
             BackToDefaults();
         }
-        private Dictionary<string, int> GetEnabledFields()
+        private bool GetEnabledFields(out Dictionary<string, int> fields)
         {
-            Dictionary<string, int> fields = new Dictionary<string, int>();
+            fields = new Dictionary<string, int>();
+            foreach(DataGridViewRow row in ConfigDataGrid.Rows)
+                if (row.Cells[(int)ConfigColumns.ConfigColumn].Value != null)
+                    MessageBox.Show(row.Cells[(int)ConfigColumns.enabled].Value.ToString());
+
+
+            return fields.Count > 0;
+            /*fields = new Dictionary<string, int>();
             for (int i = 0; i < ConfigDataGrid.Rows.Count; i++)
                 if (ConfigDataGrid[(int)ConfigColumns.ConfigColumn, i].Value != null &&
                     Convert.ToBoolean(ConfigDataGrid[(int)ConfigColumns.enabled, i].Value) == true &&
                     !fields.ContainsKey((string)ConfigDataGrid[(int)ConfigColumns.ConfigColumn, i].Value))
-                    fields.Add((string)ConfigDataGrid[(int)ConfigColumns.ConfigColumn, i].Value, i);
-            return fields.Count > 0 ? fields : null;
+                    fields.Add((string)ConfigDataGrid[(int)ConfigColumns.ConfigColumn, i].Value, i);*/
         }
         private void OffControlsForConfig()
             => BeginInvoke((MethodInvoker)(() =>
@@ -957,64 +1039,7 @@ namespace RMDebugger
                 timerRmp.Start();
                 RMPTimeout.Enabled = false;
             }));
-        async private Task LoadField(Configuration config, Dictionary<string, int> fields)
-        {
-            DateTime t0 = DateTime.Now;
-            TimeSpan tstop = DateTime.Now - t0;
-            foreach (string key in fields.Keys)
-            {
-                byte[] cmdOut = NeedThrough.Checked ?
-                    config.ConfigLoad(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), key) :
-                    config.ConfigLoad(TargetSignID.GetBytes(), key);
-
-                int valueLength = fieldsDict.ContainsKey(key) ? (int)fieldsDict[key] + 1 : 17;
-                int fieldLength = key.Length + 1;
-                int dataCount = valueLength + fieldLength + 6;
-                dataCount = NeedThrough.Checked ? dataCount + 4 : dataCount;
-
-                Tuple<byte[], ProtocolReply> replyes = null;
-                byte[] cmdIn = null;
-
-                while (tstop.Seconds < RMPTimeout.Value)
-                {
-                    tstop = DateTime.Now - t0;
-                    try
-                    {
-                        replyes = await config.GetData(cmdOut, dataCount);
-                        cmdIn = replyes.Item1;
-                        ToMessageStatus($"{key} : {replyes.Item2}");
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        ToMessageStatus(ex.Message);
-                        if (ex.Message == "No interface")
-                        {
-                            BackToDefaults();
-                            return;
-                        }
-                    }
-                    finally { await Task.Delay(50); }
-                }
-                try
-                {
-                    byte[] data = new byte[cmdIn.Length - (NeedThrough.Checked ? 10 : 6) - fieldLength];
-                    Array.Copy(cmdIn, 9 + key.Length, data, 0, data.Length);
-                    BeginInvoke((MethodInvoker)(() => {
-                        ConfigDataGrid[(int)ConfigColumns.ConfigLoad, fields[key]].Value = Methods.CheckSymbols(data);
-                        ColoredRow(fields[key], ConfigDataGrid, Color.GreenYellow);
-                    }));
-                }
-                catch
-                {
-                    BeginInvoke((MethodInvoker)(() => {
-                        ConfigDataGrid[(int)ConfigColumns.ConfigLoad, fields[key]].Value = "Error";
-                        ColoredRow(fields[key], ConfigDataGrid, Color.Red);
-                    }));
-                }
-            }
-        }
-        async private Task UploadField(Configuration config, Dictionary<string, int> fields)
+        /*async private Task UploadField(Configuration config, Dictionary<string, int> fields)
         {
             DateTime t0 = DateTime.Now;
             TimeSpan tstop = DateTime.Now - t0;
@@ -1028,8 +1053,8 @@ namespace RMDebugger
                     if (key == "addr") continue;
                 if (value is null && !factory) continue;
                 byte[] cmdOut = NeedThrough.Checked ?
-                    config.ConfigUploadNew(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), key, value, maxSize, factory) :
-                    config.ConfigUploadNew(TargetSignID.GetBytes(), key, value, maxSize, factory);
+                    config.ConfigUpload(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), key, value, maxSize, factory) :
+                    config.ConfigUpload(TargetSignID.GetBytes(), key, value, maxSize, factory);
 
                 Tuple<RmResult, ProtocolReply> replyes = null;
 
@@ -1065,7 +1090,7 @@ namespace RMDebugger
                 if (tstop.Seconds >= RMPTimeout.Value)
                     ColoredRow(fields[key], ConfigDataGrid, Color.Red);
             }
-        }
+        }*/
         private void ColoredRow(int index, DataGridView dgv, Color color)
             => Invoke((MethodInvoker)(async () => {
                 dgv.Rows[index].DefaultCellStyle.BackColor = color;

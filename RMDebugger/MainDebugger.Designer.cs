@@ -1042,7 +1042,6 @@
             this.LoadConfigButton.Text = "Load from device";
             this.LoadConfigButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.LoadConfigButton.UseVisualStyleBackColor = true;
-            this.LoadConfigButton.Click += new System.EventHandler(this.LoadConfigButton_Click);
             // 
             // ConfigDataGrid
             // 
