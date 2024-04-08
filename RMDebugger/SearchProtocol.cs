@@ -38,9 +38,7 @@ namespace SearchProtocol
                     values = DIST_TOF(requestData.Item1);
                     break;
             }
-            return values.Count == 0
-                ? null 
-                : new Tuple<byte, Dictionary<int, int>>(requestData.Item1[4], values);
+            return new Tuple<byte, Dictionary<int, int>>(requestData.Item1[4], values);
         }
         public Dictionary<int, int> AddKeys(Dictionary<int, int> data, Dictionary<int, int> dataOut)
         {

@@ -875,64 +875,62 @@ namespace RMDebugger
 
         async private Task LoadField(Dictionary<string, int> fields)
         {
-             
+            Configuration config = NeedThrough.Checked
+                ? new Configuration(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
+                : new Configuration(Options.mainInterface, TargetSignID.GetBytes());
 
+            Dictionary<string, (byte[], int)> cmdsOut = new Dictionary<string, (byte[], int)>();
+            foreach(string key in fields.Keys)
+            {
+                byte[] cmdOut = config.buildCmdLoadDelegate(key);
+                int valueLen = fieldsDict.ContainsKey(key) ? (int)fieldsDict[key] + 1 : 17;
+                int dataCount = valueLen + (key.Length + 1) + 6;
+                if (Options.through) dataCount += 4;
+                cmdsOut[key] = (cmdOut, dataCount);
+            }
 
+            void TryParseData(byte[] data, int fieldLen, out string dataValue, out Color clr)
+            {
+                try
+                {
+                    byte[] tempData = new byte[data.Length - 6 - fieldLen];
+                    Array.Copy(data, 4+fieldLen, tempData, 0, tempData.Length);
+                    dataValue = Methods.CheckSymbols(tempData);
+                    clr = Color.GreenYellow;
+                }
+                catch
+                {
+                    dataValue = "Error";
+                    clr = Color.Red;
+                }
+            }
 
-            /*DateTime t0 = DateTime.Now;
-            TimeSpan tstop = DateTime.Now - t0;
             foreach (string key in fields.Keys)
             {
-                byte[] cmdOut = NeedThrough.Checked ?
-                    config.ConfigLoad(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), key) :
-                    config.ConfigLoad(TargetSignID.GetBytes(), key);
-
-                int valueLength = fieldsDict.ContainsKey(key) ? (int)fieldsDict[key] + 1 : 17;
-                int fieldLength = key.Length + 1;
-                int dataCount = valueLength + fieldLength + 6;
-                dataCount = NeedThrough.Checked ? dataCount + 4 : dataCount;
-
-                Tuple<byte[], ProtocolReply> replyes = null;
-                byte[] cmdIn = null;
-
-                while (tstop.Seconds < RMPTimeout.Value)
+                ToMessageStatus($"{key}");
+                Tuple<byte[], ProtocolReply> reply;
+                while (true)
                 {
-                    tstop = DateTime.Now - t0;
+                    if (!Options.ConfigLoadState) return;
                     try
                     {
-                        replyes = await config.GetData(cmdOut, dataCount);
-                        cmdIn = replyes.Item1;
-                        ToMessageStatus($"{key} : {replyes.Item2}");
+                        reply = await config.GetData(cmdsOut[key].Item1, cmdsOut[key].Item2);
+                        ToReplyStatus(reply.Item2.ToString());
                         break;
                     }
                     catch (Exception ex)
                     {
-                        ToMessageStatus(ex.Message);
-                        if (ex.Message == "No interface")
-                        {
-                            BackToDefaults();
-                            return;
-                        }
+                        ToReplyStatus(ex.Message);
+                        if (ex.Message == "devNull") return;
                     }
-                    finally { await Task.Delay(50); }
+                    await Task.Delay(50);
                 }
-                try
-                {
-                    byte[] data = new byte[cmdIn.Length - (NeedThrough.Checked ? 10 : 6) - fieldLength];
-                    Array.Copy(cmdIn, 9 + key.Length, data, 0, data.Length);
-                    BeginInvoke((MethodInvoker)(() => {
-                        ConfigDataGrid[(int)ConfigColumns.ConfigLoad, fields[key]].Value = Methods.CheckSymbols(data);
-                        ColoredRow(fields[key], ConfigDataGrid, Color.GreenYellow);
-                    }));
-                }
-                catch
-                {
-                    BeginInvoke((MethodInvoker)(() => {
-                        ConfigDataGrid[(int)ConfigColumns.ConfigLoad, fields[key]].Value = "Error";
-                        ColoredRow(fields[key], ConfigDataGrid, Color.Red);
-                    }));
-                }
-            }*/
+                TryParseData(Options.through 
+                        ? config.ReturnWithoutThrough(reply.Item1) 
+                        : reply.Item1, key.Length + 1, 
+                    out string dataValue, out Color clr);
+                ColoredRow(dataValue, fields[key], ConfigDataGrid, clr);
+            }
         }
 
 
@@ -1018,26 +1016,18 @@ namespace RMDebugger
         private bool GetEnabledFields(out Dictionary<string, int> fields)
         {
             fields = new Dictionary<string, int>();
-            foreach(DataGridViewRow row in ConfigDataGrid.Rows)
+            foreach (DataGridViewRow row in ConfigDataGrid.Rows)
                 if (row.Cells[(int)ConfigColumns.ConfigColumn].Value != null)
-                    MessageBox.Show(row.Cells[(int)ConfigColumns.enabled].Value.ToString());
-
-
+                    if (Convert.ToBoolean(row.Cells[(int)ConfigColumns.enabled].Value) == true
+                        && !fields.ContainsKey((string)row.Cells[(int)ConfigColumns.ConfigColumn].Value))
+                        fields.Add((string)row.Cells[(int)ConfigColumns.ConfigColumn].Value, row.Index);
             return fields.Count > 0;
-            /*fields = new Dictionary<string, int>();
-            for (int i = 0; i < ConfigDataGrid.Rows.Count; i++)
-                if (ConfigDataGrid[(int)ConfigColumns.ConfigColumn, i].Value != null &&
-                    Convert.ToBoolean(ConfigDataGrid[(int)ConfigColumns.enabled, i].Value) == true &&
-                    !fields.ContainsKey((string)ConfigDataGrid[(int)ConfigColumns.ConfigColumn, i].Value))
-                    fields.Add((string)ConfigDataGrid[(int)ConfigColumns.ConfigColumn, i].Value, i);*/
         }
         private void OffControlsForConfig()
             => BeginInvoke((MethodInvoker)(() =>
             {
                 SerUdpPages.Enabled = false;
                 SignaturePanel.Enabled = false;
-                timerRmp.Start();
-                RMPTimeout.Enabled = false;
             }));
         /*async private Task UploadField(Configuration config, Dictionary<string, int> fields)
         {
@@ -1091,8 +1081,9 @@ namespace RMDebugger
                     ColoredRow(fields[key], ConfigDataGrid, Color.Red);
             }
         }*/
-        private void ColoredRow(int index, DataGridView dgv, Color color)
+        private void ColoredRow(string value, int index, DataGridView dgv, Color color)
             => Invoke((MethodInvoker)(async () => {
+                dgv[(int)ConfigColumns.ConfigLoad, index].Value = value;
                 dgv.Rows[index].DefaultCellStyle.BackColor = color;
                 await Task.Delay(500);
                 dgv.Rows[index].DefaultCellStyle.BackColor = Color.White;
@@ -1202,7 +1193,6 @@ namespace RMDebugger
                 SignaturePanel.Enabled = true;
                 NeedThrough.Enabled = true;
                 ClearInfoTestRS485.Enabled = true;
-                RMPTimeout.Enabled = true;
                 AddSigTestRM.Enabled = true;
                 InfoTree.Enabled = true;
                 ExtraButtonsGroup.Enabled = true;
@@ -1220,13 +1210,7 @@ namespace RMDebugger
                 dataBits.Enabled = true;
                 Parity.Enabled = true;
                 stopBits.Enabled = true;
-                if (RMPStatusBar.Value != (int)RMPTimeout.Value)
-                {
-                    RMPStatusBar.Value = (int)RMPTimeout.Value;
-                    timerLabel.Text = RMPStatusBar.Value.ToString();
-                }
                 ThroughOrNot();
-                timerRmp.Stop();
             }));
         }
         private void SetProperties()
@@ -1767,19 +1751,6 @@ namespace RMDebugger
                 devInterface, signature, type, "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, version);
             }));
         
-        
- 
-        private void timerRmp_Tick(object sender, EventArgs e)
-        {
-            if (RMPStatusBar.Value != 0) BeginInvoke((MethodInvoker)(() => {
-                RMPStatusBar.Value -= 1;
-                timerLabel.Text = RMPStatusBar.Value.ToString();
-            }));
-        }
-        private void RMPTimeout_ValueChanged(object sender, EventArgs e) {
-            RMPStatusBar.Value =  RMPStatusBar.Maximum = (int)RMPTimeout.Value;
-            timerLabel.Text = RMPTimeout.Value.ToString();
-        }
         private void NotifyMessage_Click(object sender, EventArgs e) => this.WindowState = FormWindowState.Normal;
 
         async private void InfoTree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -2115,7 +2086,5 @@ namespace RMDebugger
                 numericDaysTest.Value += 1;
             }
         }));
-
-
     }
 }

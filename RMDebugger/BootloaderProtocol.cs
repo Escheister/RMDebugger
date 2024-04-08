@@ -36,8 +36,8 @@ namespace BootloaderProtocol
 
         private byte[] _addrHex;
         private byte[] _addrElar;
-        private byte[] _throughSign;
-        private byte[] _targetSign;
+        private readonly byte[] _throughSign;
+        private readonly byte[] _targetSign;
 
         public BuildCmdDelegate buildCmdDelegate;
         public BuildDataCmdDelegate buildDataCmdDelegate;
