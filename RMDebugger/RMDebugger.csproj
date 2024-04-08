@@ -103,12 +103,6 @@
       <DependentUpon>DataDebugger.cs</DependentUpon>
     </Compile>
     <Compile Include="ForTests.cs" />
-    <Compile Include="HexUpdate.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HexUpdate.Designer.cs">
-      <DependentUpon>HexUpdate.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Configuration.cs" />
@@ -131,9 +125,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DataDebugger.resx">
       <DependentUpon>DataDebugger.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="HexUpdate.resx">
-      <DependentUpon>HexUpdate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

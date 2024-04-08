@@ -6,7 +6,7 @@
         RMR = 0x06, ATO = 0x07, RMZ = 0x08, RMTA = 0x09, RMPA = 0x0A, 
         RMIO = 0x10, RMTG = 0x11, VCS = 0x21, VUC = 0x22, MCSP = 0x23,
         MCS = 0x24, TABLET_OR_MRIS = 0x25, BCOM = 0x31, NAP = 0x32,
-        SERVER = 0x41, DI8 = 0x50, DI7C = 0x51, NAMUR = 0x52, 
+        SERVER = 0x41, DI8 = 0x50, DI7C = 0x51, NAMUR = 0x52,
         DO8 = 0x53, DO7R = 0x54, AI4 = 0x55, AI4T = 0x56, LTL9 = 0x57,
     }
     enum ProtocolReply : int
@@ -127,7 +127,7 @@
     enum InfoGrid { Signature, Type, Version, Radio, Location, Fio, Date }
 
     enum ConfigCheckList { None, uInt16=5, len4=4, len16=16 }
-    enum ConfigColumns { fColumn, enabled, fLoad, fUpload }
+    enum ConfigColumns { ConfigColumn, enabled, ConfigLoad, ConfigUpload }
 
     enum RmResult : byte
     {
