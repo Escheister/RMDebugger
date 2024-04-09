@@ -24,7 +24,7 @@ namespace ConfigurationProtocol
             buildCmdUploadDelegate += ConfigUploadThrough;
         }
         private byte[] _throughSign;
-        private byte[] _targetSign;
+        public byte[] _targetSign;
         public BuildCmdLoadDelegate buildCmdLoadDelegate;
         public BuildCmdUploadDelegate buildCmdUploadDelegate;
 

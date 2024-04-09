@@ -957,7 +957,6 @@
             this.UploadConfigButton.Text = "Upload to device";
             this.UploadConfigButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.UploadConfigButton.UseVisualStyleBackColor = true;
-            this.UploadConfigButton.Click += new System.EventHandler(this.UploadConfigButton_Click);
             // 
             // LoadConfigButton
             // 
@@ -1996,7 +1995,6 @@
             this.PasswordBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.PasswordBox.UseSystemPasswordChar = true;
             this.PasswordBox.Visible = false;
-            this.PasswordBox.TextChanged += new System.EventHandler(this.PasswordBox_TextChanged);
             // 
             // statusStrip1
             // 
@@ -2457,7 +2455,6 @@
             this.AboutButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.AboutButton.Name = "AboutButton";
             this.AboutButton.Size = new System.Drawing.Size(22, 22);
-            this.AboutButton.Click += new System.EventHandler(this.AboutButton_Click);
             // 
             // UpdateButton
             // 

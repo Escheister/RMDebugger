@@ -131,7 +131,8 @@ namespace RMDebugger
             byte[] cmdIn = receiveTask.Result;
 
             ProtocolReply reply = Options.through
-                ? Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough, new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
+                ? Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
+                                          new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
                 : Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
 
             Methods.ToLogger(cmdOut, cmdIn, reply);
@@ -146,7 +147,7 @@ namespace RMDebugger
             if (!Options.mainIsAvailable) throw new Exception("devNull");
             sendData(cmdOut);
 
-            Task<byte[]> receiveTask = receiveData(size, Options.through ? ms*2 : ms);
+            Task<byte[]> receiveTask = receiveData(size, Options.through ? ms * 2 : ms);
 
             PraseCmd(cmdOut, out CmdInput cmdMain, out CmdInput cmdThrough);
 
@@ -155,7 +156,8 @@ namespace RMDebugger
             byte[] cmdIn = receiveTask.Result;
 
             ProtocolReply reply = Options.through 
-                ? Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough, new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
+                ? Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
+                                          new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
                 : Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
 
             reply = cmdMain == CmdInput.LOAD_DATA_PAGE ? Methods.GetDataReply(cmdIn, cmdOut) : reply;
