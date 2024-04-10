@@ -1,22 +1,36 @@
 ﻿using System.Collections.Generic;
-using System.Net.Sockets;
-using System.IO.Ports;
 using System;
 
-using SearchProtocol;
 using ProtocolEnums;
 using StaticMethods;
 
 namespace RMDebugger
 {
-    internal class Information : Searching
+    internal class Information : CommandsOutput
     {
-        public Information(object sender) : base(sender) { }
+        public delegate byte[] BuildCmdDelegate(CmdOutput cmdOutput);
 
-        public byte[] GetInfo(byte[] rmSign, CmdOutput cmdOutput)
-            => FormatCmdOut(rmSign, cmdOutput, 0xff);
-        public byte[] GetInfo(byte[] rmSign, byte[] rmThrough, CmdOutput cmdOutput)
-            => CmdThroughRm(GetInfo(rmSign, cmdOutput), rmThrough, CmdOutput.ROUTING_THROUGH);
+        public Information(object sender, byte[] targetSign) : base(sender)
+        {
+            _targetSign = targetSign;
+            buildCmdDelegate += BuildCmd;
+        }
+        public Information(object sender, byte[] targetSign, byte[] throughSign) : base(sender)
+        {
+            _targetSign = targetSign;
+            _throughSign = throughSign;
+            buildCmdDelegate += BuildCmdThrough;
+        }
+
+        private readonly byte[] _throughSign;
+        private readonly byte[] _targetSign;
+
+        public BuildCmdDelegate buildCmdDelegate;
+
+        public byte[] BuildCmd(CmdOutput cmdOutput)
+            => FormatCmdOut(_targetSign, cmdOutput, 0xff);
+        public byte[] BuildCmdThrough(CmdOutput cmdOutput)
+            => CmdThroughRm(BuildCmd(cmdOutput), _throughSign, CmdOutput.ROUTING_THROUGH);
 
         private byte[] ByteArrayParse(byte[] data, byte exception)
         {

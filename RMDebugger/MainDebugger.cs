@@ -1160,8 +1160,8 @@ namespace RMDebugger
                 }
                 else
                 {
-                    byte[] cmdOut = !NeedThrough.Checked ? info.GetInfo(TargetSignID.GetBytes(), dict[e.Node.Name]) :
-                    info.GetInfo(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), dict[e.Node.Name]);
+                    byte[] cmdOut = !NeedThrough.Checked ? info.BuildCmd(TargetSignID.GetBytes(), dict[e.Node.Name]) :
+                    info.BuildCmdThrough(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), dict[e.Node.Name]);
                     reply = await info.GetData(cmdOut, size, 100);
                     byte[] cmdIn = !NeedThrough.Checked ? reply.Item1 : info.ReturnWithoutThrough(reply.Item1);
                     Dictionary<string, string> data = info.CmdInParse(cmdIn);
