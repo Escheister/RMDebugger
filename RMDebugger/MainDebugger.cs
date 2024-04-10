@@ -585,7 +585,7 @@ namespace RMDebugger
                     {
                         rows.Add(new DataGridViewRow());
                         rows[rows.Count - 1].CreateCells(DistTofGrid, key, data[key]);
-                        rows[rows.Count - 1].Height = 17;
+                        rows[rows.Count - 1].Height = 18;
                     }
                 Action action = () => {
                     DistTofGrid.Rows.Clear();
@@ -659,8 +659,10 @@ namespace RMDebugger
                         && ((DevType)data[key]).ToString() != Options.typeOfGetNear || key == TargetSignID.Value) continue;
                     rows.Add(new DataGridViewRow());
                     rows[rows.Count - 1].CreateCells(DistTofGrid, key, (DevType)data[key]);
-                    rows[rows.Count - 1].Height = 17;
-                    rows[rows.Count - 1].DefaultCellStyle.BackColor = mirrorList.Contains(key) ? mirClr : Color.White;
+                    rows[rows.Count - 1].Height = 18;
+                    if (mirrorList.Count > 0)
+                        rows[rows.Count - 1].DefaultCellStyle.BackColor = 
+                            mirrorList.Contains(key) ? mirClr : Color.White;
                 }
                 Action action = () =>
                 {
@@ -1100,6 +1102,115 @@ namespace RMDebugger
 
         //Get info
 
+
+        async private void InfoTree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            Dictionary<string, CmdOutput> dict = new Dictionary<string, CmdOutput>()
+            {
+                ["WhoAreYouInfo"] = CmdOutput.WHO_ARE_YOU,
+                ["StatusInfo"] = CmdOutput.STATUS,
+                ["GetNearInfo"] = CmdOutput.GRAPH_GET_NEAR,
+            };
+            try { TargetSignID.Value = Convert.ToUInt16(e.Node.Text); }
+            catch { }
+            if (!dict.ContainsKey(e.Node.Name)) return;
+            Information info = new Information(Options.mainInterface);
+            Invoke((MethodInvoker)(() => {
+                SerUdpPages.Enabled = false;
+                InfoTree.Enabled = false;
+                e.Node.Nodes.Clear();
+            }));
+            offTabsExcept(RMData, InfoPage);
+            Tuple<byte[], ProtocolReply> reply;
+
+            CmdMaxSize cmdSize;
+            Enum.TryParse(Enum.GetName(typeof(CmdOutput), dict[e.Node.Name]), out cmdSize);
+            int size = !NeedThrough.Checked ? (int)cmdSize : (int)cmdSize + 6;
+
+            try
+            {
+                if (dict[e.Node.Name] == CmdOutput.GRAPH_GET_NEAR)
+                {
+                    Dictionary<int, int> data = await GetDeviceListInfo(info, dict[e.Node.Name], TargetSignID.GetBytes());
+                    BeginInvoke((MethodInvoker)(() => {
+                        string radio = data is null || data.Count == 0 ? "Error" : "Ok";
+                        TreeNode getnear = new TreeNode($"Radio: {radio}");
+                        InfoFieldsGrid.Rows[(int)InfoGrid.Radio].Cells[1].Value = radio;
+                        e.Node.Nodes.Add(getnear);
+                        Dictionary<string, List<int>> newData = new Dictionary<string, List<int>>();
+                        if (radio != "Error")
+                            foreach (int key in data.Keys)
+                            {
+                                if (!newData.ContainsKey($"{(DevType)data[key]}")) newData[$"{(DevType)data[key]}"] = new List<int>();
+                                newData[$"{(DevType)data[key]}"].Add(key);
+                            }
+                        foreach (string key in newData.Keys)
+                        {
+                            TreeNode type = new TreeNode($"{key}: {newData[key].Count}");
+                            getnear.Nodes.Add(type);
+                            foreach (int i in newData[key])
+                            {
+                                TreeNode signature = new TreeNode($"{i}");
+                                type.Nodes.Add(signature);
+                                signature.ToolTipText = $"Нажмите на сигнатуру {i}, что бы опросить";
+                            }
+                        }
+                        e.Node.ExpandAll();
+                    }));
+                }
+                else
+                {
+                    byte[] cmdOut = !NeedThrough.Checked ? info.GetInfo(TargetSignID.GetBytes(), dict[e.Node.Name]) :
+                    info.GetInfo(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), dict[e.Node.Name]);
+                    reply = await info.GetData(cmdOut, size, 100);
+                    byte[] cmdIn = !NeedThrough.Checked ? reply.Item1 : info.ReturnWithoutThrough(reply.Item1);
+                    Dictionary<string, string> data = info.CmdInParse(cmdIn);
+                    ToMessageStatus(reply.Item2.ToString());
+                    BeginInvoke((MethodInvoker)(() => {
+                        data.Add("Date", DateTime.Now.ToString("dd-MM-yy HH:mm"));
+                        foreach (string str in data.Keys)
+                        {
+                            e.Node.Nodes.Add($"{str}: {data[str]}");
+                            if (Enum.GetNames(typeof(InfoGrid)).Contains(str))
+                                InfoFieldsGrid.Rows[(int)Enum.Parse(typeof(InfoGrid), str)].Cells[1].Value = data[str];
+                        }
+                        e.Node.Expand();
+                    }));
+                }
+            }
+            catch (Exception ex) { ToMessageStatus(ex.Message); }
+            finally { BackToDefaults(); }
+        }
+        private void OpenCloseMenuInfoTree_Click(object sender, EventArgs e)
+        {
+            if (OpenCloseMenuInfoTree.Text == "<")
+            {
+                OpenCloseMenuInfoTree.Text = ">";
+                InfoTreePanel.Location = new Point(InfoTreePanel.Location.X - 162, InfoTreePanel.Location.Y);
+            }
+            else
+            {
+                OpenCloseMenuInfoTree.Text = "<";
+                InfoTreePanel.Location = new Point(InfoTreePanel.Location.X + 162, InfoTreePanel.Location.Y);
+            }
+        }
+        private void InfoClearGrid_Click(object sender, EventArgs e) => DefaultInfoGrid();
+        private void InfoSaveToCSVButton_Click(object sender, EventArgs e)
+        {
+            if ((string)InfoFieldsGrid.Rows[0].Cells[1].Value == string.Empty) return;
+            string path = Environment.CurrentDirectory + $"\\InformationAboutDevice.csv";
+            CSVLib csv = new CSVLib(path);
+            string columns = "";
+            string[] columnsEnum = Enum.GetNames(typeof(InfoGrid));
+            foreach (string column in columnsEnum)
+                columns += column != "Date" ? $"{column};" : column;
+            csv.AddFields(columns);
+            csv.MainIndexes = new int[] { 0, 1, columnsEnum.Length - 1 };
+            List<string> list = new List<string>();
+            for (int i = 0; i < InfoFieldsGrid.Rows.Count; i++)
+                list.Add((string)InfoFieldsGrid.Rows[i].Cells[1].Value);
+            csv.WriteCsv(string.Join(";", list));
+        }
 
 
 
@@ -1760,116 +1871,7 @@ namespace RMDebugger
         
         private void NotifyMessage_Click(object sender, EventArgs e) => this.WindowState = FormWindowState.Normal;
 
-        async private void InfoTree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
-            Dictionary<string, CmdOutput> dict = new Dictionary<string, CmdOutput>()
-            {
-                ["WhoAreYouInfo"] = CmdOutput.WHO_ARE_YOU,
-                ["StatusInfo"] = CmdOutput.STATUS,
-                ["GetNearInfo"] = CmdOutput.GRAPH_GET_NEAR,
-            };
-            try { TargetSignID.Value = Convert.ToUInt16(e.Node.Text); }
-            catch { }
-            if (!dict.ContainsKey(e.Node.Name)) return;
-            Information info = new Information(Options.mainInterface);
-            Invoke((MethodInvoker)(() => {
-                if (mainPort.IsOpen) Methods.FlushBuffer(mainPort);
-                if (udpGate.Connected) Methods.FlushBuffer(udpGate);
-                SerUdpPages.Enabled = false;
-                InfoTree.Enabled = false;
-                e.Node.Nodes.Clear();
-            }));
-            offTabsExcept(RMData, InfoPage);
-            Tuple<byte[], ProtocolReply> reply;
 
-            CmdMaxSize cmdSize;
-            Enum.TryParse(Enum.GetName(typeof(CmdOutput), dict[e.Node.Name]), out cmdSize);
-            int size = !NeedThrough.Checked ? (int)cmdSize : (int)cmdSize + 6;
-
-            try
-            {
-                if (dict[e.Node.Name] == CmdOutput.GRAPH_GET_NEAR)
-                {
-                    Dictionary<int, int> data = await GetDeviceListInfo(info, dict[e.Node.Name], TargetSignID.GetBytes());
-                    BeginInvoke((MethodInvoker)(() => {
-                        string radio = data is null || data.Count == 0 ? "Error" : "Ok";
-                        TreeNode getnear = new TreeNode($"Radio: {radio}");
-                        InfoFieldsGrid.Rows[(int)InfoGrid.Radio].Cells[1].Value = radio;
-                        e.Node.Nodes.Add(getnear);
-                        Dictionary<string, List<int>> newData = new Dictionary<string, List<int>>();
-                        if (radio != "Error")
-                            foreach (int key in data.Keys)
-                            {
-                                if (!newData.ContainsKey($"{(DevType)data[key]}")) newData[$"{(DevType)data[key]}"] = new List<int>();
-                                newData[$"{(DevType)data[key]}"].Add(key);
-                            }
-                        foreach (string key in newData.Keys)
-                        {
-                            TreeNode type = new TreeNode($"{key}: {newData[key].Count}");
-                            getnear.Nodes.Add(type);
-                            foreach (int i in newData[key])
-                            {
-                                TreeNode signature = new TreeNode($"{i}");
-                                type.Nodes.Add(signature);
-                                signature.ToolTipText = $"Нажмите на сигнатуру {i}, что бы опросить";
-                            }
-                        }
-                        e.Node.ExpandAll();
-                    }));
-                }
-                else
-                {
-                    byte[] cmdOut = !NeedThrough.Checked ? info.GetInfo(TargetSignID.GetBytes(), dict[e.Node.Name]) :
-                    info.GetInfo(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), dict[e.Node.Name]);
-                    reply = await info.GetData(cmdOut, size, 100);
-                    byte[] cmdIn = !NeedThrough.Checked ? reply.Item1 : info.ReturnWithoutThrough(reply.Item1);
-                    Dictionary<string, string> data = info.CmdInParse(cmdIn);
-                    ToMessageStatus(reply.Item2.ToString());
-                    BeginInvoke((MethodInvoker)(() => {
-                        data.Add("Date", DateTime.Now.ToString("dd-MM-yy HH:mm"));
-                        foreach (string str in data.Keys)
-                        {
-                            e.Node.Nodes.Add($"{str}: {data[str]}");
-                            if (Enum.GetNames(typeof(InfoGrid)).Contains(str))
-                                InfoFieldsGrid.Rows[(int)Enum.Parse(typeof(InfoGrid), str)].Cells[1].Value = data[str];
-                        }
-                        e.Node.Expand();
-                    }));
-                }
-            }
-            catch (Exception ex) { ToMessageStatus(ex.Message); }
-            finally { BackToDefaults(); }
-        }
-        private void OpenCloseMenuInfoTree_Click(object sender, EventArgs e)
-        {
-            if (OpenCloseMenuInfoTree.Text == "<")
-            {
-                OpenCloseMenuInfoTree.Text = ">";
-                InfoTreePanel.Location = new Point(InfoTreePanel.Location.X - 162, InfoTreePanel.Location.Y);
-            }
-            else
-            {
-                OpenCloseMenuInfoTree.Text = "<";
-                InfoTreePanel.Location = new Point(InfoTreePanel.Location.X + 162, InfoTreePanel.Location.Y);
-            }
-        }
-        private void InfoClearGrid_Click(object sender, EventArgs e) => DefaultInfoGrid();
-        private void InfoSaveToCSVButton_Click(object sender, EventArgs e)
-        {
-            if ((string)InfoFieldsGrid.Rows[0].Cells[1].Value == string.Empty) return;
-            string path = Environment.CurrentDirectory + $"\\InformationAboutDevice.csv";
-            CSVLib csv = new CSVLib(path);
-            string columns = "";
-            string[] columnsEnum = Enum.GetNames(typeof(InfoGrid));
-            foreach (string column in columnsEnum)
-                columns += column != "Date" ? $"{column};" : column;
-            csv.AddFields(columns);
-            csv.MainIndexes = new int[] { 0, 1, columnsEnum.Length - 1 };
-            List<string> list = new List<string>();
-            for (int i = 0; i < InfoFieldsGrid.Rows.Count; i++)
-                list.Add((string)InfoFieldsGrid.Rows[i].Cells[1].Value);
-            csv.WriteCsv(string.Join(";", list));
-        }
         async private void SetOnlineButton_Click(object sender, EventArgs e) =>
              await Task.Run(() => SendCommandFromButton(new CommandsOutput(Options.mainInterface), CmdOutput.ONLINE));
         async private void ResetButton_Click(object sender, EventArgs e) =>
