@@ -118,6 +118,8 @@ namespace RMDebugger
 
             LoadConfigButton.Click += LoadConfigButtonClick;
             UploadConfigButton.Click += UploadConfigButtonClick;
+
+            InfoTree.NodeMouseClick += InfoTreeNodeClick;
         }
 
 
@@ -543,7 +545,30 @@ namespace RMDebugger
                 ExtendedBox.Enabled = !Options.through;
             ThroughSignID.Enabled = Options.through;
         }
-        
+
+        // method for Get near & Dist Tof
+        async private Task<Dictionary<int, int>> GetDeviceListInfo(Searching search, CmdOutput cmdOutput, byte[] rmSign)
+        {
+            byte ix = 0x00;
+            int iteration = 1;
+            byte[] rmThrough = ThroughSignID.GetBytes();
+            Dictionary<int, int> dataReturn = new Dictionary<int, int>();
+            try
+            {
+                do
+                {
+                    Tuple<byte, Dictionary<int, int>> data = await search.RequestAndParseNew(cmdOutput, ix, rmSign, rmThrough);
+                    ToReplyStatus("Ok");
+                    ix = data.Item1;
+                    iteration++;
+                    search.AddKeys(dataReturn, data.Item2);
+                }
+                while (ix != 0x00 && iteration <= 5);
+            }
+            catch (Exception ex) { ToReplyStatus(ex.Message); }
+            return dataReturn.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+        }
+
         //DistTof
         async private void DistTofClick(object sender, EventArgs e)
         {
@@ -1101,11 +1126,63 @@ namespace RMDebugger
 
 
         //Get info
+        async private void InfoTreeNodeClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if (UInt16.TryParse(e.Node.Text, out ushort newSignTarget))
+            {
+                TargetSignID.Value = newSignTarget;
+                return;
+            }
+            //выключение всего
+            e.Node.Nodes.Clear();
+            switch (e.Node.Name)
+            {
+                case "GetNearInfo":
+                    Searching search = new Searching(Options.mainInterface);
+                    Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
+                    string radio = data.Count > 0 ? "Ok" : "Null";
+                    TreeNode getnear = new TreeNode($"Radio: {radio}");
+                    e.Node.Nodes.Add(getnear);
+                    InfoFieldsGrid.Rows[(int)InfoGrid.Radio].Cells[1].Value = radio;
+                    if (data.Count > 0) {
+                        Dictionary<string, List<int>> typeNodesData = new Dictionary<string, List<int>>();
+                        foreach (int key in data.Keys)
+                        {
+                            string type = $"{(DevType)data[key]}";
+                            if (!typeNodesData.ContainsKey(type)) typeNodesData[type] = new List<int>();
+                            typeNodesData[type].Add(key);
+                        }
 
+                        List<TreeNode> typeNodesList = new List<TreeNode>();
+                        foreach (string key in typeNodesData.Keys)
+                        {
+                            TreeNode typeNode = new TreeNode($"{key} : {typeNodesData[key].Count}");
+                            foreach (int sign in typeNodesData[key]) 
+                                typeNode.Nodes.Add(
+                                    new TreeNode($"{sign}") 
+                                    {
+                                        ToolTipText = $"Нажмите на сигнатуру {key}, что бы опросить"
+                                    });
+                            typeNodesList.Add(typeNode);
+                        }
+                        getnear.Nodes.AddRange(typeNodesList.ToArray());
+                    }
+                    e.Node.ExpandAll();
+                    //включение всего
+                    return;
+                case "WhoAreYouInfo":
+
+                    break;
+                case "StatusInfo":
+                    break;
+                default: return;
+            }
+
+        }
 
         async private void InfoTree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            Dictionary<string, CmdOutput> dict = new Dictionary<string, CmdOutput>()
+            /*Dictionary<string, CmdOutput> dict = new Dictionary<string, CmdOutput>()
             {
                 ["WhoAreYouInfo"] = CmdOutput.WHO_ARE_YOU,
                 ["StatusInfo"] = CmdOutput.STATUS,
@@ -1160,8 +1237,7 @@ namespace RMDebugger
                 }
                 else
                 {
-                    byte[] cmdOut = !NeedThrough.Checked ? info.BuildCmd(TargetSignID.GetBytes(), dict[e.Node.Name]) :
-                    info.BuildCmdThrough(TargetSignID.GetBytes(), ThroughSignID.GetBytes(), dict[e.Node.Name]);
+                    byte[] cmdOut = info.buildCmdDelegate(dict[e.Node.Name]);
                     reply = await info.GetData(cmdOut, size, 100);
                     byte[] cmdIn = !NeedThrough.Checked ? reply.Item1 : info.ReturnWithoutThrough(reply.Item1);
                     Dictionary<string, string> data = info.CmdInParse(cmdIn);
@@ -1179,7 +1255,7 @@ namespace RMDebugger
                 }
             }
             catch (Exception ex) { ToMessageStatus(ex.Message); }
-            finally { BackToDefaults(); }
+            finally { BackToDefaults(); }*/
         }
         private void OpenCloseMenuInfoTree_Click(object sender, EventArgs e)
         {
@@ -1409,28 +1485,7 @@ namespace RMDebugger
 
         
 
-        async private Task<Dictionary<int, int>> GetDeviceListInfo(Searching search, CmdOutput cmdOutput, byte[] rmSign)
-        {
-            byte ix = 0x00;
-            int iteration = 1;
-            byte[] rmThrough = ThroughSignID.GetBytes();
-            bool through = NeedThrough.Checked;
-            Dictionary<int, int> dataReturn = new Dictionary<int, int>();
-            try
-            {
-                do
-                {
-                    Tuple<byte, Dictionary<int, int>> data = await search.RequestAndParseNew(cmdOutput, ix, rmSign, rmThrough, through);
-                    ToReplyStatus("Ok");
-                    ix = data.Item1;
-                    iteration++;
-                    search.AddKeys(dataReturn, data.Item2);
-                }
-                while (ix != 0x00 && iteration <= 5);
-            }
-            catch (Exception ex) { ToReplyStatus(ex.Message); }
-            return dataReturn.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
-        }
+
         
  
         private void ClearStatusStatusRM_Click(object sender, EventArgs e)
