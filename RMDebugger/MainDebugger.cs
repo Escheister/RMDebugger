@@ -120,6 +120,7 @@ namespace RMDebugger
             UploadConfigButton.Click += UploadConfigButtonClick;
 
             InfoTree.NodeMouseClick += InfoTreeNodeClick;
+            StartTestRSButton.Click += StartTestRSButtonClick;
         }
 
 
@@ -1133,18 +1134,19 @@ namespace RMDebugger
                 TargetSignID.Value = newSignTarget;
                 return;
             }
-            //выключение всего
-            e.Node.Nodes.Clear();
             switch (e.Node.Name)
             {
                 case "GetNearInfo":
                     Searching search = new Searching(Options.mainInterface);
                     Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
                     string radio = data.Count > 0 ? "Ok" : "Null";
+                    e.Node.Nodes.Clear();
                     TreeNode getnear = new TreeNode($"Radio: {radio}");
                     e.Node.Nodes.Add(getnear);
                     InfoFieldsGrid.Rows[(int)InfoGrid.Radio].Cells[1].Value = radio;
-                    if (data.Count > 0) {
+                    if (data.Count > 0)
+                    {
+                        e.Node.Expand();
                         Dictionary<string, List<int>> typeNodesData = new Dictionary<string, List<int>>();
                         foreach (int key in data.Keys)
                         {
@@ -1156,119 +1158,62 @@ namespace RMDebugger
                         List<TreeNode> typeNodesList = new List<TreeNode>();
                         foreach (string key in typeNodesData.Keys)
                         {
-                            TreeNode typeNode = new TreeNode($"{key} : {typeNodesData[key].Count}");
+                            TreeNode typeNode = new TreeNode($"{key}: {typeNodesData[key].Count}");
                             foreach (int sign in typeNodesData[key]) 
                                 typeNode.Nodes.Add(
                                     new TreeNode($"{sign}") 
                                     {
-                                        ToolTipText = $"Нажмите на сигнатуру {key}, что бы опросить"
+                                        ToolTipText = $"Нажмите на сигнатуру {sign}, что бы опросить",
+                                        ForeColor = SystemColors.HotTrack
                                     });
                             typeNodesList.Add(typeNode);
                         }
                         getnear.Nodes.AddRange(typeNodesList.ToArray());
+                        getnear.Expand();
                     }
-                    e.Node.ExpandAll();
-                    //включение всего
+                    e.Node.Expand();
                     return;
                 case "WhoAreYouInfo":
-
+                    GetInfoAboutDevice(CmdOutput.WHO_ARE_YOU, e.Node);
                     break;
                 case "StatusInfo":
+                    GetInfoAboutDevice(CmdOutput.STATUS, e.Node);
                     break;
                 default: return;
             }
-
         }
-
-        async private void InfoTree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        async private void GetInfoAboutDevice(CmdOutput cmdOutput, TreeNode treeNode)
         {
-            /*Dictionary<string, CmdOutput> dict = new Dictionary<string, CmdOutput>()
-            {
-                ["WhoAreYouInfo"] = CmdOutput.WHO_ARE_YOU,
-                ["StatusInfo"] = CmdOutput.STATUS,
-                ["GetNearInfo"] = CmdOutput.GRAPH_GET_NEAR,
-            };
-            try { TargetSignID.Value = Convert.ToUInt16(e.Node.Text); }
-            catch { }
-            if (!dict.ContainsKey(e.Node.Name)) return;
-            Information info = new Information(Options.mainInterface);
-            Invoke((MethodInvoker)(() => {
-                SerUdpPages.Enabled = false;
-                InfoTree.Enabled = false;
-                e.Node.Nodes.Clear();
-            }));
-            offTabsExcept(RMData, InfoPage);
-            Tuple<byte[], ProtocolReply> reply;
+            Information info = NeedThrough.Checked 
+                ? new Information(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
+                : new Information(Options.mainInterface, TargetSignID.GetBytes());
 
-            CmdMaxSize cmdSize;
-            Enum.TryParse(Enum.GetName(typeof(CmdOutput), dict[e.Node.Name]), out cmdSize);
-            int size = !NeedThrough.Checked ? (int)cmdSize : (int)cmdSize + 6;
-
+            byte[] cmdOut = info.buildCmdDelegate(cmdOutput);
+            int size = !NeedThrough.Checked ? (int)cmdOutput : (int)cmdOutput + 6;
+            treeNode.Nodes.Clear();
             try
             {
-                if (dict[e.Node.Name] == CmdOutput.GRAPH_GET_NEAR)
+                Tuple<byte[], ProtocolReply> reply = await info.GetData(cmdOut, size);
+                ToReplyStatus(reply.Item2.ToString());
+                byte[] cmdIn = !NeedThrough.Checked ? reply.Item1 : info.ReturnWithoutThrough(reply.Item1);
+                Dictionary<string, string> data = info.CmdInParse(cmdIn);
+                data.Add("Date", DateTime.Now.ToString("dd-MM-yy HH:mm"));
+                foreach (string str in data.Keys)
                 {
-                    Dictionary<int, int> data = await GetDeviceListInfo(info, dict[e.Node.Name], TargetSignID.GetBytes());
-                    BeginInvoke((MethodInvoker)(() => {
-                        string radio = data is null || data.Count == 0 ? "Error" : "Ok";
-                        TreeNode getnear = new TreeNode($"Radio: {radio}");
-                        InfoFieldsGrid.Rows[(int)InfoGrid.Radio].Cells[1].Value = radio;
-                        e.Node.Nodes.Add(getnear);
-                        Dictionary<string, List<int>> newData = new Dictionary<string, List<int>>();
-                        if (radio != "Error")
-                            foreach (int key in data.Keys)
-                            {
-                                if (!newData.ContainsKey($"{(DevType)data[key]}")) newData[$"{(DevType)data[key]}"] = new List<int>();
-                                newData[$"{(DevType)data[key]}"].Add(key);
-                            }
-                        foreach (string key in newData.Keys)
-                        {
-                            TreeNode type = new TreeNode($"{key}: {newData[key].Count}");
-                            getnear.Nodes.Add(type);
-                            foreach (int i in newData[key])
-                            {
-                                TreeNode signature = new TreeNode($"{i}");
-                                type.Nodes.Add(signature);
-                                signature.ToolTipText = $"Нажмите на сигнатуру {i}, что бы опросить";
-                            }
-                        }
-                        e.Node.ExpandAll();
-                    }));
+                    treeNode.Nodes.Add($"{str}: {data[str]}");
+                    if (Enum.GetNames(typeof(InfoGrid)).Contains(str))
+                        InfoFieldsGrid.Rows[(int)Enum.Parse(typeof(InfoGrid), str)].Cells[1].Value = data[str];
                 }
-                else
-                {
-                    byte[] cmdOut = info.buildCmdDelegate(dict[e.Node.Name]);
-                    reply = await info.GetData(cmdOut, size, 100);
-                    byte[] cmdIn = !NeedThrough.Checked ? reply.Item1 : info.ReturnWithoutThrough(reply.Item1);
-                    Dictionary<string, string> data = info.CmdInParse(cmdIn);
-                    ToMessageStatus(reply.Item2.ToString());
-                    BeginInvoke((MethodInvoker)(() => {
-                        data.Add("Date", DateTime.Now.ToString("dd-MM-yy HH:mm"));
-                        foreach (string str in data.Keys)
-                        {
-                            e.Node.Nodes.Add($"{str}: {data[str]}");
-                            if (Enum.GetNames(typeof(InfoGrid)).Contains(str))
-                                InfoFieldsGrid.Rows[(int)Enum.Parse(typeof(InfoGrid), str)].Cells[1].Value = data[str];
-                        }
-                        e.Node.Expand();
-                    }));
-                }
+                treeNode.Expand();
             }
-            catch (Exception ex) { ToMessageStatus(ex.Message); }
-            finally { BackToDefaults(); }*/
+            catch (Exception ex) { ToReplyStatus(ex.Message); }
         }
         private void OpenCloseMenuInfoTree_Click(object sender, EventArgs e)
         {
-            if (OpenCloseMenuInfoTree.Text == "<")
-            {
-                OpenCloseMenuInfoTree.Text = ">";
-                InfoTreePanel.Location = new Point(InfoTreePanel.Location.X - 162, InfoTreePanel.Location.Y);
-            }
-            else
-            {
-                OpenCloseMenuInfoTree.Text = "<";
-                InfoTreePanel.Location = new Point(InfoTreePanel.Location.X + 162, InfoTreePanel.Location.Y);
-            }
+            InfoTreePanel.Location = OpenCloseMenuInfoTree.Text == "<"
+                ? new Point(InfoTreePanel.Location.X - 162, InfoTreePanel.Location.Y)
+                : new Point(InfoTreePanel.Location.X + 162, InfoTreePanel.Location.Y);
+            OpenCloseMenuInfoTree.Text = OpenCloseMenuInfoTree.Text == "<" ? ">" : "<";
         }
         private void InfoClearGrid_Click(object sender, EventArgs e) => DefaultInfoGrid();
         private void InfoSaveToCSVButton_Click(object sender, EventArgs e)
@@ -1288,7 +1233,11 @@ namespace RMDebugger
             csv.WriteCsv(string.Join(";", list));
         }
 
+        //RS485 test
+        async private void StartTestRSButtonClick(object sender, EventArgs e)
+        {
 
+        }
 
 
 
@@ -1317,7 +1266,7 @@ namespace RMDebugger
 
         private void TaskForChangedRows()
         {
-            StartTestRMButton.Enabled =
+            StartTestRSButton.Enabled =
                 SaveLogTestRS485.Enabled =
                 StatusRM485GridView.Rows.Count > 0;
             ToMessageStatus($"{StatusRM485GridView.Rows.Count} devices on RM Test.");
@@ -1457,12 +1406,9 @@ namespace RMDebugger
         }
         private void DefaultInfoGrid()
         {
-            BeginInvoke((MethodInvoker)(() =>
-            {
-                InfoFieldsGrid.Rows.Clear();
-                foreach (string data in Enum.GetNames(typeof(InfoGrid))) InfoFieldsGrid.Rows.Add(data);
-                foreach (TreeNode node in InfoTree.Nodes) node.Nodes.Clear();
-            }));
+            InfoFieldsGrid.Rows.Clear();
+            foreach (string data in Enum.GetNames(typeof(InfoGrid))) InfoFieldsGrid.Rows.Add(data);
+            foreach (TreeNode node in InfoTree.Nodes) node.Nodes.Clear();
         }
         
 
@@ -1562,10 +1508,10 @@ namespace RMDebugger
         }
         private bool CheckButtonAndTime()
         {
-            if (StartTestRMButton.Text == "&Start Test" || !Options.mainIsAvailable) return false;
+            if (StartTestRSButton.Text == "&Start Test" || !Options.mainIsAvailable) return false;
             if (TimerTestBox.Checked && setTimerTest == 0)
             {
-                StartTestRMButton.Text = "&Start Test";
+                StartTestRSButton.Text = "&Start Test";
                 if (GetMessageTestBox.Checked)
                 {
                     NotifyMessage.BalloonTipTitle = "Время истекло!";
@@ -1580,15 +1526,15 @@ namespace RMDebugger
 
         async private void StartStatusRMTestButton_Click(object sender, EventArgs e)
         {
-            if (StartTestRMButton.Text == "&Stop Test")
+            if (StartTestRSButton.Text == "&Stop Test")
             {
-                StartTestRMButton.Text = "&Start Test";
-                StartTestRMButton.Enabled = false;
+                StartTestRSButton.Text = "&Start Test";
+                StartTestRSButton.Enabled = false;
             }
             else
             {
-                StartTestRMButton.Text = "&Stop Test";
-                StartTestRMButton.Image = Resources.StatusStopped;
+                StartTestRSButton.Text = "&Stop Test";
+                StartTestRSButton.Image = Resources.StatusStopped;
                 await Task.Run(() => RMStatusTest());
             }
         }
@@ -1647,9 +1593,9 @@ namespace RMDebugger
             }
             ToMessageStatus($"Devices on test: {StatusRM485GridView.Rows.Count}");
             await Task.WhenAll(tasks);
-            StartTestRMButton.Text = "&Start Test";
-            StartTestRMButton.Image = Resources.StatusRunning;
-            StartTestRMButton.Enabled = true;
+            StartTestRSButton.Text = "&Start Test";
+            StartTestRSButton.Image = Resources.StatusRunning;
+            StartTestRSButton.Enabled = true;
             BackToDefaults();
         }
 
@@ -1746,7 +1692,7 @@ namespace RMDebugger
                     }
                 }
             }
-            while (StartTestRMButton.Text == "&Stop Test"
+            while (StartTestRSButton.Text == "&Stop Test"
                 /*&& (test.Sock.Connected || test.Port.IsOpen)*/
                 && CheckButtonAndTime());
         }
@@ -1857,14 +1803,14 @@ namespace RMDebugger
             BeginInvoke((MethodInvoker)(() =>
             {
                 SerUdpPages.Enabled = false;
-                StartTestRMButton.Enabled = false;
+                StartTestRSButton.Enabled = false;
                 AutoScanTestRM.Enabled = false;
                 ClearDataTestRS485.Enabled = false;
                 settingsGroupBox.Enabled = false;
                 AddSigTestRM.Enabled = false;
                 minSigToScan.Enabled = false;
                 maxSigToScan.Enabled = false;
-                StartTestRMButton.Enabled = false;
+                StartTestRSButton.Enabled = false;
                 SignaturePanel.Enabled = false;
             }));
             offTabsExcept(RMData, TestPage);
@@ -2026,20 +1972,14 @@ namespace RMDebugger
             }));
         private void ShowExtendedMenu_Click(object sender, EventArgs e)
         {
-            if (ShowExtendedMenu.Text == "Show &menu")
-            {
-                ShowExtendedMenu.Text = "Hide &menu";
-                extendedMenuPanel.Location = new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y - 147);
-                ShowExtendedMenu.Image = Resources.Unhide;
-                ToolTipHelper.SetToolTip(ShowExtendedMenu, "Скрыть расширенное меню");
-            }
-            else
-            {
-                ShowExtendedMenu.Text = "Show &menu";
-                extendedMenuPanel.Location = new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y + 147);
-                ShowExtendedMenu.Image = Resources.Hide;
-                ToolTipHelper.SetToolTip(ShowExtendedMenu, "Показать расширенное меню");
-            }
+            bool hideMenu = ShowExtendedMenu.Text == "Show &menu";
+            StatusRM485GridView.Columns[0].Visible = hideMenu;
+            extendedMenuPanel.Location = hideMenu
+                ? new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y - 147)
+                : new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y + 147);
+            ShowExtendedMenu.Image = hideMenu ? Resources.Unhide : Resources.Hide;
+            ToolTipHelper.SetToolTip(ShowExtendedMenu, hideMenu ? "Скрыть расширенное меню" : "Показать расширенное меню");
+            ShowExtendedMenu.Text = hideMenu ? "Hide &menu" : "Show &menu";
         }
         private void WorkTestTimer_Tick(object sender, EventArgs e)
         {
