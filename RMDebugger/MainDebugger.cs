@@ -1272,7 +1272,7 @@ namespace RMDebugger
             if (!sw) StartTestRSButton.Enabled = true;
         }
 
-        private Dictionary<string, >
+        /*private Dictionary<string, Dictionary<string, int>>*/
 
         private Dictionary<string, Dictionary<int, Tuple<int, int, DevType>>> GetGridInfo()
         {
@@ -1769,7 +1769,7 @@ namespace RMDebugger
                 /*&& (test.Sock.Connected || test.Port.IsOpen)*/
                 && CheckButtonAndTime());
         }
-        private Dictionary<string, Dictionary<int, Tuple<int, int, DevType>>> GetGridInfo()
+        /*private Dictionary<string, Dictionary<int, Tuple<int, int, DevType>>> GetGridInfo()
         {
             // interface :
             // Sig : 
@@ -1804,7 +1804,7 @@ namespace RMDebugger
             catch (Exception ex) { MessageBox.Show(ex.ToString());}
             
             return _data;
-        }
+        }*/
         private async Task<Dictionary<string, Dictionary<int, Tuple<int, DevType>>>> GetDevicesInfo(Searching search, string devInterface, Dictionary<int, int> data)
         {
             Dictionary<string, Dictionary<int, Tuple<int, DevType>>> _data = new Dictionary<string, Dictionary<int, Tuple<int, DevType>>>();

@@ -121,4 +121,14 @@ namespace RMDebugger
             return GetCode(reply.Item2);
         }
     }
+
+    internal class InterfaceForTests : ForTests
+    {
+        public InterfaceForTests(object sender) : base(sender) 
+        { 
+
+        }
+
+    }
+
 }
