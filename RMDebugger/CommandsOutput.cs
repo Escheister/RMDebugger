@@ -5,11 +5,11 @@ using System.Text;
 using System.Linq;
 using System;
 
+using System.Threading.Tasks;
+using StaticSettings;
 using ProtocolEnums;
 using StaticMethods;
 using CRC16;
-using StaticSettings;
-using System.Threading.Tasks;
 
 namespace RMDebugger
 {

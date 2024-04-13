@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System;
 
-using ProtocolEnums;
-using RMDebugger;
 using System.Threading.Tasks;
 using StaticSettings;
+using ProtocolEnums;
+using RMDebugger;
 
 namespace SearchProtocol
 {

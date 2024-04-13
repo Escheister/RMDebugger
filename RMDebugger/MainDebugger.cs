@@ -1244,13 +1244,9 @@ namespace RMDebugger
                 StatusRM485GridView.ClearSelection();
                 AfterStartTestRSEvent(true);
 
-                //
 
 
-                await Task.Delay(5000);
-
-
-                //
+                await Task.Run(() => StartTaskRS485Test());
 
                 AfterStartTestRSEvent(false);
                 Options.RS485TestState = false;
@@ -1272,7 +1268,43 @@ namespace RMDebugger
             if (!sw) StartTestRSButton.Enabled = true;
         }
 
-        /*private Dictionary<string, Dictionary<string, int>>*/
+        async private Task StartTaskRS485Test()
+        {
+
+        }
+
+        private bool GetDevices(out Dictionary<string, List<DeviceClass>> interfacesDict)
+        {
+            interfacesDict = new Dictionary<string, List<DeviceClass>>();
+            if (StatusRM485GridView.Rows.Count == 0) return false;
+            foreach(DataGridViewRow row in StatusRM485GridView.Rows)
+            {
+                string interfaceDevice = $"{row.Cells[(int)RS485Columns.Interface].Value}";
+                int deviceSignature = (int)row.Cells[(int)RS485Columns.Sign].Value;
+                int rowIndex = row.Index;
+                int deviceVersion = (int)row.Cells[(int)RS485Columns.Version].Value;
+                Enum.TryParse(row.Cells[(int)RS485Columns.Type].Value.ToString(), out DevType deviceType);
+                if (!interfacesDict.ContainsKey(interfaceDevice)) interfacesDict[interfaceDevice] = new List<DeviceClass>();
+                interfacesDict[interfaceDevice].Add(new DeviceClass
+                {
+                    devIndexRow = rowIndex,
+                    devSign = deviceSignature,
+                    devVer = deviceVersion,
+                    devType = deviceType,
+                }) ;
+            }
+            return true;
+        }
+
+
+
+
+
+
+
+
+
+
 
         private Dictionary<string, Dictionary<int, Tuple<int, int, DevType>>> GetGridInfo()
         {

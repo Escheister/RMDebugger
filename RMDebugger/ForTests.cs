@@ -12,8 +12,8 @@ namespace RMDebugger
 {
     internal class ForTests : Searching
     {
-        public ForTests(object sender) : base (sender) { }
-
+        public ForTests(object sender, List<DeviceClass> _listDeviceClass) : base (sender) => listDeviceClass = _listDeviceClass;
+        private List<DeviceClass> listDeviceClass;
 
         async private Task<Tuple<byte[], ProtocolReply>> GetDataTest(byte[] cmdOut, int size, int ms = 250)
         {
@@ -120,15 +120,20 @@ namespace RMDebugger
             Tuple<byte[], ProtocolReply> reply = await GetDataTest(cmdOut, GetSizeCMD(cmdOutput, devType), 100);
             return GetCode(reply.Item2);
         }
+
+
+
+
+
     }
 
-    internal class InterfaceForTests : ForTests
+    internal class DeviceClass
     {
-        public InterfaceForTests(object sender) : base(sender) 
-        { 
-
-        }
-
+        public DeviceClass() { }
+        public int devIndexRow { get; set; }
+        public int devSign { get; set; }
+        public DevType devType { get; set; }
+        public int devVer { get; set; }
     }
 
 }
