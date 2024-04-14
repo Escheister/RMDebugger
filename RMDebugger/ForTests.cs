@@ -12,6 +12,7 @@ namespace RMDebugger
 {
     internal class ForTests : Searching
     {
+        public ForTests(object sender) : base(sender) { }
         public ForTests(object sender, List<DeviceClass> _listDeviceClass) : base (sender) => listDeviceClass = _listDeviceClass;
         private List<DeviceClass> listDeviceClass;
 

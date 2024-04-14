@@ -120,7 +120,10 @@ namespace RMDebugger
             UploadConfigButton.Click += UploadConfigButtonClick;
 
             InfoTree.NodeMouseClick += InfoTreeNodeClick;
+
             StartTestRSButton.Click += StartTestRSButtonClick;
+            AddSigTestRM.Click += AddTargetSignID;
+
         }
 
 
@@ -1236,7 +1239,7 @@ namespace RMDebugger
 
 
         //RS485 test
-        async private void StartTestRSButtonClick(object sender, EventArgs e)
+        private void StartTestRSButtonClick(object sender, EventArgs e)
         {
             Options.RS485TestState = !Options.RS485TestState;
             if (Options.RS485TestState && StatusRM485GridView.Rows.Count > 0)
@@ -1244,9 +1247,9 @@ namespace RMDebugger
                 StatusRM485GridView.ClearSelection();
                 AfterStartTestRSEvent(true);
 
+                MessageBox.Show(GetConnectedInterfaceString());
 
-
-                await Task.Run(() => StartTaskRS485Test());
+                //StartTaskRS485Test();
 
                 AfterStartTestRSEvent(false);
                 Options.RS485TestState = false;
@@ -1268,9 +1271,39 @@ namespace RMDebugger
             if (!sw) StartTestRSButton.Enabled = true;
         }
 
-        async private Task StartTaskRS485Test()
+        private void StartTaskRS485Test()
         {
+            GetDevices(out Dictionary<string, List<DeviceClass>> devices);
+            
+            List<Task> tasks = new List<Task>();
 
+            foreach (string key in devices.Keys)
+            {
+
+            }
+
+            Task.WaitAll(tasks.ToArray());
+
+            /*
+            
+            interface string is "device:settings":
+            example:
+                172.23.11.109:4001
+                COM3:38400
+            
+            string[] interfaceSettings = dict[key].Split(":");
+            if (IPAddress.TryParse(interfaceSettings[0], out IPAddress ipAddr)
+            {
+                ...
+            }
+            else if 
+            {
+                ...
+            }
+
+             */
+
+            
         }
 
         private bool GetDevices(out Dictionary<string, List<DeviceClass>> interfacesDict)
@@ -1295,6 +1328,136 @@ namespace RMDebugger
             }
             return true;
         }
+
+        private string GetConnectedInterfaceString()
+        {
+            string deviceInterface = "";
+            string deviceOption = "";
+            if (Options.mainInterface is Socket Sock)
+            {
+                deviceInterface = ((IPEndPoint)Sock.RemoteEndPoint).Address.MapToIPv4().ToString();
+                deviceOption = ((IPEndPoint)Sock.RemoteEndPoint).Port.ToString();
+            }
+            else if (Options.mainInterface is SerialPort Port)
+            {
+                deviceInterface = Port.PortName;
+                deviceOption = Port.BaudRate.ToString();
+            }
+            return $"{deviceInterface}:{deviceOption}";
+        }
+
+        // //Add signature from Target numeric
+
+        async private void AddTargetSignID(object sender, EventArgs e)
+        {
+            Searching search = new Searching(Options.mainInterface);
+            byte[] cmdOut = search.FormatCmdOut(TargetSignID.GetBytes(), CmdOutput.STATUS, 0xff);
+            Tuple<byte[], ProtocolReply> replyes;
+            try
+            {
+                replyes = await search.GetData(cmdOut, (int)CmdMaxSize.STATUS, 50);
+                DeviceClass device = new DeviceClass
+                {
+                    devSign = (int)TargetSignID.Value,
+                    devType = search.GetType(replyes.Item1),
+                    devVer = search.GetVersion(replyes.Item1)
+                };
+                AddToGridDevice(device);
+            }
+            catch (Exception ex) { ToReplyStatus(ex.Message); }
+        }
+
+        
+
+        private void AddToGridDevice(DeviceClass device)
+        {
+            GetDevices(out Dictionary<string, List<DeviceClass>> devicesInGrid);
+            string connectedInterface = GetConnectedInterfaceString();
+
+            if (devicesInGrid.ContainsKey(connectedInterface))
+            {
+                List<int> signaturesInGrid = new List<int>();
+                foreach (DeviceClass deviceInGrid in devicesInGrid[connectedInterface])
+                    signaturesInGrid.Add(device.devSign);
+                if (signaturesInGrid.Contains(device.devSign)) return;
+
+            }
+
+            StatusRM485GridView.Rows.Add(
+                connectedInterface, device.devSign, device.devType, 
+                "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, device.devVer);
+        }
+        private void AddToGridDevices(List<DeviceClass> devices)
+        {
+            GetDevices(out Dictionary<string, List<DeviceClass>> devicesInGrid);
+            string connectedInterface = GetConnectedInterfaceString();
+
+            List<DataGridViewRow> rows = new List<DataGridViewRow>();
+            List<DeviceClass> newDevicesForGrid = new List<DeviceClass>();
+            if (devicesInGrid.ContainsKey(connectedInterface))
+            {
+                List<int> signaturesInGrid = new List<int>();
+                foreach (DeviceClass device in devicesInGrid[connectedInterface])
+                    signaturesInGrid.Add(device.devSign);
+
+                foreach (DeviceClass device in devices)
+                    if (!signaturesInGrid.Contains(device.devSign))
+                        newDevicesForGrid.Add(device);
+            }
+            else newDevicesForGrid = devices;
+
+            foreach (DeviceClass device in newDevicesForGrid)
+            {
+                rows.Add(new DataGridViewRow());
+                rows[rows.Count - 1].CreateCells(
+                    DistTofGrid, connectedInterface, device.devSign, device.devType,
+                    "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, device.devVer);
+            }
+            if (rows.Count > 0) StatusRM485GridView.Rows.AddRange(rows.ToArray());
+        }
+
+
+        private void AddToGridTest(string devInterface, int signature, DevType type, int version) =>
+    Invoke((MethodInvoker)(() => {
+        StatusRM485GridView.Rows.Add(
+        devInterface, signature, type, "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, version);
+    }));
+        async private void AddSigTestRM_Click(object sender, EventArgs e)
+        {
+            string devInterface;
+            if (mainPort.IsOpen) devInterface = mainPort.PortName;
+            else if (udpGate.Connected) devInterface = ((IPEndPoint)udpGate.RemoteEndPoint).Port.ToString();
+            else devInterface = "None";
+            Dictionary<string, Dictionary<int, Tuple<int, int, DevType>>> dataFromGrid = GetGridInfo();
+            if (dataFromGrid is null || !dataFromGrid.ContainsKey(devInterface) || !dataFromGrid[devInterface].ContainsKey((int)TargetSignID.Value))
+            {
+                Searching search = new Searching(Options.mainInterface);
+                byte[] cmdOut = search.FormatCmdOut(TargetSignID.GetBytes(), CmdOutput.STATUS, 0xff);
+                Tuple<byte[], ProtocolReply> replyes = null;
+                try
+                {
+                    replyes = await search.GetData(cmdOut, (int)CmdMaxSize.STATUS, 50);
+                    AddToGridTest(devInterface, (int)TargetSignID.Value,
+                        search.GetType(replyes.Item1),
+                        search.GetVersion(replyes.Item1));
+                }
+                catch (Exception ex) { ToMessageStatus(ex.Message); }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1947,7 +2110,7 @@ namespace RMDebugger
             BackToDefaults();
             TaskForChangedRows();
         }
-        async private void AddSigTestRM_Click(object sender, EventArgs e)
+        /*async private void AddSigTestRM_Click(object sender, EventArgs e)
         {
             string devInterface;
             if (mainPort.IsOpen) devInterface = mainPort.PortName;
@@ -1968,12 +2131,9 @@ namespace RMDebugger
                 }
                 catch (Exception ex) { ToMessageStatus(ex.Message); }
             }
-        }
+        }*/
 
-        private void AddToGridTest(string devInterface, int signature, DevType type, int version) =>
-            Invoke((MethodInvoker)(() => { StatusRM485GridView.Rows.Add(
-                devInterface, signature, type, "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, version);
-            }));
+
         
         private void NotifyMessage_Click(object sender, EventArgs e) => this.WindowState = FormWindowState.Normal;
 
