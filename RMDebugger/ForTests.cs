@@ -15,6 +15,7 @@ namespace RMDebugger
         public ForTests(object sender) : base(sender) { }
         public ForTests(object sender, List<DeviceClass> _listDeviceClass) : base (sender) => listDeviceClass = _listDeviceClass;
         private List<DeviceClass> listDeviceClass;
+        public List<DeviceClass> ListDeviceClass { get { return listDeviceClass; } }
 
         async private Task<Tuple<byte[], ProtocolReply>> GetDataTest(byte[] cmdOut, int size, int ms = 250)
         {

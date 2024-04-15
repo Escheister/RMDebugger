@@ -54,6 +54,7 @@ namespace StaticSettings
 
         //RS485Test
         public static bool RS485TestState { get; set; } = false;
+        public static bool RS485ManualScanState { get; set; } = false;
 
 
 
