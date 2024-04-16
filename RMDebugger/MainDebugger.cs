@@ -127,6 +127,8 @@ namespace RMDebugger
             AddSignatureIDToTest.Click += AddTargetSignID;
             ManualScanToTest.Click += ManualScanToTestClick;
             AutoScanToTest.Click += AutoScanToTestClick;
+
+            ClearInfoTestRS485.Click += ClearInfoTestRS485Click;
         }
 
 
@@ -1316,6 +1318,7 @@ namespace RMDebugger
             StatusRM485GridView.Rows.Add(
                 connectedInterface, device.devSign, device.devType, 
                 "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, device.devVer);
+            ToMessageStatus($"Device count: {StatusRM485GridView.RowCount}");
         }
         private void AddToGridDevices(List<DeviceClass> devices)
         {
@@ -1345,6 +1348,7 @@ namespace RMDebugger
                 rows[rows.Count - 1].Height = 18;
             }
             if (rows.Count > 0) StatusRM485GridView.Rows.AddRange(rows.ToArray());
+            ToMessageStatus($"Device count: {StatusRM485GridView.RowCount}");
         }
 
 
@@ -1355,8 +1359,8 @@ namespace RMDebugger
             {
                 StatusRM485GridView.ClearSelection();
                 AfterStartTestRSEvent(true);
-
-                WorkTestTimer.Start();
+                ToMessageStatus($"Device count: {StatusRM485GridView.RowCount}");
+                /*WorkTestTimer.Start();*/
                 await Task.Run(() => StartTaskRS485Test());
 
                 AfterStartTestRSEvent(false);
@@ -1394,6 +1398,7 @@ namespace RMDebugger
                     (int)numericMinutesTest.Value,
                     (int)numericSecondsTest.Value).TotalSeconds;
 
+            Invoke((MethodInvoker)(() => WorkTestTimer.Start()));
 
             try
             {
@@ -1406,13 +1411,23 @@ namespace RMDebugger
                 await Task.WhenAll(tasks.ToArray());
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
-            finally { MessageBox.Show("Тест завершён"); }
+            finally { ToMessageStatus($"Device count: {StatusRM485GridView.RowCount} | Завершено"); }
         }
         private void WorkTestTimer_Tick(object sender, EventArgs e)
         {
             setTimerTest -= 1;
             realTimeWorkingTest += 1;
             ChangeWorkTestTime(realTimeWorkingTest);
+            if (TimerTestBox.Checked && setTimerTest == 0)
+            {
+                Options.RS485TestState = false;
+                if (GetMessageTestBox.Checked)
+                {
+                    NotifyMessage.BalloonTipTitle = "Время истекло!";
+                    NotifyMessage.BalloonTipText = $"Время истекло, тест завершен";
+                    NotifyMessage.ShowBalloonTip(10);
+                }
+            }
         }
 
         async private Task ConnectInterfaceAndStartTest(string[] interfaceSettings, List<DeviceClass> devices)
@@ -1435,22 +1450,23 @@ namespace RMDebugger
             }
         }
 
-        private bool CheckButtonAndTime()
+        async private Task StartTestNew(ForTests forTests)
         {
-            if (StartTestRSButton.Text == "&Start Test" || !Options.mainIsAvailable) return false;
-            if (TimerTestBox.Checked && setTimerTest == 0)
+            //опрос
+            /* загрузка данных из списка устройств
+             * 
+             * 
+             * 
+             * 
+             * 
+             */
+            do
             {
-                StartTestRSButton.Text = "&Start Test";
-                if (GetMessageTestBox.Checked)
-                {
-                    NotifyMessage.BalloonTipTitle = "Время истекло!";
-                    NotifyMessage.BalloonTipText = $"Время истекло, тест завершен";
-                    NotifyMessage.ShowBalloonTip(10);
-                }
-                return false;
+                
             }
-            return true;
+            while (Options.RS485TestState && Options.mainIsAvailable);
         }
+
         async private Task StartTest(ForTests forTests)
         {
             do
@@ -1459,7 +1475,7 @@ namespace RMDebugger
                 {
                     foreach (DeviceClass device in forTests.ListDeviceClass)
                     {
-                        if (!CheckButtonAndTime()) return;
+                        if (!Options.RS485TestState || !Options.mainIsAvailable) return;
                         byte[] rmSign = device.devSign.GetBytes();
                         List<int> replyCodes;
                         switch (i)
@@ -1475,9 +1491,6 @@ namespace RMDebugger
                                         FillGridResults(code, device.devIndexRow);
                                 }
                                 break;*/
-                            case 2:
-                                FillGridResults(await forTests.RS485Test(rmSign, CmdOutput.ROUTING_GET, device.devType), device.devIndexRow);
-                                break;
                             /*case 3:
                                 if (RadioCheckTestBox.Checked)
                                 {
@@ -1508,7 +1521,7 @@ namespace RMDebugger
                     }
                 }
             }
-            while (Options.RS485TestState);
+            while (Options.RS485TestState && Options.mainIsAvailable);
         }
         // //Add signature from Target numeric
 
@@ -1794,19 +1807,26 @@ namespace RMDebugger
 
 
         
- 
-        private void ClearStatusStatusRM_Click(object sender, EventArgs e)
-            => BeginInvoke((MethodInvoker)(() =>
+        private void ClearInfoTestRS485Click(object sender, EventArgs e)
+        {
+            foreach(DataGridViewRow row in StatusRM485GridView.Rows)
             {
-                for (int r = 0; r < StatusRM485GridView.Rows.Count; r++)
-                {
-                    for (int i = 3; i < 11; i++) StatusRM485GridView[i, r].Value = 0;
-                    StatusRM485GridView[(int)RS485Columns.Status, r].Value = "-";
-                    StatusRM485GridView.Rows[r].DefaultCellStyle.BackColor = Color.White;
-                }
-                realTimeWorkingTest = 0;
-                ChangeWorkTestTime(realTimeWorkingTest);
-            }));
+                row.Cells[(int)RS485Columns.Status].Value = "-";
+                for (int i = 4; i < 11; i++) row.Cells[i].Value = 0;
+                row.DefaultCellStyle.BackColor = Color.White;
+            }
+            realTimeWorkingTest = 0;
+            ChangeWorkTestTime(realTimeWorkingTest);
+        }
+
+        private void FillGridResult(int index) => Invoke((MethodInvoker)(() => 
+        {
+            DataGridViewRow row = StatusRM485GridView.Rows[index];
+            int Errors = 0;
+            for (int i = (int)RS485Columns.NoReply; i < 12; i++) Errors += Convert.ToInt32(row.Cells[i].Value);
+
+        }));
+
         private void FillGridResults(int code, int index)
         {
             Invoke((MethodInvoker)(() =>

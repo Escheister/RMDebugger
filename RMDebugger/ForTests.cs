@@ -127,6 +127,20 @@ namespace RMDebugger
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
     internal class DeviceClass
@@ -137,5 +151,4 @@ namespace RMDebugger
         public DevType devType { get; set; }
         public int devVer { get; set; }
     }
-
 }
