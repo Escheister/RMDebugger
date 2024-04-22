@@ -215,7 +215,14 @@ namespace RMDebugger
             set
             {
                 DeviceRx = value;
-                devPercentErrors = 100 - (100 * DeviceRx / devTx);
+                try
+                {
+                    devPercentErrors = 100.000 - (100.000 * DeviceRx / devTx);
+                }
+                catch (DivideByZeroException)
+                {
+                    devPercentErrors = 0;
+                }
                 devStatus = devPercentErrors >= 1.000 ? "Bad" : "Good";
             }
         }
