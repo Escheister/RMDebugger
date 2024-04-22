@@ -7,6 +7,7 @@ using StaticMethods;
 using ProtocolEnums;
 using StaticSettings;
 using CRC16;
+using System.Runtime.Remoting.Messaging;
 
 namespace RMDebugger
 {
@@ -146,9 +147,73 @@ namespace RMDebugger
     internal class DeviceClass
     {
         public DeviceClass() { }
-        public int devIndexRow { get; set; }
+        public int devIndexRow;
+        public string devInterface { get; set; }
         public int devSign { get; set; }
         public DevType devType { get; set; }
+        public string devStatus { get; set; }
+        public int devTx { get; set; }
+        public int devRx { get; set; }
+
+        private int DeviceErrors;
+        public int devErrors
+        {
+            get => DeviceErrors;
+            set
+            {
+                DeviceErrors = value;
+                devPercentErrors = 100.00 - (100.00 * devRx / devTx);
+            }
+        }
+        public double devPercentErrors { get; set; }
+
+        private int DeviceNoReply;
+        public int devNoReply
+        {
+            get => DeviceNoReply;
+            set
+            {
+                DeviceNoReply = value;
+                devErrors = value;
+            }
+        }
+
+        private int DeviceBadReply;
+        public int devBadReply
+        {
+            get => DeviceBadReply;
+            set
+            {
+                DeviceBadReply = value;
+                devErrors = value;
+            }
+        }
+
+        private int DeviceBadCRC;
+        public int devBadCRC
+        {
+            get => DeviceBadCRC;
+            set
+            {
+                DeviceBadCRC = value;
+                devErrors = value;
+            }
+        }
+
+        private int DeviceBadRadio;
+        public int devBadRadio
+        {
+            get => DeviceBadRadio;
+            set
+            {
+                DeviceBadRadio = value;
+                devErrors = value;
+            }
+        }
+
+        public string devWorkTime { get; set; }
+
         public int devVer { get; set; }
+
     }
 }

@@ -98,7 +98,6 @@ namespace RMDebugger
             if (buffer.Length > 0) await Port.BaseStream.ReadAsync(buffer, 0, bytes);
             return buffer;
         }
-
         protected void PraseCmd(byte[] cmdOut, out CmdInput cmdMain, out CmdInput cmdThrough)
         {
             CmdOutput cmdOne = (CmdOutput)((cmdOut[2] << 8) | cmdOut[3]);
@@ -116,7 +115,6 @@ namespace RMDebugger
                     break;
             }
         }
-
         async public Task<Tuple<RmResult, ProtocolReply>> GetResult(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");
