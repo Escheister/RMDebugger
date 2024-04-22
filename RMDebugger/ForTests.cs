@@ -7,7 +7,7 @@ using StaticMethods;
 using ProtocolEnums;
 using StaticSettings;
 using CRC16;
-using System.Runtime.Remoting.Messaging;
+using System.Drawing;
 
 namespace RMDebugger
 {
@@ -128,6 +128,62 @@ namespace RMDebugger
 
 
 
+        //new methods
+        //who are you*
+        //get near**
+        //online status*
+        //dist tof**
+
+        //*no radio, get info about device
+        //*radio
+        // 0 - ok, 1 - no reply(null), 2 - bad reply, 3 - bad crc, 4 - bad radio
+        private bool AddValueToDevice(DeviceClass device, ProtocolReply reply)
+        {
+            switch (reply)
+            {
+                case ProtocolReply.Ok: return true;
+                case ProtocolReply.Null:
+                    device.devNoReply += 1;
+                    break;
+                case ProtocolReply.WCrc:
+                    device.devBadCRC += 1;
+                    break;
+            }
+            return false;
+        }
+
+        async public Task GetDataFromDevice(DeviceClass device, CmdOutput cmdOutput)
+        {
+            Tuple <byte[], ProtocolReply> reply = await GetDataTest(
+                FormatCmdOut(device.devSign.GetBytes(), cmdOutput, 0xff), 
+                GetSizeCMD(cmdOutput, device.devType), 100);
+            if (!AddValueToDevice(device, reply.Item2)) return;
+            if (cmdOutput == CmdOutput.STATUS)
+            {
+                try
+                {
+                    TimeSpan time = TimeSpan.FromSeconds(
+                                      reply.Item1[reply.Item1.Length - 5] << 24
+                                    | reply.Item1[reply.Item1.Length - 6] << 16
+                                    | reply.Item1[reply.Item1.Length - 7] << 8
+                                    | reply.Item1[reply.Item1.Length - 8]);
+                    device.devWorkTime = $"{time.Days}d " +
+                                        $"{time.Hours}h " +
+                                        $": {time.Minutes}m " +
+                                        $": {time.Seconds}s";
+                    device.devVer = reply.Item1[reply.Item1.Length - 3] << 8 | reply.Item1[reply.Item1.Length - 4];
+                }
+                catch
+                {
+                    device.devBadReply += 1;
+                    return;
+                }
+            }
+            device.devRx += 1;
+        }
+
+
+
 
 
 
@@ -147,24 +203,23 @@ namespace RMDebugger
     internal class DeviceClass
     {
         public DeviceClass() { }
-        public int devIndexRow;
         public string devInterface { get; set; }
         public int devSign { get; set; }
         public DevType devType { get; set; }
         public string devStatus { get; set; }
         public int devTx { get; set; }
-        public int devRx { get; set; }
-
-        private int DeviceErrors;
-        public int devErrors
+        private int DeviceRx { get; set; }
+        public int devRx
         {
-            get => DeviceErrors;
+            get => DeviceRx;
             set
             {
-                DeviceErrors = value;
-                devPercentErrors = 100.00 - (100.00 * devRx / devTx);
+                DeviceRx = value;
+                devPercentErrors = 100 - (100 * DeviceRx / devTx);
+                devStatus = devPercentErrors >= 1.000 ? "Bad" : "Good";
             }
         }
+        public int devErrors { get; set; }
         public double devPercentErrors { get; set; }
 
         private int DeviceNoReply;
@@ -212,8 +267,6 @@ namespace RMDebugger
         }
 
         public string devWorkTime { get; set; }
-
         public int devVer { get; set; }
-
     }
 }

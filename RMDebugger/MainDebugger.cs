@@ -23,8 +23,6 @@ using StaticSettings;
 using File_Verifier;
 using CSV;
 using System.ComponentModel;
-using System.ServiceProcess;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace RMDebugger
 {
@@ -44,6 +42,7 @@ namespace RMDebugger
         };
 
         BindingList<DeviceClass> testerData = new BindingList<DeviceClass>();
+
         private int setTimerTest;
         private int realTimeWorkingTest = 0;
 
@@ -1275,22 +1274,6 @@ namespace RMDebugger
                 if (!interfacesDict.ContainsKey(device.devInterface)) interfacesDict[device.devInterface] = new List<DeviceClass>();
                 interfacesDict[device.devInterface].Add(device);
             }
-            /*foreach(DataGridViewRow row in StatusRM485GridView.Rows)
-            {
-                string interfaceDevice = $"{row.Cells[(int)RS485Columns.Interface].Value}";
-                int deviceSignature = (int)row.Cells[(int)RS485Columns.Sign].Value;
-                int rowIndex = row.Index;
-                int deviceVersion = (int)row.Cells[(int)RS485Columns.Version].Value;
-                Enum.TryParse(row.Cells[(int)RS485Columns.Type].Value.ToString(), out DevType deviceType);
-                if (!interfacesDict.ContainsKey(interfaceDevice)) interfacesDict[interfaceDevice] = new List<DeviceClass>();
-                interfacesDict[interfaceDevice].Add(new DeviceClass
-                {
-                    devIndexRow = rowIndex,
-                    devSign = deviceSignature,
-                    devVer = deviceVersion,
-                    devType = deviceType,
-                }) ;
-            }*/
             return true;
         }
         private string GetConnectedInterfaceString()
@@ -1405,7 +1388,6 @@ namespace RMDebugger
                 foreach (string key in devices.Keys)
                 {
                     if (key == connectedInterface)
-                        /*tasks.Add(StartTest(new ForTests(Options.mainInterface, devices[key])));*/
                         tasks.Add(StartTestNew(new ForTests(Options.mainInterface, devices[key])));
                     else tasks.Add(ConnectInterfaceAndStartTest(key.Split(':'), devices[key]));
                 }
@@ -1421,8 +1403,8 @@ namespace RMDebugger
             do {
                 await Task.Delay(1000);
                 Invoke((MethodInvoker)(() => {
-                    testerData.ResetBindings();
                     StatusRM485GridView.Refresh();
+                    testerData.ResetBindings();
                 }));
             }
             while (Options.RS485TestState && Options.mainIsAvailable);
@@ -1467,32 +1449,36 @@ namespace RMDebugger
 
         async private Task StartTestNew(ForTests forTests)
         {
-            //опрос
-            /* загрузка данных из списка устройств
-             * 
-             * 
-             * 
-             * 
-             * 
-             */
             do
             {
-                await Task.Delay(1);
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 2; i++)
                 {
                     foreach (DeviceClass device in forTests.ListDeviceClass)
                     {
                         if (!Options.RS485TestState || !Options.mainIsAvailable) return;
                         device.devTx += 1;
-                        if (i == 3) device.devBadCRC += 1;
-                        else device.devRx += 1;
+                        switch (i)
+                        {
+                            case 0:
+                                await forTests.GetDataFromDevice(device, CmdOutput.WHO_ARE_YOU);
+                                break;
+                            /*case 1:
+                                break;*/
+                            case 1:
+                                await forTests.GetDataFromDevice(device, CmdOutput.STATUS);
+                                break;
+                            /*case 3:
+                                break;
+                            case 4:
+                                break;*/
+                        }
                     }
                 }
             }
             while (Options.RS485TestState && Options.mainIsAvailable);
         }
 
-        async private Task StartTest(ForTests forTests)
+        /*async private Task StartTest(ForTests forTests)
         {
             do
             {
@@ -1508,7 +1494,7 @@ namespace RMDebugger
                             case 0:
                                 FillGridResults(await forTests.RS485Test(rmSign, CmdOutput.WHO_ARE_YOU, device.devType), device.devIndexRow);
                                 break;
-                            /*case 1:
+                            *//*case 1:
                                 if (RadioCheckTestBox.Checked)
                                 {
                                     replyCodes = await forTests.RadioTest(rmSign, CmdOutput.GRAPH_GET_NEAR, dataGrid);
@@ -1523,7 +1509,7 @@ namespace RMDebugger
                                     foreach (int code in replyCodes)
                                         FillGridResults(code, device.devIndexRow);
                                 }
-                                break;*/
+                                break;*//*
                             case 4:
                                 Tuple<int, TimeSpan?, int?> data = await forTests.GetWorkTimeAndVersion(rmSign, device.devType);
                                 FillGridResults(data.Item1, device.devIndexRow);
@@ -1547,7 +1533,7 @@ namespace RMDebugger
                 }
             }
             while (Options.RS485TestState && Options.mainIsAvailable);
-        }
+        }*/
         // //Add signature from Target numeric
 
         async private void AddTargetSignID(object sender, EventArgs e)
@@ -1821,9 +1807,16 @@ namespace RMDebugger
         private void StatusGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e) => TaskForChangedRows();
         private void ClearDataStatusRM_Click(object sender, EventArgs e)
         {
-            StatusRM485GridView.Rows.Clear();
-            realTimeWorkingTest = 0;
-            ChangeWorkTestTime(realTimeWorkingTest);
+            foreach(DeviceClass device in testerData)
+            {
+                device.devRx = 0;
+                device.devTx = 0;
+                device.devErrors = 0;
+                device.devBadCRC = 0;
+                device.devBadReply = 0;
+                device.devBadRadio = 0;
+                device.devNoReply = 0;
+            }
         }
 
 
@@ -1844,10 +1837,6 @@ namespace RMDebugger
             ChangeWorkTestTime(realTimeWorkingTest);
         }
 
-        private void FillGridResult(DeviceClass device)
-        {
-            device.devTx += 1;
-        }
 
         private void FillGridResults(int code, int index)
         {
