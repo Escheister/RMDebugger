@@ -7,13 +7,11 @@ using StaticMethods;
 using ProtocolEnums;
 using StaticSettings;
 using CRC16;
-using System.Drawing;
 
 namespace RMDebugger
 {
     internal class ForTests : Searching
     {
-        public ForTests(object sender) : base(sender) { }
         public ForTests(object sender, List<DeviceClass> _listDeviceClass) : base (sender) => listDeviceClass = _listDeviceClass;
         private List<DeviceClass> listDeviceClass;
         public List<DeviceClass> ListDeviceClass { get { return listDeviceClass; } }
@@ -73,55 +71,24 @@ namespace RMDebugger
         }
         private int GetSizeCMD(CmdOutput cmdOutput, DevType devType)
         {
-            int cmdInSize;
             switch (devType)
             {
                 case DevType.RM485:
                     {
                         Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out RM485MaxSize rm485);
-                        cmdInSize = (int)rm485;
-                        break;
+                        return (int)rm485;
                     }
                 case DevType.RMH:
                     {
                         Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out RMHMaxSize RMH);
-                        cmdInSize = (int)RMH;
-                        break;
+                        return (int)RMH;
                     }
                 default:
                     {
                         Enum.TryParse(Enum.GetName(typeof(CmdOutput), CmdOutput.STATUS), out CmdMaxSize cmdMaxSize);
-                        cmdInSize = (int)cmdMaxSize;
-                        break;
+                        return (int)cmdMaxSize;
                     }
             }
-            return cmdInSize;
-        }
-        async public Task<Tuple<int, TimeSpan?, int?>> GetWorkTimeAndVersion(byte[] rmSign, DevType devType)
-        {
-            /* 1) code
-             * 2) time
-             * 3) version */
-            byte[] cmdOut = FormatCmdOut(rmSign, CmdOutput.STATUS, 0xff);
-            Tuple<byte[], ProtocolReply> reply = await GetDataTest(cmdOut, GetSizeCMD(CmdOutput.STATUS, devType), 100);
-            if (reply.Item2 == ProtocolReply.Ok)
-            {
-                int timeSeconds =
-                  reply.Item1[reply.Item1.Length - 5] << 24
-                | reply.Item1[reply.Item1.Length - 6] << 16
-                | reply.Item1[reply.Item1.Length - 7] << 8
-                | reply.Item1[reply.Item1.Length - 8];
-                int version = reply.Item1[reply.Item1.Length - 3] << 8 | reply.Item1[reply.Item1.Length - 4];
-                TimeSpan time = TimeSpan.FromSeconds(timeSeconds);
-                return new Tuple<int, TimeSpan?, int?>(10, time, version);
-            }
-            else return new Tuple<int, TimeSpan?, int?>(GetCode(reply.Item2), null, null);
-        }
-        async public Task<int> RS485Test(byte[] rmSign, CmdOutput cmdOutput, DevType devType)
-        {
-            byte[] cmdOut = FormatCmdOut(rmSign, cmdOutput, 0xff);
-            Tuple<byte[], ProtocolReply> reply = await GetDataTest(cmdOut, GetSizeCMD(cmdOutput, devType), 100);
-            return GetCode(reply.Item2);
         }
 
 

@@ -1391,29 +1391,29 @@ namespace RMDebugger
                         tasks.Add(StartTestNew(new ForTests(Options.mainInterface, devices[key])));
                     else tasks.Add(ConnectInterfaceAndStartTest(key.Split(':'), devices[key]));
                 }
-                tasks.Add(RefreshGridTask());
+                /*tasks.Add(RefreshGridTask());*/
                 await Task.WhenAll(tasks.ToArray());
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
-            finally { ToMessageStatus($"Device count: {StatusRM485GridView.RowCount} | Завершено"); }
+            finally {
+                RefreshGridTask();
+                ToMessageStatus($"Device count: {StatusRM485GridView.RowCount} | Завершено"); 
+            }
         }
 
-        async private Task RefreshGridTask()
-        {
-            do {
-                await Task.Delay(1000);
-                Invoke((MethodInvoker)(() => {
-                    StatusRM485GridView.Refresh();
-                    testerData.ResetBindings();
-                }));
-            }
-            while (Options.RS485TestState && Options.mainIsAvailable);
-        }
+
+
+        private void RefreshGridTask()
+            => Invoke((MethodInvoker)(() => {
+                testerData.ResetBindings();
+                StatusRM485GridView.Refresh();
+            }));
 
         private void WorkTestTimer_Tick(object sender, EventArgs e)
         {
             setTimerTest -= 1;
             realTimeWorkingTest += 1;
+            RefreshGridTask();
             ChangeWorkTestTime(realTimeWorkingTest);
             if (TimerTestBox.Checked && setTimerTest == 0)
             {
@@ -1451,11 +1451,11 @@ namespace RMDebugger
         {
             do
             {
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < 2 && Options.RS485TestState && Options.mainIsAvailable; i++)
                 {
                     foreach (DeviceClass device in forTests.ListDeviceClass)
                     {
-                        if (!Options.RS485TestState || !Options.mainIsAvailable) return;
+                        if (!Options.RS485TestState || !Options.mainIsAvailable) break;
                         device.devTx += 1;
                         switch (i)
                         {

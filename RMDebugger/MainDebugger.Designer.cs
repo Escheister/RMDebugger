@@ -433,7 +433,7 @@
             this.RMData.Margin = new System.Windows.Forms.Padding(0);
             this.RMData.Name = "RMData";
             this.RMData.SelectedIndex = 0;
-            this.RMData.Size = new System.Drawing.Size(987, 630);
+            this.RMData.Size = new System.Drawing.Size(847, 458);
             this.RMData.TabIndex = 16;
             // 
             // DistTofPage
@@ -480,7 +480,7 @@
             // AutoDistTof
             // 
             this.AutoDistTof.BackColor = System.Drawing.Color.Transparent;
-            this.AutoDistTof.Image = global::RMDebugger.Properties.Resources.StatusRunning;
+            this.AutoDistTof.Image = ((System.Drawing.Image)(resources.GetObject("AutoDistTof.Image")));
             this.AutoDistTof.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.AutoDistTof.Location = new System.Drawing.Point(185, 78);
             this.AutoDistTof.Name = "AutoDistTof";
@@ -732,7 +732,7 @@
             // 
             // AutoGetNear
             // 
-            this.AutoGetNear.Image = global::RMDebugger.Properties.Resources.StatusRunning;
+            this.AutoGetNear.Image = ((System.Drawing.Image)(resources.GetObject("AutoGetNear.Image")));
             this.AutoGetNear.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.AutoGetNear.Location = new System.Drawing.Point(185, 78);
             this.AutoGetNear.Name = "AutoGetNear";
@@ -897,7 +897,7 @@
             // HexUploadButton
             // 
             this.HexUploadButton.Enabled = false;
-            this.HexUploadButton.Image = global::RMDebugger.Properties.Resources.StatusRunning;
+            this.HexUploadButton.Image = ((System.Drawing.Image)(resources.GetObject("HexUploadButton.Image")));
             this.HexUploadButton.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
             this.HexUploadButton.Location = new System.Drawing.Point(-1, 24);
             this.HexUploadButton.Name = "HexUploadButton";
@@ -924,7 +924,7 @@
             // 
             this.ClearGridButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ClearGridButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.ClearGridButton.Image = global::RMDebugger.Properties.Resources.Eraser;
+            this.ClearGridButton.Image = ((System.Drawing.Image)(resources.GetObject("ClearGridButton.Image")));
             this.ClearGridButton.Location = new System.Drawing.Point(220, 584);
             this.ClearGridButton.Margin = new System.Windows.Forms.Padding(0);
             this.ClearGridButton.Name = "ClearGridButton";
@@ -948,7 +948,7 @@
             // UploadConfigButton
             // 
             this.UploadConfigButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.UploadConfigButton.Image = global::RMDebugger.Properties.Resources.CloudUpload;
+            this.UploadConfigButton.Image = ((System.Drawing.Image)(resources.GetObject("UploadConfigButton.Image")));
             this.UploadConfigButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.UploadConfigButton.Location = new System.Drawing.Point(109, 583);
             this.UploadConfigButton.Margin = new System.Windows.Forms.Padding(0);
@@ -962,7 +962,7 @@
             // LoadConfigButton
             // 
             this.LoadConfigButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.LoadConfigButton.Image = global::RMDebugger.Properties.Resources.CloudDownload;
+            this.LoadConfigButton.Image = ((System.Drawing.Image)(resources.GetObject("LoadConfigButton.Image")));
             this.LoadConfigButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.LoadConfigButton.Location = new System.Drawing.Point(-1, 583);
             this.LoadConfigButton.Margin = new System.Windows.Forms.Padding(0);
@@ -1279,7 +1279,7 @@
             this.TestPage.Location = new System.Drawing.Point(4, 22);
             this.TestPage.Name = "TestPage";
             this.TestPage.Padding = new System.Windows.Forms.Padding(3);
-            this.TestPage.Size = new System.Drawing.Size(979, 604);
+            this.TestPage.Size = new System.Drawing.Size(839, 432);
             this.TestPage.TabIndex = 6;
             this.TestPage.Text = "Test";
             // 
@@ -1292,7 +1292,7 @@
             this.TestPages.Location = new System.Drawing.Point(3, 3);
             this.TestPages.Name = "TestPages";
             this.TestPages.SelectedIndex = 0;
-            this.TestPages.Size = new System.Drawing.Size(973, 598);
+            this.TestPages.Size = new System.Drawing.Size(833, 426);
             this.TestPages.TabIndex = 0;
             // 
             // RS485Page
@@ -1303,7 +1303,7 @@
             this.RS485Page.Location = new System.Drawing.Point(4, 22);
             this.RS485Page.Name = "RS485Page";
             this.RS485Page.Padding = new System.Windows.Forms.Padding(3);
-            this.RS485Page.Size = new System.Drawing.Size(965, 572);
+            this.RS485Page.Size = new System.Drawing.Size(825, 400);
             this.RS485Page.TabIndex = 0;
             this.RS485Page.Text = "RS485";
             // 
@@ -1321,7 +1321,7 @@
             this.extendedMenuPanel.Controls.Add(this.ShowExtendedMenu);
             this.extendedMenuPanel.Controls.Add(this.StartTestRSButton);
             this.extendedMenuPanel.Controls.Add(this.AutoScanToTest);
-            this.extendedMenuPanel.Location = new System.Drawing.Point(0, 402);
+            this.extendedMenuPanel.Location = new System.Drawing.Point(0, 230);
             this.extendedMenuPanel.Margin = new System.Windows.Forms.Padding(0);
             this.extendedMenuPanel.Name = "extendedMenuPanel";
             this.extendedMenuPanel.Size = new System.Drawing.Size(294, 170);
@@ -1440,7 +1440,7 @@
             this.SaveLogTestRS485.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.SaveLogTestRS485.Enabled = false;
             this.SaveLogTestRS485.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.SaveLogTestRS485.Image = global::RMDebugger.Properties.Resources.SaveAs;
+            this.SaveLogTestRS485.Image = ((System.Drawing.Image)(resources.GetObject("SaveLogTestRS485.Image")));
             this.SaveLogTestRS485.Location = new System.Drawing.Point(272, 0);
             this.SaveLogTestRS485.Margin = new System.Windows.Forms.Padding(0);
             this.SaveLogTestRS485.Name = "SaveLogTestRS485";
@@ -1455,7 +1455,7 @@
             // 
             this.ClearDataTestRS485.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ClearDataTestRS485.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.ClearDataTestRS485.Image = global::RMDebugger.Properties.Resources.DeleteTable;
+            this.ClearDataTestRS485.Image = ((System.Drawing.Image)(resources.GetObject("ClearDataTestRS485.Image")));
             this.ClearDataTestRS485.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.ClearDataTestRS485.Location = new System.Drawing.Point(209, 29);
             this.ClearDataTestRS485.Margin = new System.Windows.Forms.Padding(0);
@@ -1471,7 +1471,7 @@
             // 
             this.ClearInfoTestRS485.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ClearInfoTestRS485.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.ClearInfoTestRS485.Image = global::RMDebugger.Properties.Resources.DeleteTaskList;
+            this.ClearInfoTestRS485.Image = ((System.Drawing.Image)(resources.GetObject("ClearInfoTestRS485.Image")));
             this.ClearInfoTestRS485.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.ClearInfoTestRS485.Location = new System.Drawing.Point(209, 52);
             this.ClearInfoTestRS485.Margin = new System.Windows.Forms.Padding(0);
@@ -1674,7 +1674,7 @@
             // 
             this.ShowExtendedMenu.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ShowExtendedMenu.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.ShowExtendedMenu.Image = global::RMDebugger.Properties.Resources.Unhide;
+            this.ShowExtendedMenu.Image = ((System.Drawing.Image)(resources.GetObject("ShowExtendedMenu.Image")));
             this.ShowExtendedMenu.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ShowExtendedMenu.Location = new System.Drawing.Point(148, 0);
             this.ShowExtendedMenu.Margin = new System.Windows.Forms.Padding(0);
@@ -1691,7 +1691,7 @@
             this.StartTestRSButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.StartTestRSButton.Enabled = false;
             this.StartTestRSButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.StartTestRSButton.Image = global::RMDebugger.Properties.Resources.StatusRunning;
+            this.StartTestRSButton.Image = ((System.Drawing.Image)(resources.GetObject("StartTestRSButton.Image")));
             this.StartTestRSButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.StartTestRSButton.Location = new System.Drawing.Point(0, 0);
             this.StartTestRSButton.Margin = new System.Windows.Forms.Padding(0);
@@ -1769,7 +1769,7 @@
             dataGridViewCellStyle37.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.StatusRM485GridView.DefaultCellStyle = dataGridViewCellStyle37;
             this.StatusRM485GridView.GridColor = System.Drawing.Color.White;
-            this.StatusRM485GridView.Location = new System.Drawing.Point(3, 3);
+            this.StatusRM485GridView.Location = new System.Drawing.Point(2, 2);
             this.StatusRM485GridView.Margin = new System.Windows.Forms.Padding(1);
             this.StatusRM485GridView.Name = "StatusRM485GridView";
             this.StatusRM485GridView.ReadOnly = true;
@@ -1794,7 +1794,7 @@
             this.StatusRM485GridView.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.StatusRM485GridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.StatusRM485GridView.ShowCellToolTips = false;
-            this.StatusRM485GridView.Size = new System.Drawing.Size(959, 542);
+            this.StatusRM485GridView.Size = new System.Drawing.Size(821, 374);
             this.StatusRM485GridView.TabIndex = 21;
             this.StatusRM485GridView.TabStop = false;
             this.StatusRM485GridView.VirtualMode = true;
@@ -2018,7 +2018,7 @@
             this.PasswordBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.PasswordBox.BackColor = System.Drawing.Color.White;
             this.PasswordBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.PasswordBox.Location = new System.Drawing.Point(3, 397);
+            this.PasswordBox.Location = new System.Drawing.Point(3, 225);
             this.PasswordBox.Margin = new System.Windows.Forms.Padding(0);
             this.PasswordBox.MaxLength = 20;
             this.PasswordBox.Name = "PasswordBox";
@@ -2037,10 +2037,10 @@
             this.toolStripStatusLabel1,
             this.MessageStatus,
             this.ReplyStatus});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 659);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 487);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.statusStrip1.Size = new System.Drawing.Size(1170, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1030, 22);
             this.statusStrip1.SizingGrip = false;
             this.statusStrip1.TabIndex = 17;
             this.statusStrip1.Text = "statusStrip1";
@@ -2060,7 +2060,7 @@
             this.MessageStatus.Margin = new System.Windows.Forms.Padding(0);
             this.MessageStatus.Name = "MessageStatus";
             this.MessageStatus.Overflow = System.Windows.Forms.ToolStripItemOverflow.Never;
-            this.MessageStatus.Size = new System.Drawing.Size(1076, 22);
+            this.MessageStatus.Size = new System.Drawing.Size(936, 22);
             this.MessageStatus.Spring = true;
             this.MessageStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -2284,7 +2284,7 @@
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.toolStrip1.Size = new System.Drawing.Size(1170, 27);
+            this.toolStrip1.Size = new System.Drawing.Size(1030, 27);
             this.toolStrip1.TabIndex = 20;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -2576,7 +2576,7 @@
             this.ExtraButtonsGroup.Location = new System.Drawing.Point(9, 221);
             this.ExtraButtonsGroup.Margin = new System.Windows.Forms.Padding(0);
             this.ExtraButtonsGroup.Name = "ExtraButtonsGroup";
-            this.ExtraButtonsGroup.Size = new System.Drawing.Size(163, 434);
+            this.ExtraButtonsGroup.Size = new System.Drawing.Size(163, 262);
             this.ExtraButtonsGroup.TabIndex = 3;
             this.ExtraButtonsGroup.TabStop = false;
             this.ExtraButtonsGroup.Text = "Extra buttons";
@@ -2585,7 +2585,7 @@
             // 
             this.label15.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(121, 414);
+            this.label15.Location = new System.Drawing.Point(121, 242);
             this.label15.Margin = new System.Windows.Forms.Padding(0);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(20, 13);
@@ -2595,7 +2595,7 @@
             // AutoExtraButtonsTimeout
             // 
             this.AutoExtraButtonsTimeout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.AutoExtraButtonsTimeout.Location = new System.Drawing.Point(70, 411);
+            this.AutoExtraButtonsTimeout.Location = new System.Drawing.Point(70, 239);
             this.AutoExtraButtonsTimeout.Margin = new System.Windows.Forms.Padding(0);
             this.AutoExtraButtonsTimeout.Maximum = new decimal(new int[] {
             5000,
@@ -2629,7 +2629,7 @@
             this.ButtonsPanel.Location = new System.Drawing.Point(1, 16);
             this.ButtonsPanel.Margin = new System.Windows.Forms.Padding(0);
             this.ButtonsPanel.Name = "ButtonsPanel";
-            this.ButtonsPanel.Size = new System.Drawing.Size(159, 380);
+            this.ButtonsPanel.Size = new System.Drawing.Size(159, 208);
             this.ButtonsPanel.TabIndex = 20;
             // 
             // SetOnlineFreqNumeric
@@ -2721,7 +2721,7 @@
             // 
             this.AutoExtraButtons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.AutoExtraButtons.AutoSize = true;
-            this.AutoExtraButtons.Location = new System.Drawing.Point(22, 414);
+            this.AutoExtraButtons.Location = new System.Drawing.Point(22, 242);
             this.AutoExtraButtons.Margin = new System.Windows.Forms.Padding(0);
             this.AutoExtraButtons.Name = "AutoExtraButtons";
             this.AutoExtraButtons.Size = new System.Drawing.Size(48, 17);
@@ -2766,7 +2766,7 @@
             // 
             // OpenDebugFromToolStrip
             // 
-            this.OpenDebugFromToolStrip.Image = global::RMDebugger.Properties.Resources.Writeable;
+            this.OpenDebugFromToolStrip.Image = ((System.Drawing.Image)(resources.GetObject("OpenDebugFromToolStrip.Image")));
             this.OpenDebugFromToolStrip.Name = "OpenDebugFromToolStrip";
             this.OpenDebugFromToolStrip.Size = new System.Drawing.Size(189, 26);
             this.OpenDebugFromToolStrip.Text = "Open debug window";
@@ -2779,7 +2779,7 @@
             // 
             // AboutFromToolStrip
             // 
-            this.AboutFromToolStrip.Image = global::RMDebugger.Properties.Resources.StatusInformationOutlineNoColor;
+            this.AboutFromToolStrip.Image = ((System.Drawing.Image)(resources.GetObject("AboutFromToolStrip.Image")));
             this.AboutFromToolStrip.Name = "AboutFromToolStrip";
             this.AboutFromToolStrip.Size = new System.Drawing.Size(189, 26);
             this.AboutFromToolStrip.Text = "About";
@@ -2805,7 +2805,7 @@
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1170, 681);
+            this.ClientSize = new System.Drawing.Size(1030, 509);
             this.Controls.Add(this.ExtraButtonsGroup);
             this.Controls.Add(this.SignaturePanel);
             this.Controls.Add(this.toolStrip1);
