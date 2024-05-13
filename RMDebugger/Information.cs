@@ -75,10 +75,8 @@ namespace RMDebugger
                         {
                             int intTime = cmdIn[9] << 24 | cmdIn[8] << 16 | cmdIn[7] << 8 | cmdIn[6]; 
                             TimeSpan time = TimeSpan.FromSeconds(intTime);
-                            data["Work Time"] = $"{time.Days}d " +
-                                $"{time.Hours}h " +
-                                $": {time.Minutes}m " +
-                                $": {time.Seconds}s";
+                            data["Work Time"] = $"{(time.Days > 0 ? $"{time.Days}d " : "")}" +
+                                                $"{time.Hours:00}:{time.Minutes:00}:{time.Seconds:00}";
                         }
                         data["Version"] = $"{(cmdIn[cmdIn.Length - 3] << 8) | cmdIn[cmdIn.Length - 4]}";
                         break; 
@@ -99,10 +97,8 @@ namespace RMDebugger
                         {
                             int intTime = cmdIn[9] << 24 | cmdIn[8] << 16 | cmdIn[7] << 8 | cmdIn[6];
                             TimeSpan time = TimeSpan.FromSeconds(intTime);
-                            data["Work Time"] = $"{time.Days}d " +
-                                $"{time.Hours}h " +
-                                $": {time.Minutes}m " +
-                                $": {time.Seconds}s";
+                            data["Work Time"] = $"{(time.Days > 0 ? $"{time.Days}d " : "")}" +
+                                                $"{time.Hours:00}:{time.Minutes:00}:{time.Seconds:00}";
                             data["Battery"] = $"{(cmdIn[10] == 0 ? 0 : cmdIn[10] / 10)}v";
                             data["Notification status"] = $"{(int)cmdIn[11]}";
                             switch ((int)cmdIn[11])

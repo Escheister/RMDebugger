@@ -7,6 +7,8 @@ using StaticMethods;
 using ProtocolEnums;
 using StaticSettings;
 using CRC16;
+using System.ComponentModel;
+
 
 namespace RMDebugger
 {
@@ -85,25 +87,11 @@ namespace RMDebugger
                     }
                 default:
                     {
-                        Enum.TryParse(Enum.GetName(typeof(CmdOutput), CmdOutput.STATUS), out CmdMaxSize cmdMaxSize);
+                        Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out CmdMaxSize cmdMaxSize);
                         return (int)cmdMaxSize;
                     }
             }
         }
-
-
-
-
-
-        //new methods
-        //who are you*
-        //get near**
-        //online status*
-        //dist tof**
-
-        //*no radio, get info about device
-        //*radio
-        // 0 - ok, 1 - no reply(null), 2 - bad reply, 3 - bad crc, 4 - bad radio
         private bool AddValueToDevice(DeviceClass device, ProtocolReply reply)
         {
             switch (reply)
@@ -134,11 +122,9 @@ namespace RMDebugger
                                     | reply.Item1[reply.Item1.Length - 6] << 16
                                     | reply.Item1[reply.Item1.Length - 7] << 8
                                     | reply.Item1[reply.Item1.Length - 8]);
-                    device.devWorkTime = $"{time.Days}d " +
-                                        $"{time.Hours}h " +
-                                        $": {time.Minutes}m " +
-                                        $": {time.Seconds}s";
-                    device.devVer = reply.Item1[reply.Item1.Length - 3] << 8 | reply.Item1[reply.Item1.Length - 4];
+
+                    device.devWorkTime = $"{(time.Days > 0 ? $"{time.Days}d " : "")}" +
+                                         $"{time.Hours:00}:{time.Minutes:00}:{time.Seconds:00}";
                 }
                 catch
                 {
@@ -166,22 +152,35 @@ namespace RMDebugger
 
 
     }
-
     internal class DeviceClass
     {
         public DeviceClass() { }
+
+        public void Reset()
+        {
+            DeviceRx = 0;
+            devTx = 0;
+            devErrors = 0;
+            devBadCRC = 0;
+            devBadRadio = 0;
+            devBadReply = 0;
+            devNoReply = 0;
+            devWorkTime = string.Empty;
+            devStatus = string.Empty;
+        }
+
         public string devInterface { get; set; }
         public int devSign { get; set; }
         public DevType devType { get; set; }
         public string devStatus { get; set; }
         public int devTx { get; set; }
-        private int DeviceRx { get; set; }
+
+        private int DeviceRx;
         public int devRx
         {
             get => DeviceRx;
-            set
-            {
-                DeviceRx = value;
+            set {
+                DeviceRx = value; 
                 try
                 {
                     devPercentErrors = 100.000 - (100.000 * DeviceRx / devTx);
@@ -200,8 +199,7 @@ namespace RMDebugger
         public int devNoReply
         {
             get => DeviceNoReply;
-            set
-            {
+            set {
                 DeviceNoReply = value;
                 devErrors = value;
             }
@@ -211,8 +209,7 @@ namespace RMDebugger
         public int devBadReply
         {
             get => DeviceBadReply;
-            set
-            {
+            set {
                 DeviceBadReply = value;
                 devErrors = value;
             }
@@ -222,8 +219,7 @@ namespace RMDebugger
         public int devBadCRC
         {
             get => DeviceBadCRC;
-            set
-            {
+            set {
                 DeviceBadCRC = value;
                 devErrors = value;
             }
@@ -233,8 +229,7 @@ namespace RMDebugger
         public int devBadRadio
         {
             get => DeviceBadRadio;
-            set
-            {
+            set {
                 DeviceBadRadio = value;
                 devErrors = value;
             }

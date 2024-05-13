@@ -131,8 +131,11 @@ namespace RMDebugger
             AutoScanToTest.Click += AutoScanToTestClick;
 
             ClearInfoTestRS485.Click += ClearInfoTestRS485Click;
+            MoreInfoTestRS485.Click += MoreInfoTestRS485Click;
             StatusRM485GridView.DataSource = testerData;
         }
+
+
 
 
         //********************
@@ -487,7 +490,7 @@ namespace RMDebugger
         }
         async private Task check_ip()
         {
-            int timeout = 250;
+            int timeout = 500;
             using Ping ping = new Ping();
             byte[] buffer = new byte[32];
             PingOptions pingOptions = new PingOptions(buffer.Length, true);
@@ -497,7 +500,7 @@ namespace RMDebugger
             if (reply.Status != IPStatus.Success) return;
             try
             {
-                for (int reconnect = 0; reconnect < 5 && Options.pingOk;)
+                for (int reconnect = 0; reconnect < 100 && Options.pingOk;)
                 {
                     reply = await ping.SendPingAsync(ip, timeout, buffer, pingOptions);
                     if (reply.Status != IPStatus.Success) reconnect++;
@@ -1345,7 +1348,6 @@ namespace RMDebugger
                 AfterStartTestRSEvent(true);
                 ToMessageStatus($"Device count: {StatusRM485GridView.RowCount}");
                 await Task.Run(() => StartTaskRS485Test());
-
                 AfterStartTestRSEvent(false);
                 Options.RS485TestState = false;
                 WorkTestTimer.Stop();
@@ -1362,6 +1364,7 @@ namespace RMDebugger
                 settingsGroupBox.Enabled = 
                 ClearDataTestRS485.Enabled =
                 timerPanelTest.Enabled = !sw;
+            StatusRM485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
             StartTestRSButton.Text = sw ? "&Stop" : "&Start Test";
             StartTestRSButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
             if (!sw) StartTestRSButton.Enabled = true;
@@ -1391,13 +1394,12 @@ namespace RMDebugger
                         tasks.Add(StartTestNew(new ForTests(Options.mainInterface, devices[key])));
                     else tasks.Add(ConnectInterfaceAndStartTest(key.Split(':'), devices[key]));
                 }
-                /*tasks.Add(RefreshGridTask());*/
                 await Task.WhenAll(tasks.ToArray());
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             finally {
                 RefreshGridTask();
-                ToMessageStatus($"Device count: {StatusRM485GridView.RowCount} | Завершено"); 
+                ToMessageStatus($"Device count: {StatusRM485GridView.RowCount} | Завершено");
             }
         }
 
@@ -1455,6 +1457,7 @@ namespace RMDebugger
                 {
                     foreach (DeviceClass device in forTests.ListDeviceClass)
                     {
+                        /*await Task.Delay(1);*/
                         if (!Options.RS485TestState || !Options.mainIsAvailable) break;
                         device.devTx += 1;
                         switch (i)
@@ -1574,7 +1577,8 @@ namespace RMDebugger
         private void AfterRS485ManualScanEvent(bool sw)
         {
             AfterAnyAutoEvent(sw);
-            StatusRM485GridView.Enabled =
+            StatusRM485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
+            StatusRM485GridView.AllowUserToDeleteRows =
                 minSigToScan.Enabled = 
                 maxSigToScan.Enabled =
                 StartTestRSButton.Enabled =  // <----------
@@ -1636,7 +1640,8 @@ namespace RMDebugger
         private void AfterRS485AutoScanEvent(bool sw)
         {
             AfterAnyAutoEvent(sw);
-            StatusRM485GridView.Enabled =
+            StatusRM485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
+            StatusRM485GridView.AllowUserToDeleteRows =
                 extendedMenuPanel.Enabled = !sw;
         }
         async private Task AutoScanAdd()
@@ -1672,7 +1677,129 @@ namespace RMDebugger
             });
             AddToGridDevices(devices);
         }
+        private void minSigToScan_ValueChanged(object sender, EventArgs e)
+        {
+            maxSigToScan.Minimum = minSigToScan.Value;
+            if (minSigToScan.Value >= maxSigToScan.Value)
+                maxSigToScan.Value = minSigToScan.Value;
+        }
+        private void ShowExtendedMenu_Click(object sender, EventArgs e)
+        {
+            bool hideMenu = ShowExtendedMenu.Text == "Show &menu";
+            StatusRM485GridView.Columns[0].Visible = hideMenu;
+            extendedMenuPanel.Location = hideMenu
+                ? new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y - 147)
+                : new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y + 147);
+            ShowExtendedMenu.Image = hideMenu ? Resources.Unhide : Resources.Hide;
+            ToolTipHelper.SetToolTip(ShowExtendedMenu, hideMenu ? "Скрыть расширенное меню" : "Показать расширенное меню");
+            ShowExtendedMenu.Text = hideMenu ? "Hide &menu" : "Show &menu";
+        }
+        private void MoreInfoTestRS485Click(object sender, EventArgs e)
+        {
+            bool sw = MoreInfoTestRS485.Text == "More info";
+            StatusRM485GridView.Columns[(int)RS485Columns.NoReply].Visible = sw;
+            StatusRM485GridView.Columns[(int)RS485Columns.BadReply].Visible = sw;
+            StatusRM485GridView.Columns[(int)RS485Columns.BadCrc].Visible = sw;
+            StatusRM485GridView.Columns[(int)RS485Columns.BadRadio].Visible = sw;
+            MoreInfoTestRS485.Text = sw ? "Hide info" : "More info";
+        }
+        private void ChangeWorkTestTime(int seconds)
+        {
+            TimeSpan time = TimeSpan.FromSeconds(seconds);
+            WorkingTimeLabel.Text = $"{(time.Days > 0 ? $"{time.Days}d " : "")}" +
+                                    $"{time.Hours:00}:{time.Minutes:00}:{time.Seconds:00}";
+        }
+        private void SaveLogTestRS485_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog.ShowDialog() == DialogResult.Cancel)
+                return;
+            File.WriteAllText(saveFileDialog.FileName, GetLogFromTestRM485());
+        }
+        private string GetLogFromTestRM485()
+        {
+            if (StatusRM485GridView.Rows.Count > 0)
+            {
+                DateTime time = DateTime.Now;
+                int tX = 0;
+                int rX = 0;
+                int errors = 0;
+                for (int i = 0; i < StatusRM485GridView.Rows.Count; i++)
+                {
+                    tX += (int)StatusRM485GridView[(int)RS485Columns.Tx, i].Value;
+                    rX += (int)StatusRM485GridView[(int)RS485Columns.Rx, i].Value;
+                    errors += (int)StatusRM485GridView[(int)RS485Columns.Errors, i].Value;
+                }
+                string log =
+                    $"Время создания лога\t\t\t{time}\n" +
+                    $"Общее время тестирования\t\t{WorkingTimeLabel.Text}\n\n" +
+                    $"\nОбщее количество отправленных пакетов: {tX}." +
+                    $"\nОбщее количество принятых пакетов: {rX}." +
+                    $"\nОбщее количество ошибок: {errors}\n\n";
 
+                //"Испытуемые: sig, sig, sig... sig"
+                Dictionary<ushort, int> signDataIndex = new Dictionary<ushort, int>();
+                for (int i = 0; i < StatusRM485GridView.Rows.Count; i++)
+                    signDataIndex[Convert.ToUInt16(StatusRM485GridView[(int)RS485Columns.Sign, i].Value)] = i;
+
+                signDataIndex = signDataIndex.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+                log += $"Количество испытуемых: {signDataIndex.Count}\n";
+                log += $"Сигнатуры испытуемых: {String.Join(", ", signDataIndex.Keys)}.\n\n";
+
+                if (errors > 0)
+                    foreach (ushort key in signDataIndex.Keys)
+                    {
+                        int i = signDataIndex[key];
+                        if ((int)StatusRM485GridView[(int)RS485Columns.Errors, i].Value > 0)
+                        {
+                            ushort sign = Convert.ToUInt16(StatusRM485GridView[(int)RS485Columns.Sign, i].Value);
+                            string type = Convert.ToString(StatusRM485GridView[(int)RS485Columns.Type, i].Value);
+                            int noReply = (int)StatusRM485GridView[(int)RS485Columns.NoReply, i].Value;
+                            int badReply = (int)StatusRM485GridView[(int)RS485Columns.BadReply, i].Value;
+                            int badCRC = (int)StatusRM485GridView[(int)RS485Columns.BadCrc, i].Value;
+                            int badRadio = (int)StatusRM485GridView[(int)RS485Columns.BadRadio, i].Value;
+                            log += $"Информация об устройстве типа {type} с сигнатурой {sign}:\n" +
+                                   $"Состояние: {StatusRM485GridView[(int)RS485Columns.Status, i].Value}\n" +
+                                   $"Версия прошивки устройства: {StatusRM485GridView[(int)RS485Columns.Version, i].Value}\n" +
+                                   $"Количество отправленных пакетов устройству: {Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.Tx, i].Value)}\n" +
+                                   $"Количество принятых пакетов от устройства: {Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.Rx, i].Value)}\n";
+                            log += noReply > 0 ? $"Пропустил опрос: {noReply}\n" : "";
+                            log += badReply > 0 ? $"Проблемы с ответом: {badReply}\n" : "";
+                            log += badCRC > 0 ? $"Проблемы с CRC: {badCRC}\n" : "";
+                            log += badRadio > 0 ? $"Проблемы с Radio: {badRadio}\n" : "";
+                            log += $"Процент ошибок: {Math.Round(Convert.ToDouble(StatusRM485GridView[(int)RS485Columns.PercentErrors, i].Value), 3)}\n\n\n";
+                        }
+                    }
+                else log += "В следствии прогона ошибок не обнаружено.\n\n";
+                return log;
+            }
+            else return "Empty";
+        }
+        private void TimerTestBox_CheckedChanged(object sender, EventArgs e)
+            => GetMessageTestBox.Visible = timerPanelTest.Visible = TimerTestBox.Checked;
+        private void numericSecondsTest_ValueChanged(object sender, EventArgs e)
+        {
+            if (numericSecondsTest.Value == 60)
+            {
+                numericSecondsTest.Value = 0;
+                numericMinutesTest.Value += 1;
+            }
+        }
+        private void numericMinutesTest_ValueChanged(object sender, EventArgs e)
+        {
+            if (numericMinutesTest.Value == 60)
+            {
+                numericMinutesTest.Value = 0;
+                numericHoursTest.Value += 1;
+            }
+        }
+        private void numericHoursTest_ValueChanged(object sender, EventArgs e)
+        {
+            if (numericHoursTest.Value == 24)
+            {
+                numericHoursTest.Value = 0;
+                numericDaysTest.Value += 1;
+            }
+        }
 
 
 
@@ -1731,7 +1858,7 @@ namespace RMDebugger
             StartTestRSButton.Enabled =
                 SaveLogTestRS485.Enabled =
                 StatusRM485GridView.Rows.Count > 0;
-            ToMessageStatus($"{StatusRM485GridView.Rows.Count} devices on RM Test.");
+            /*ToMessageStatus($"{StatusRM485GridView.Rows.Count} devices on RM Test.");*/
         }
         private void offTabsExcept(TabControl tab, TabPage exc)
         {
@@ -1805,34 +1932,19 @@ namespace RMDebugger
         private void StatusGridView_DoubleClick(object sender, EventArgs e) => StatusRM485GridView.ClearSelection();
         private void StatusGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e) => TaskForChangedRows();
         private void StatusGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e) => TaskForChangedRows();
-        private void ClearDataStatusRM_Click(object sender, EventArgs e)
-        {
-            foreach(DeviceClass device in testerData)
-            {
-                device.devRx = 0;
-                device.devTx = 0;
-                device.devErrors = 0;
-                device.devBadCRC = 0;
-                device.devBadReply = 0;
-                device.devBadRadio = 0;
-                device.devNoReply = 0;
-            }
-        }
+        private void ClearDataStatusRM_Click(object sender, EventArgs e) => testerData.Clear();
 
 
 
-        
 
 
-        
+
+
         private void ClearInfoTestRS485Click(object sender, EventArgs e)
         {
-            foreach(DataGridViewRow row in StatusRM485GridView.Rows)
-            {
-                row.Cells[(int)RS485Columns.Status].Value = "-";
-                for (int i = 4; i < 11; i++) row.Cells[i].Value = 0;
-                row.DefaultCellStyle.BackColor = Color.White;
-            }
+            foreach (DeviceClass device in testerData)
+                device.Reset();
+            RefreshGridTask();
             realTimeWorkingTest = 0;
             ChangeWorkTestTime(realTimeWorkingTest);
         }
@@ -1993,12 +2105,6 @@ namespace RMDebugger
         }
 
         private void HexUploadFilename_DoubleClick(object sender, EventArgs e) => PasswordBox.Visible = !PasswordBox.Visible;
-        private void minSigToScan_ValueChanged(object sender, EventArgs e)
-        {
-            maxSigToScan.Minimum = minSigToScan.Value;
-            if (minSigToScan.Value >= maxSigToScan.Value)
-                maxSigToScan.Value = minSigToScan.Value;
-        }
         private void ConfigDataGrid_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
             => e.Cancel = ConfigDataGrid[0, e.Row.Index].Value is null;
         private void ClearGridButton_Click(object sender, EventArgs e)
@@ -2010,118 +2116,6 @@ namespace RMDebugger
                         ConfigDataGrid[(int)ConfigColumns.ConfigUpload, i].Value = null;
                     }
             }));
-        private void ShowExtendedMenu_Click(object sender, EventArgs e)
-        {
-            bool hideMenu = ShowExtendedMenu.Text == "Show &menu";
-            StatusRM485GridView.Columns[0].Visible = hideMenu;
-            extendedMenuPanel.Location = hideMenu
-                ? new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y - 147)
-                : new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y + 147);
-            ShowExtendedMenu.Image = hideMenu ? Resources.Unhide : Resources.Hide;
-            ToolTipHelper.SetToolTip(ShowExtendedMenu, hideMenu ? "Скрыть расширенное меню" : "Показать расширенное меню");
-            ShowExtendedMenu.Text = hideMenu ? "Hide &menu" : "Show &menu";
-        }
 
-
-        private void ChangeWorkTestTime(int seconds) 
-            => BeginInvoke((MethodInvoker)(() => {
-            TimeSpan time = TimeSpan.FromSeconds(seconds);
-            WorkingTimeLabel.Text = $"{time.Days}d " +
-                                    $"{time.Hours}h " +
-                                    $": {time.Minutes}m " +
-                                    $": {time.Seconds}s";
-        }));
-
-        private void SaveLogTestRS485_Click(object sender, EventArgs e)
-        {
-            if (saveFileDialog.ShowDialog() == DialogResult.Cancel)
-                return;
-            File.WriteAllText(saveFileDialog.FileName, GetLogFromTestRM485());
-        }
-        private string GetLogFromTestRM485()
-        {
-            if (StatusRM485GridView.Rows.Count > 0)
-            {
-                DateTime time = DateTime.Now;
-                int tX = 0;
-                int rX = 0;
-                int errors = 0;
-                for (int i = 0; i < StatusRM485GridView.Rows.Count; i++)
-                {
-                    tX += (int)StatusRM485GridView[(int)RS485Columns.Tx, i].Value;
-                    rX += (int)StatusRM485GridView[(int)RS485Columns.Rx, i].Value;
-                    errors += (int)StatusRM485GridView[(int)RS485Columns.Errors, i].Value;
-                }
-                string log =
-                    $"Время создания лога\t\t\t{time}\n" +
-                    $"Общее время тестирования\t\t{WorkingTimeLabel.Text}\n\n" +
-                    $"\nОбщее количество отправленных пакетов: {tX}." +
-                    $"\nОбщее количество принятых пакетов: {rX}." +
-                    $"\nОбщее количество ошибок: {errors}\n\n";
-
-                //"Испытуемые: sig, sig, sig... sig"
-                Dictionary<ushort, int> signDataIndex = new Dictionary<ushort, int>();
-                for (int i = 0; i < StatusRM485GridView.Rows.Count; i++)
-                    signDataIndex[Convert.ToUInt16(StatusRM485GridView[(int)RS485Columns.Sign, i].Value)] = i;
-
-                signDataIndex = signDataIndex.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
-                log += $"Количество испытуемых: {signDataIndex.Count}\n";
-                log += $"Сигнатуры испытуемых: {String.Join(", ", signDataIndex.Keys)}.\n\n";
-
-                if (errors > 0)
-                    foreach (ushort key in signDataIndex.Keys)
-                    {
-                        int i = signDataIndex[key];
-                        if ((int)StatusRM485GridView[(int)RS485Columns.Errors, i].Value > 0)
-                        {
-                            ushort sign = Convert.ToUInt16(StatusRM485GridView[(int)RS485Columns.Sign, i].Value);
-                            string type = Convert.ToString(StatusRM485GridView[(int)RS485Columns.Type, i].Value);
-                            int noReply = (int)StatusRM485GridView[(int)RS485Columns.NoReply, i].Value;
-                            int badReply = (int)StatusRM485GridView[(int)RS485Columns.BadReply, i].Value;
-                            int badCRC = (int)StatusRM485GridView[(int)RS485Columns.BadCrc, i].Value;
-                            int badRadio = (int)StatusRM485GridView[(int)RS485Columns.BadRadio, i].Value;
-                            log += $"Информация об устройстве типа {type} с сигнатурой {sign}:\n" +
-                                   $"Состояние: {StatusRM485GridView[(int)RS485Columns.Status, i].Value}\n" +
-                                   $"Версия прошивки устройства: {StatusRM485GridView[(int)RS485Columns.Version, i].Value}\n"+
-                                   $"Количество отправленных пакетов устройству: {Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.Tx, i].Value)}\n" +
-                                   $"Количество принятых пакетов от устройства: {Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.Rx, i].Value)}\n";
-                            log += noReply > 0 ? $"Пропустил опрос: {noReply}\n" : "";
-                            log += badReply > 0 ? $"Проблемы с ответом: {badReply}\n" : "";
-                            log += badCRC > 0 ? $"Проблемы с CRC: {badCRC}\n" : "";
-                            log += badRadio > 0 ? $"Проблемы с Radio: {badRadio}\n" : "";
-                            log += $"Процент ошибок: {Math.Round(Convert.ToDouble(StatusRM485GridView[(int)RS485Columns.PercentErrors, i].Value), 3)}\n\n\n";
-                        }
-                    }
-                else log += "В следствии прогона ошибок не обнаружено.\n\n";
-                return log;
-            }
-            else return "Empty";
-        }
-        private void TimerTestBox_CheckedChanged(object sender, EventArgs e)
-            => GetMessageTestBox.Visible = timerPanelTest.Visible = TimerTestBox.Checked;
-        private void numericSecondsTest_ValueChanged(object sender, EventArgs e)
-        {
-            if (numericSecondsTest.Value == 60)
-            {
-                numericSecondsTest.Value = 0;
-                numericMinutesTest.Value += 1;
-            }
-        }
-        private void numericMinutesTest_ValueChanged(object sender, EventArgs e)
-        {
-            if (numericMinutesTest.Value == 60)
-            {
-                numericMinutesTest.Value = 0;
-                numericHoursTest.Value += 1;
-            }
-        }
-        private void numericHoursTest_ValueChanged(object sender, EventArgs e)
-        {
-            if (numericHoursTest.Value == 24)
-            {
-                numericHoursTest.Value = 0;
-                numericDaysTest.Value += 1;
-            }
-        }
     }
 }
