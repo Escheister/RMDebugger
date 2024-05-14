@@ -1858,7 +1858,6 @@ namespace RMDebugger
             StartTestRSButton.Enabled =
                 SaveLogTestRS485.Enabled =
                 StatusRM485GridView.Rows.Count > 0;
-            /*ToMessageStatus($"{StatusRM485GridView.Rows.Count} devices on RM Test.");*/
         }
         private void offTabsExcept(TabControl tab, TabPage exc)
         {
