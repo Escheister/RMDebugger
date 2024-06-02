@@ -163,6 +163,16 @@ namespace RMDebugger.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap dinosaur {
+            get {
+                object obj = ResourceManager.GetObject("dinosaur", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Download {
             get {
                 object obj = ResourceManager.GetObject("Download", resourceCulture);
@@ -206,16 +216,6 @@ namespace RMDebugger.Properties {
         public static System.Drawing.Bitmap OpenFolder {
             get {
                 object obj = ResourceManager.GetObject("OpenFolder", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Pin {
-            get {
-                object obj = ResourceManager.GetObject("Pin", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -306,16 +306,6 @@ namespace RMDebugger.Properties {
         public static System.Drawing.Bitmap Unhide {
             get {
                 object obj = ResourceManager.GetObject("Unhide", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Unpin {
-            get {
-                object obj = ResourceManager.GetObject("Unpin", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

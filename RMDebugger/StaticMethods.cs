@@ -24,13 +24,13 @@ namespace StaticMethods
                     string stringIn = cmdIn is null ? "" : BitConverter.ToString(cmdIn).Replace("-", " ");
                     string msg = $"Send\t->  {stringOut}\n" +
                                  $"{reply}\t<-  {stringIn}\n";
-                    if (Options.debugForm.allToolStripMenuItem.Checked)
+                    if (Options.debugForm.allFlagToolStrip.Checked)
                     {
                         Options.debugForm.LogBox.AppendText(msg);
                         Options.debugForm.LogBox.ScrollToCaret();
                         return;
                     }
-                    if (Options.debugForm.errorsToolStripMenuItem.Checked)
+                    if (Options.debugForm.errorsFlagToolStrip.Checked)
                         if (reply != ProtocolReply.Ok)
                         {
                             Options.debugForm.LogBox.AppendText(msg);
@@ -51,7 +51,7 @@ namespace StaticMethods
         public static ProtocolReply GetReply(byte[] bufferIn, byte[] rmSign, CmdInput cmdMain)
         {
             if (bufferIn.Length == 0) return ProtocolReply.Null;
-            /*if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;*/
+            if (Options.checkCrc && !CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;
             if (!SignatureEqual(bufferIn, rmSign)) return ProtocolReply.WSign;
             if (!CmdInputEqual(bufferIn, cmdMain)) return ProtocolReply.WCmd;
             return ProtocolReply.Ok;
@@ -59,7 +59,7 @@ namespace StaticMethods
         public static ProtocolReply GetReply(byte[] bufferIn, byte[] rmThrough, CmdInput cmdThrough, byte[] rmSign, CmdInput cmdMain)
         {
             if (bufferIn.Length == 0) return ProtocolReply.Null;
-            /*if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;*/
+            if (Options.checkCrc && !CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;
             if (!SignatureEqual(bufferIn, rmThrough, rmSign)) return ProtocolReply.WSign;
             if (!CmdInputEqual(bufferIn, cmdThrough, cmdMain)) return ProtocolReply.WCmd;
             return ProtocolReply.Ok;
@@ -69,7 +69,7 @@ namespace StaticMethods
             if (!DataEqual(bufferIn, bufferOut)) return ProtocolReply.WData;
             return ProtocolReply.Ok;
         }
-        private static bool SignatureEqual(byte[] bufferIn, byte[] rmSign)
+        public static bool SignatureEqual(byte[] bufferIn, byte[] rmSign)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace StaticMethods
             }
             catch { return false; }
         }
-        private static bool SignatureEqual(byte[] bufferIn, byte[] rmThrough, byte[] rmSign)
+        public static bool SignatureEqual(byte[] bufferIn, byte[] rmThrough, byte[] rmSign)
         {
             try
             {
@@ -89,12 +89,12 @@ namespace StaticMethods
             }
             catch { return false; }
         }
-        private static bool CmdInputEqual(byte[] bufferIn, CmdInput cmdMain)
+        public static bool CmdInputEqual(byte[] bufferIn, CmdInput cmdMain)
         {
             try { return cmdMain == (CmdInput)((bufferIn[2] << 8) | bufferIn[3]); }
             catch { return false; }
         }
-        private static bool CmdInputEqual(byte[] bufferIn, CmdInput cmdThrough, CmdInput cmdMain)
+        public static bool CmdInputEqual(byte[] bufferIn, CmdInput cmdThrough, CmdInput cmdMain)
         {
             try 
             { 
@@ -103,7 +103,7 @@ namespace StaticMethods
             }
             catch { return false; }
         }
-        private static bool DataEqual(byte[] bufferIn, byte[] bufferOut)
+        public static bool DataEqual(byte[] bufferIn, byte[] bufferOut)
         {
             try
             {
@@ -126,18 +126,6 @@ namespace StaticMethods
         {
             try { return (RmResult)bufferIn[bufferIn.Length - 3]; }
             catch { return RmResult.Error; }
-        }
-        public static void FlushBuffer(SerialPort serial)
-        {
-            if (!serial.IsOpen) return;
-            if (serial.BytesToRead > 0)
-                serial.DiscardInBuffer();
-        }
-        public static void FlushBuffer(Socket socket)
-        {
-            if (!socket.Connected) return;
-            if (socket.Available > 0)
-                socket.Receive(new byte[socket.Available]);
         }
         public static byte[] uShortToTwoBytes(ushort cmd) => BitConverter.GetBytes(cmd).Reverse().ToArray();
     }

@@ -23,6 +23,7 @@ namespace RMDebugger
                 RegistryKey rKey = currentUserKey.OpenSubKey(mainName, true);
                 if (!debugger.checkInMainFolder(rKey, FolderNameBox.Text)) rKey.CreateSubKey(FolderNameBox.Text);
                 RegistryKey sKey = rKey.OpenSubKey(FolderNameBox.Text, true);
+
                 sKey.SetValue("ThroughRM485", $"{debugger.NeedThrough.Checked}");
                 sKey.SetValue("MainSignatureID", $"{debugger.TargetSignID.Value}");
                 sKey.SetValue("ThroughSignatureID", $"{debugger.ThroughSignID.Value}");

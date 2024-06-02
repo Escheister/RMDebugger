@@ -109,7 +109,7 @@
     { 
         Interface, Sign, Type, Status, Tx, Rx, Errors, 
         PercentErrors, NoReply, BadReply, BadCrc, BadRadio,
-        WorkTime, Version
+        Nearby, WorkTime, Version
     }
     enum RM485MaxSize : int
     {

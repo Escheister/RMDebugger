@@ -11,12 +11,12 @@ using CRC16;
 
 namespace BootloaderProtocol
 {
-    internal class Bootloader : CommandsOutput
+    internal class BootloaderNew : CommandsOutput
     {
         public delegate byte[] BuildCmdDelegate(CmdOutput cmdOutput);
         public delegate byte[] BuildDataCmdDelegate(byte[] data);
 
-        public Bootloader(object sender, byte[] targetSign) : base(sender)
+        public BootloaderNew(object sender, byte[] targetSign) : base(sender)
         {
             _addrHex = new byte[2];
             _addrElar = new byte[2];
@@ -24,7 +24,7 @@ namespace BootloaderProtocol
             buildCmdDelegate += BuildCmd;
             buildDataCmdDelegate += BuildDataCmd;
         }
-        public Bootloader(object sender, byte[] targetSign, byte[] throughSign) : base(sender)
+        public BootloaderNew(object sender, byte[] targetSign, byte[] throughSign) : base(sender)
         {
             _addrHex = new byte[2];
             _addrElar = new byte[2];
@@ -33,11 +33,35 @@ namespace BootloaderProtocol
             buildCmdDelegate += BuildCmdThrough;
             buildDataCmdDelegate += BuildDataCmdThrough;
         }
+        //Try dispose
+        public override void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                hexQueue = null;
+                base.Dispose(disposing);
+            }
+        }
 
         private byte[] _addrHex;
         private byte[] _addrElar;
         private readonly byte[] _throughSign;
         private readonly byte[] _targetSign;
+
+        private Queue<byte[]> hexQueue;
+        public Queue<byte[]> HexQueue { get { return hexQueue; } }
+
+        private int pageSize;
+        public int PageSize
+        {
+            set { pageSize = value; }
+            get { return pageSize; }
+        }
 
         public BuildCmdDelegate buildCmdDelegate;
         public BuildDataCmdDelegate buildDataCmdDelegate;
@@ -56,11 +80,11 @@ namespace BootloaderProtocol
             data.CopyTo(loadField, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(loadField);
         }
-        private string[] GetStringsFromFile(string path)
+        private void GetStringsFromFile(string path, out string[] fileStrings)
         {
             using StreamReader file = new StreamReader(path);
-                Task<string> data = file.ReadToEndAsync();
-                return data.Result.Trim().Split('\n');
+            Task<string> data = file.ReadToEndAsync();
+            fileStrings = data.Result.Trim().Split('\n');
         }
         private byte[] GetBytesFromString(string line) => StringToByteArray(line.Replace(":", string.Empty).Replace("\r", string.Empty));
         private byte[] StringToByteArray(string hex) => Enumerable.Range(0, hex.Length)
@@ -73,14 +97,14 @@ namespace BootloaderProtocol
             for (int i = 0; i < array.Length; i++) hex += array[i];
             return hex == 0;
         }
-        public byte[][] GetByteDataFromFile(string filename)
+        public void SetQueueFromHex(string filepath)
         {
-            string[] fileStrings = GetStringsFromFile(filename);
-            List <byte[]> stringBytes = new List <byte[]>();
-            for(int i = 0; i < fileStrings.Length; i++)
+            hexQueue = new Queue<byte[]>();
+            GetStringsFromFile(filepath, out string[] fileStrings);
+            for (int i = 0; i < fileStrings.Length; i++)
             {
                 byte[] byteString = GetBytesFromString(fileStrings[i]);
-                if (!IntelHexCheckSum(byteString)) throw new Exception($"{FileCheck.CrcError}: {i+1}");
+                if (!IntelHexCheckSum(byteString)) throw new Exception($"{FileCheck.CrcError}: {i + 1}");
                 switch ((RecordType)byteString[3])
                 {
                     case RecordType.ESAR: goto default;
@@ -89,60 +113,38 @@ namespace BootloaderProtocol
                     case RecordType.EndRec: continue;
                     case RecordType.ELAR: break;
                     case RecordType.SLAR: continue;
-                    default: throw new Exception($"{FileCheck.CmdError}: {i+1}");
+                    default: throw new Exception($"{FileCheck.CmdError}: {i + 1}");
                 }
-                stringBytes.Add(byteString);
+                hexQueue.Enqueue(byteString);
             }
-            return stringBytes.ToArray();
         }
-        public Tuple<byte[], int> GetDataForUpload(byte[][] hexFile, int pageSize, int indexZero)
+        public void GetDataForUpload(out byte[] dataOutput)
         {
+            bool GetAccessToDequeuing(byte[] dequeued)
+                =>  dequeued[0] == 0x10 && hexQueue.Count != 0 && (RecordType)hexQueue.Peek()[3] == RecordType.Rec;
+
             List<byte> data = new List<byte>();
             List<byte> cmd = new List<byte>();
-            RecordType type = (RecordType)hexFile[indexZero][3];
-            if (type == RecordType.ELAR)
+            while (pageSize > data.Count)
             {
-                _addrElar = new byte[2] { hexFile[indexZero][5], hexFile[indexZero][4] };
-                indexZero++;
-                return new Tuple<byte[], int>(null, indexZero);
-            }
-            else
-            {
-                byte[] sizePack = new byte[2];
-                _addrHex = new byte[2] { hexFile[indexZero][2], hexFile[indexZero][1] };
-                int size = 0;
-                for (;size <= pageSize;)
+                byte[] dequeueArray = hexQueue.Dequeue();
+                switch ((RecordType)dequeueArray[3]) 
                 {
-                    type = (RecordType)hexFile[indexZero][3];
-                    if (type == RecordType.ELAR) break;
-                    int sizeHex = hexFile[indexZero][0];
-                    if (size + sizeHex <= pageSize)
-                    {
-                        size += sizeHex;
-                        for (int i = 4; i < hexFile[indexZero].Length - 1; i++) data.Add(hexFile[indexZero][i]);
-                        if (indexZero < hexFile.Length - 1)
-                        {
-                            ushort predictAddr = (ushort)((hexFile[indexZero][1] << 8 | hexFile[indexZero][2]) + 0x0010);
-                            indexZero++;
-                            if (predictAddr == (ushort)(hexFile[indexZero][1] << 8 | hexFile[indexZero][2]))
-                                continue;
-                            else break;
-                        }
-                        else
-                        {
-                            indexZero++; 
-                            break;
-                        }
-                    }
-                    else break;
+                    case RecordType.Rec: // 0x00
+                        if (data.Count == 0) _addrHex = new byte[] { dequeueArray[2], dequeueArray[1] };
+                        data.AddRange(dequeueArray.Skip(4).Take(dequeueArray[0]));
+                        break;
+                    case RecordType.ELAR: // 0x04
+                        _addrElar = new byte[] { dequeueArray[5], dequeueArray[4] };
+                        continue;
                 }
-                sizePack[0] = (byte)size;
-                cmd.AddRange(sizePack);
-                cmd.AddRange(_addrHex);
-                cmd.AddRange(_addrElar);
-                cmd.AddRange(data);
-                return new Tuple<byte[], int>(cmd.ToArray(), indexZero);
+                if (!GetAccessToDequeuing(dequeueArray)) break;
             }
+            cmd.AddRange(new byte[] { (byte)data.Count, 0x00 });
+            cmd.AddRange(_addrHex);
+            cmd.AddRange(_addrElar);
+            cmd.AddRange(data);
+            dataOutput = cmd.ToArray();
         }
     }
 }

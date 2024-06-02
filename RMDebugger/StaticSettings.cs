@@ -32,6 +32,7 @@ namespace StaticSettings
                 public static ushort signatureID { get; set; } = 0;
                 public static ushort signatureThrough { get; set; } = 1;*/
         public static bool through { get; set; } = false;
+        public static bool showMessages {  get; set; }
 
         //DistTof
         public static bool autoDistTof { get; set; }
@@ -46,7 +47,8 @@ namespace StaticSettings
         //Hex uploader
         public static string hexPath { get; set; }
         public static bool HexUploadState { get; set; } = false;
-        public static int awaitCorrectHexUpload { get; set; } = 20;
+        public static int hexTimeout { get; set; } = 20;
+        public static bool checkCrc { get; set; }
 
         //Config
         public static bool ConfigUploadState { get; set; } = false;

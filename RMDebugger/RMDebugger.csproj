@@ -165,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="photo_2023-04-04_20-13-58.ico" />
+    <None Include="Resources\dinosaur.gif" />
     <None Include="Resources\DeleteTaskList.png" />
     <None Include="Resources\DeleteTable.png" />
     <None Include="Resources\Unhide.png" />
@@ -177,8 +178,6 @@
     <None Include="Resources\CloudRun.png" />
     <None Include="Resources\Restart.png" />
     <None Include="Resources\Online.png" />
-    <None Include="Resources\Pin.png" />
-    <None Include="Resources\Unpin.png" />
     <None Include="Resources\Add.png" />
     <None Include="Resources\UploadDocument.png" />
     <None Include="Resources\DownloadDocument.png" />

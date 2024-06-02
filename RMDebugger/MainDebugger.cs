@@ -1,6 +1,7 @@
 ﻿using System.Net.NetworkInformation;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.ComponentModel;
 using RMDebugger.Properties;
 using System.Windows.Forms;
 using System.Diagnostics;
@@ -16,13 +17,13 @@ using System;
 
 using ConfigurationProtocol;
 using BootloaderProtocol;
+using StaticSettings;
 using SearchProtocol;
 using ProtocolEnums;
 using StaticMethods;
-using StaticSettings;
 using File_Verifier;
 using CSV;
-using System.ComponentModel;
+using System.Drawing.Printing;
 
 namespace RMDebugger
 {
@@ -57,16 +58,23 @@ namespace RMDebugger
         {
             Load += MainFormLoad;
             FormClosed += MainFormClosed;
-            PasswordBox.TextChanged += (s, e) => ResetButton.Visible =
-                                                 SetBootloaderStopButton.Visible =
-                                                 SetBootloaderStartButton.Visible = 
-                                                 PasswordBox.Text == "198237645";
-            PinButton.Click += (s, e) =>
+
+            PasswordBox.TextChanged += (s, e) => 
+                ResetButton.Visible =    
+                SetBootloaderStopButton.Visible = 
+                SetBootloaderStartButton.Visible = 
+                PasswordBox.Text == "198237645";
+
+
+            windowPinToolStrip.CheckedChanged += (s, e) =>
             {
-                this.TopMost = PinButton.Checked;
-                PinButton.ToolTipText = PinButton.Checked ? "Поверх других окон." : "Обычное состояние окна.";
-                PinButton.Image = PinButton.Checked ? Resources.Pin : Resources.Unpin;
+                this.TopMost = windowPinToolStrip.Checked;
+                windowPinToolStrip.ToolTipText = windowPinToolStrip.Checked ? "Поверх других окон." : "Обычное состояние окна.";
             };
+            transparentToolStrip.CheckedChanged += (s, e) => this.Opacity = transparentToolStrip.Checked ? 0.95 : 1;
+            messagesToolStrip.CheckedChanged += (s, e) => Options.showMessages = messagesToolStrip.Checked;
+            HexTimeout.ValueChanged += (s, e) => Options.hexTimeout = (int)HexTimeout.Value;
+
             comPort.SelectedIndexChanged += (s, e) => mainPort.PortName = comPort.SelectedItem.ToString();
             BaudRate.SelectedIndexChanged += (s, e) => BaudRateSelectedIndexChanged(s, e);
             RefreshSerial.Click += (s, e) => AddPorts(comPort);
@@ -103,6 +111,7 @@ namespace RMDebugger
                     mirClr = MirrorColor.Color;
             };
             TypeFilterBox.SelectedIndexChanged += (s, e) => Options.typeOfGetNear = TypeFilterBox.Text;
+            HexCheckCrc.CheckedChanged += (s, e) => Options.checkCrc = HexCheckCrc.Checked;
             Options.timeoutDistTof = DistToftimeout.Value;
             HexUploadButton.Click += HexUploadButtonClick;
 
@@ -132,11 +141,23 @@ namespace RMDebugger
 
             ClearInfoTestRS485.Click += ClearInfoTestRS485Click;
             MoreInfoTestRS485.Click += MoreInfoTestRS485Click;
-            StatusRM485GridView.DataSource = testerData;
+            TimerSettingsTestBox.CheckedChanged += (s, e) => timerPanelTest.Visible = TimerSettingsTestBox.Checked;
+            StatusRS485GridView.DataSource = testerData;
+            StatusRS485GridView.RowPrePaint += CellValueChangedRS485;
+
+            SetOnlineButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.ONLINE);
+            ResetButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.RESET);
+            SetBootloaderStartButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.START_BOOTLOADER);
+            SetBootloaderStopButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.STOP_BOOTLOADER);
         }
 
+        private void HexTimeout_ValueChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
 
-
+        private void CellValueChangedRS485(object sender, DataGridViewRowPrePaintEventArgs e)
+            => StatusRS485GridView.Rows[e.RowIndex].DefaultCellStyle.BackColor = testerData[e.RowIndex].statusColor;
 
         //********************
         private void MainFormLoad(object sender, EventArgs e)
@@ -149,6 +170,29 @@ namespace RMDebugger
             DefaultConfigGrid();
             SetProperties();
         }
+        private void SetProperties()
+        {
+            NeedThrough.Checked = Settings.Default.ThroughRM485;
+            TargetSignID.Value = Settings.Default.MainSignatureID;
+            ThroughSignID.Value = Settings.Default.ThroughSignatureID;
+            numericPort.Value = Settings.Default.UDPGatePort;
+            HexPageSize.Value = Settings.Default.LastPageSize;
+            IPaddressBox.Text = Settings.Default.UDPGateIP;
+            HexPathBox.Items.Add(Settings.Default.LastPathToHex);
+            if (HexPathBox.Items.Count != 0) HexPathBox.SelectedItem = HexPathBox.Items[0];
+            ThroughOrNot();
+            TypeFilterBox.SelectedIndex = 0;
+            if (Settings.Default.LastPortName != string.Empty && comPort.Items.Contains(Settings.Default.LastPortName))
+                comPort.Text = Settings.Default.LastPortName;
+            BaudRate.Text = Settings.Default.LastBaudRate.ToString();
+            transparentToolStrip.Checked = Settings.Default.LastTransparent;
+            Options.showMessages = messagesToolStrip.Checked = Settings.Default.LastShowMessages;
+            Options.checkCrc = HexCheckCrc.Checked = Settings.Default.LastCheckCrc;
+            HexTimeout.Value = Settings.Default.LastHexTimeout;
+            Options.hexTimeout = (int)HexTimeout.Value;
+        }
+        private void NotifyMessage_Click(object sender, EventArgs e)
+            => this.WindowState = FormWindowState.Normal;
         //********************
         private void MainFormClosed(object sender, FormClosedEventArgs e)
         {
@@ -163,6 +207,10 @@ namespace RMDebugger
             Settings.Default.LastBaudRate = Int32.TryParse(BaudRate.Text, out int digit)
                 ? digit
                 : 38400;
+            Settings.Default.LastTransparent = transparentToolStrip.Checked;
+            Settings.Default.LastShowMessages = messagesToolStrip.Checked;
+            Settings.Default.LastCheckCrc = HexCheckCrc.Checked;
+            Settings.Default.LastHexTimeout = (int)HexTimeout.Value;
             Settings.Default.Save();
         }
         private void ToMessageStatus(string msg) => BeginInvoke((MethodInvoker)(() => MessageStatus.Text = msg ));
@@ -181,10 +229,8 @@ namespace RMDebugger
                 if (Version.TryParse(ver, out Version driveVer) && driveVer.CompareTo(curVer) > 0)
                 {
                     UpdateButton.Visible = true;
-                    UpdateButton.ToolTipText = $"Доступна новая версия: {ver}";
-                    NotifyMessage.BalloonTipTitle = "Обновление";
-                    NotifyMessage.BalloonTipText = $"Доступна новая версия: {ver}";
-                    NotifyMessage.ShowBalloonTip(10);
+                    if (Options.showMessages)
+                        NotifyMessage.ShowBalloonTip(5, "Обновление", $"Доступна новая версия: {ver}", ToolTipIcon.Info);
                 }
             }
         }
@@ -221,29 +267,6 @@ namespace RMDebugger
             try { Dns.GetHostEntry("drive.google.com");
                 return true; }
             catch { return false; }
-        }
-
-        private void ComDefault()
-        {
-            mainPort.WriteTimeout =
-                mainPort.ReadTimeout = 500;
-            BaudRate.SelectedItem = "38400";
-            DataBitsForSerial(dataBits8, null);
-            ParityForSerial(ParityNone, null);
-            StopBitsForSerial(stopBits1, null);
-            BaudRateSelectedIndexChanged(null, null);
-        }
-
-        private void AddPorts(ComboBox box)
-        {
-            box.Items.Clear();
-            string[] ports = SerialPort.GetPortNames();
-            if (ports.Length > 0)
-            {
-                box.Items.AddRange(ports);
-                box.SelectedItem = box.Items[0];
-            }
-            OpenCom.Enabled = ports.Length > 0;
         }
 
         /// <summary>
@@ -399,9 +422,30 @@ namespace RMDebugger
                 this.Enabled = true;
             }
         }
-        
-        
+
+
         //Serial config
+        private void ComDefault()
+        {
+            mainPort.WriteTimeout =
+                mainPort.ReadTimeout = 500;
+            BaudRate.SelectedItem = "38400";
+            DataBitsForSerial(dataBits8, null);
+            ParityForSerial(ParityNone, null);
+            StopBitsForSerial(stopBits1, null);
+            BaudRateSelectedIndexChanged(null, null);
+        }
+        private void AddPorts(ComboBox box)
+        {
+            box.Items.Clear();
+            string[] ports = SerialPort.GetPortNames();
+            if (ports.Length > 0)
+            {
+                box.Items.AddRange(ports);
+                box.SelectedItem = box.Items[0];
+            }
+            OpenCom.Enabled = ports.Length > 0;
+        }
         private void BaudRateSelectedIndexChanged(object sender, EventArgs e)
             => mainPort.BaudRate = Convert.ToInt32(BaudRate.SelectedItem);
         private void DataBitsForSerial(object sender, EventArgs e)
@@ -500,10 +544,11 @@ namespace RMDebugger
             if (reply.Status != IPStatus.Success) return;
             try
             {
-                for (int reconnect = 0; reconnect < 100 && Options.pingOk;)
+                for (int reconnect = 0; reconnect <= 5 && Options.pingOk;)
                 {
                     reply = await ping.SendPingAsync(ip, timeout, buffer, pingOptions);
                     if (reply.Status != IPStatus.Success) reconnect++;
+                    else reconnect = 0;
                     await Task.Delay(timeout);
                 }
             }
@@ -535,7 +580,7 @@ namespace RMDebugger
             Options.mainInterface = sw ? udpGate : null;
         }
         
-        //after any interface
+        // //after any interface
         private void AfterAnyInterfaceEvent(bool sw)
         {
             RMData.Enabled =
@@ -559,6 +604,39 @@ namespace RMDebugger
                 RS485Page.Enabled = 
                 ExtendedBox.Enabled = !Options.through;
             ThroughSignID.Enabled = Options.through;
+        }
+
+        // Off\On tabs
+        private void offTabsExcept(TabControl tab, TabPage exc)
+        {
+            Action action = () =>
+            {
+                foreach (TabPage t in tab.TabPages)
+                {
+                    if (t == exc)
+                    {
+                        t.Text = $"↓{t.Text}↓";
+                        continue;
+                    }
+                    t.Enabled = false;
+                }
+            };
+            if (InvokeRequired) BeginInvoke(action);
+            else action();
+        }
+        private void onTabPages(TabControl tab)
+        {
+            Action action = () =>
+            {
+                foreach (TabPage page in tab.TabPages)
+                {
+                    if (page.Enabled == false)
+                        page.Enabled = true;
+                    page.Text = page.Text.Replace("↓", "");
+                }
+            };
+            if (InvokeRequired) BeginInvoke(action);
+            else action();
         }
 
         // method for Get near & Dist Tof
@@ -715,9 +793,8 @@ namespace RMDebugger
                 if (auto && rows.Count > 0 && KnockKnockBox.Checked)
                 {
                     Options.autoGetNear = false;
-                    NotifyMessage.BalloonTipTitle = "Тук-тук!";
-                    NotifyMessage.BalloonTipText = $"Ответ получен!";
-                    NotifyMessage.ShowBalloonTip(10);
+                    if (Options.showMessages)
+                        NotifyMessage.ShowBalloonTip(5, "Тук-тук!", $"Ответ получен!", ToolTipIcon.Info);
                 }
 
                 await Task.Delay(auto ? Options.timeoutGetNear : 50);
@@ -742,9 +819,12 @@ namespace RMDebugger
                 dataBits.Enabled = 
                 Parity.Enabled = 
                 stopBits.Enabled = !sw;
+            DinoRunningProcessOk.Enabled =
+                DinoRunningProcessOk.Visible = sw;
         }
 
         //Hex uploader
+        private void HexUploadFilename_DoubleClick(object sender, EventArgs e) => PasswordBox.Visible = !PasswordBox.Visible;
         async private void HexUploadButtonClick(object sender, EventArgs e)
         {
             Options.HexUploadState = !Options.HexUploadState;
@@ -752,7 +832,7 @@ namespace RMDebugger
             {
                 AfterHexUploadEvent(true);
                 offTabsExcept(RMData, HexUpdatePage);
-                await Task.Run(() => HexUploadAsync());
+                await Task.Run(() => HexUploadAsyncNew());
                 Options.HexUploadState = false;
                 AfterHexUploadEvent(false);
                 onTabPages(RMData);
@@ -764,82 +844,90 @@ namespace RMDebugger
             HexPathBox.Enabled = 
                 HexPageSize.Enabled = 
                 HexPathButton.Enabled =
+                HexTimeout.Enabled =
                 SignaturePanel.Enabled = !sw;
             HexUploadButton.Text = sw ? "Stop" : "Upload";
             HexUploadButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
             UpdateBar.Value = 0; 
             BytesStart.Text = "0";
         }
-        async private Task HexUploadAsync()
+        async private Task HexUploadAsyncNew()
         {
-            Bootloader boot = NeedThrough.Checked 
-                ? new Bootloader(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes()) 
-                : new Bootloader(Options.mainInterface, TargetSignID.GetBytes());
-
-            byte[] cmdBootStart = boot.buildCmdDelegate(CmdOutput.START_BOOTLOADER);
-            byte[] cmdBootStop = boot.buildCmdDelegate(CmdOutput.STOP_BOOTLOADER);
-            byte[] cmdConfirmData = boot.buildCmdDelegate(CmdOutput.UPDATE_DATA_PAGE);
-
-            byte[][] hex;
-            try { hex = boot.GetByteDataFromFile(Options.hexPath); }
-            catch (Exception ex) { ToMessageStatus(ex.Message); return; }
-
-            async Task<bool> GetReplyFromDevice(byte[] cmdOut, int receiveDelay = 50, bool taskDelay = false, int delayMs = 25)
+            using (BootloaderNew boot = NeedThrough.Checked
+                ? new BootloaderNew(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
+                : new BootloaderNew(Options.mainInterface, TargetSignID.GetBytes()))
             {
-                DateTime t0 = DateTime.Now;
-                TimeSpan tstop = DateTime.Now - t0;
-                while (tstop.Seconds < Options.awaitCorrectHexUpload && Options.HexUploadState)
+                try { boot.SetQueueFromHex(Options.hexPath); }
+                catch (Exception ex) { ToMessageStatus(ex.Message); return; }
+
+                //async method
+                async Task<bool> GetReplyFromDevice(byte[] cmdOut, int receiveDelay = 50, bool taskDelay = false, int delayMs = 25)
                 {
-                    try
+                    DateTime t0 = DateTime.Now;
+                    TimeSpan tstop = DateTime.Now - t0;
+                    while (tstop.Seconds < Options.hexTimeout && Options.HexUploadState)
                     {
-                        Tuple<byte[], ProtocolReply> replyes = await boot.GetData(cmdOut, cmdOut.Length, receiveDelay);
-                        ToReplyStatus(replyes.Item2.ToString());
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        ToReplyStatus(ex.Message);
-                        if (ex.Message == "devNull") return false;
-                        if ((DateTime.Now - t0).Seconds >= Options.awaitCorrectHexUpload)
+                        try
                         {
-                            DialogResult message = MessageBox.Show(this, "Timeout", "Something wrong...", MessageBoxButtons.RetryCancel);
-                            if (message == DialogResult.Cancel) break;
-                            else t0 = DateTime.Now;
+                            Tuple<byte[], ProtocolReply> replyes = await boot.GetData(cmdOut, cmdOut.Length, receiveDelay);
+                            ToReplyStatus(replyes.Item2.ToString());
+                            return true;
                         }
-                        if (taskDelay) await Task.Delay(delayMs);
+                        catch (Exception ex)
+                        {
+                            ToReplyStatus(ex.Message);
+                            if (ex.Message == "devNull") return false;
+                            if ((DateTime.Now - t0).Seconds >= Options.hexTimeout)
+                            {
+                                DialogResult message = MessageBox.Show(this, "Timeout", "Something wrong...", MessageBoxButtons.RetryCancel);
+                                if (message == DialogResult.Cancel) break;
+                                else t0 = DateTime.Now;
+                            }
+                            if (taskDelay) await Task.Delay(delayMs);
+                        }
                     }
+                    return false;
                 }
-                return false;
-            }
-            if (await GetReplyFromDevice(cmdBootStart, taskDelay: true)) ToMessageStatus("Bootload OK");
-            else return;
 
-            DateTime t0 = DateTime.Now;
-            TimeSpan tstop;
-            Tuple<byte[], int> tuple;
-            for (int i = 0; i <= hex.Length - 1 && Options.HexUploadState;)
-            {
-                tuple = boot.GetDataForUpload(hex, (int)HexPageSize.Value, i);
-                i = tuple.Item2;
-                if (tuple.Item1 is null) continue;
-                else
+                byte[] cmdBootStart = boot.buildCmdDelegate(CmdOutput.START_BOOTLOADER);
+                byte[] cmdBootStop = boot.buildCmdDelegate(CmdOutput.STOP_BOOTLOADER);
+                byte[] cmdConfirmData = boot.buildCmdDelegate(CmdOutput.UPDATE_DATA_PAGE);
+
+                if (!await GetReplyFromDevice(cmdBootStart, taskDelay: true)) return;
+
+                ToMessageStatus("Bootload OK");
+
+
+                boot.PageSize = (int)HexPageSize.Value;
+                int startFrom = boot.HexQueue.Count();
+                Stopwatch stopwatchQueue = new Stopwatch();
+                stopwatchQueue.Start();
+
+                while (boot.HexQueue.Count() > 0)
                 {
-                    if (!await GetReplyFromDevice(boot.buildDataCmdDelegate(tuple.Item1), receiveDelay: 200)) return;
-                    if (!await GetReplyFromDevice(cmdConfirmData, taskDelay:true, delayMs:10)) return;
-                    BeginInvoke((MethodInvoker)(() => {
-                        UpdateBar.Value = 100 * i / hex.Length;
-                        BytesStart.Text = i.ToString();
+                    boot.GetDataForUpload(out byte[] dataOutput); 
+                    if (!await GetReplyFromDevice(boot.buildDataCmdDelegate(dataOutput), receiveDelay: 250)) return;
+                    if (!await GetReplyFromDevice(cmdConfirmData, taskDelay: true, delayMs: 10)) return;
+                    BeginInvoke((MethodInvoker)(() =>
+                    {
+                        //100.000 - (100.000 * DeviceRx / devTx);
+                        UpdateBar.Value = boot.HexQueue.Count() > 0 ? Convert.ToInt32(100.000 - (100.000 * boot.HexQueue.Count() / startFrom)) : 0;
+                        BytesStart.Text = (startFrom - boot.HexQueue.Count()).ToString();
                     }));
                 }
-            }
-            await GetReplyFromDevice(cmdBootStop, taskDelay: true);
-            tstop = DateTime.Now - t0;
-            string timeUplod = $" {tstop.Minutes}:{tstop.Seconds}:{tstop.Milliseconds}";
-            if (Options.HexUploadState)
-            {
-                Invoke((MethodInvoker)(() => { MessageStatus.Text = $"Firmware OK | Uploaded for" + timeUplod; }));
-                NotifyMessage.ShowBalloonTip(5, "Прошивка устройства", 
-                    $"Файл {Path.GetFileName(Options.hexPath)} успешно загружен на устройство за" + timeUplod, ToolTipIcon.Info);
+                await GetReplyFromDevice(cmdBootStop, taskDelay: true);
+                stopwatchQueue.Stop();
+                string timeUplod = $"{stopwatchQueue.Elapsed.Minutes:00}:{stopwatchQueue.Elapsed.Seconds:00}:{stopwatchQueue.Elapsed.Milliseconds:000}";
+                if (Options.HexUploadState)
+                {
+                    Invoke((MethodInvoker)(() => { MessageStatus.Text = $"Firmware OK | Uploaded for " + timeUplod; }));
+                    if (Options.showMessages)
+                        NotifyMessage.ShowBalloonTip(5,
+                            "Прошивка устройства",
+                            $"Файл {Path.GetFileName(Options.hexPath)} успешно загружен на устройство за " + timeUplod,
+                            ToolTipIcon.Info);
+                }
+
             }
         }
         private void HexPathButton_Click(object sender, EventArgs e)
@@ -861,10 +949,8 @@ namespace RMDebugger
         {
             string[] FilePath = (string[])e.Data.GetData(DataFormats.FileDrop);
             foreach (string path in FilePath)
-            {
-                if (HexPathBox.Items.Contains(path)) continue;
-                if (new FileInfo(path).Extension == ".hex") HexPathBox.Items.Add(path);
-            }
+                if (!HexPathBox.Items.Contains(path) && new FileInfo(path).Extension == ".hex")
+                    HexPathBox.Items.Add(path);
             HexPathBox.SelectedItem = FilePath[0];
         }
         private void Hex_Box_DragEnter(object sender, DragEventArgs e)
@@ -887,7 +973,33 @@ namespace RMDebugger
 
 
         //Config
-
+        private void ConfigDataGrid_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+            => e.Cancel = ConfigDataGrid[0, e.Row.Index].Value is null;
+        private void ClearGridButton_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < ConfigDataGrid.Rows.Count - 1; i++)
+                if (Convert.ToBoolean(ConfigDataGrid[(int)ConfigColumns.enabled, i].Value))
+                {
+                    ConfigDataGrid[(int)ConfigColumns.ConfigLoad, i].Value = null;
+                    ConfigDataGrid[(int)ConfigColumns.ConfigUpload, i].Value = null;
+                }
+        }
+        private void DefaultConfigGrid()
+        {
+            BeginInvoke((MethodInvoker)(() =>
+            {
+                foreach (string key in fieldsDict.Keys)
+                {
+                    int row = ConfigDataGrid.Rows.Add(key);
+                    ConfigDataGrid.Rows[row].Cells[0].ReadOnly = true;
+                    ConfigDataGrid.Rows[row].Cells[3].ReadOnly = false;
+                    ConfigDataGrid.Rows[row].Cells[3].ToolTipText = GetDescription(fieldsDict[key]);
+                }
+                ConfigDataGrid.Rows.Add();
+                ConfigDataGrid.Rows[ConfigDataGrid.Rows.Count - 1].Cells[1].ReadOnly = true;
+                ConfigDataGrid.Rows[ConfigDataGrid.Rows.Count - 1].Cells[3].ReadOnly = true;
+            }));
+        }
         private string GetDescription(ConfigCheckList ccl)
         {
             switch (ccl)
@@ -1268,10 +1380,18 @@ namespace RMDebugger
 
 
         //RS485 test
+        private void StatusGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e) => TaskForChangedRows();
+        private void StatusGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e) => TaskForChangedRows();
+        private void TaskForChangedRows()
+        {
+            StartTestRSButton.Enabled =
+                SaveLogTestRS485.Enabled =
+                StatusRS485GridView.Rows.Count > 0;
+        }
         private bool GetDevices(out Dictionary<string, List<DeviceClass>> interfacesDict)
         {
             interfacesDict = new Dictionary<string, List<DeviceClass>>();
-            if (StatusRM485GridView.Rows.Count == 0) return false;
+            if (StatusRS485GridView.Rows.Count == 0) return false;
             foreach(DeviceClass device in testerData)
             {
                 if (!interfacesDict.ContainsKey(device.devInterface)) interfacesDict[device.devInterface] = new List<DeviceClass>();
@@ -1311,7 +1431,7 @@ namespace RMDebugger
             }
             device.devInterface = connectedInterface;
             testerData.Add(device);
-            ToMessageStatus($"Device count: {StatusRM485GridView.RowCount}");
+            ToMessageStatus($"Device count: {StatusRS485GridView.RowCount}");
         }
         private void AddToGridDevices(List<DeviceClass> devices)
         {
@@ -1336,35 +1456,39 @@ namespace RMDebugger
                 device.devInterface = connectedInterface;
                 testerData.Add(device);
             }
-            ToMessageStatus($"Device count: {StatusRM485GridView.RowCount}");
+            ToMessageStatus($"Device count: {StatusRS485GridView.RowCount}");
         }
 
 
         async private void StartTestRSButtonClick(object sender, EventArgs e)
         {
             Options.RS485TestState = !Options.RS485TestState;
-            if (Options.RS485TestState && StatusRM485GridView.Rows.Count > 0)
+            if (Options.RS485TestState && StatusRS485GridView.Rows.Count > 0)
             {
                 AfterStartTestRSEvent(true);
-                ToMessageStatus($"Device count: {StatusRM485GridView.RowCount}");
+                offTabsExcept(RMData, TestPage);
+                offTabsExcept(TestPages, RS485Page);
+                ToMessageStatus($"Device count: {StatusRS485GridView.RowCount}");
                 await Task.Run(() => StartTaskRS485Test());
                 AfterStartTestRSEvent(false);
                 Options.RS485TestState = false;
                 WorkTestTimer.Stop();
+                onTabPages(RMData);
+                onTabPages(TestPages);
             }
             else StartTestRSButton.Enabled = false;
         }
         private void AfterStartTestRSEvent(bool sw)
         {
             AfterAnyAutoEvent(sw);
-            StatusRM485GridView.AllowUserToDeleteRows =
+            StatusRS485GridView.AllowUserToDeleteRows =
                 SignaturePanel.Enabled = 
                 AutoScanToTest.Enabled = 
                 scanGroupBox.Enabled = 
                 settingsGroupBox.Enabled = 
                 ClearDataTestRS485.Enabled =
                 timerPanelTest.Enabled = !sw;
-            StatusRM485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
+            StatusRS485GridView.Cursor = sw ? Cursors.AppStarting : Cursors.Default;
             StartTestRSButton.Text = sw ? "&Stop" : "&Start Test";
             StartTestRSButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
             if (!sw) StartTestRSButton.Enabled = true;
@@ -1377,7 +1501,7 @@ namespace RMDebugger
             List<Task> tasks = new List<Task>();
             string connectedInterface = GetConnectedInterfaceString();
 
-            if (TimerTestBox.Checked)
+            if (TimerSettingsTestBox.Checked)
                 setTimerTest = (int)new TimeSpan(
                                (int)numericDaysTest.Value,
                                (int)numericHoursTest.Value,
@@ -1399,16 +1523,15 @@ namespace RMDebugger
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             finally {
                 RefreshGridTask();
-                ToMessageStatus($"Device count: {StatusRM485GridView.RowCount} | Завершено");
+                ToMessageStatus($"Device count: {StatusRS485GridView.RowCount} | Завершено");
             }
         }
-
-
-
         private void RefreshGridTask()
-            => Invoke((MethodInvoker)(() => {
+            => BeginInvoke((MethodInvoker)(() => {
                 testerData.ResetBindings();
-                StatusRM485GridView.Refresh();
+                StatusRS485GridView.ClearSelection();
+                StatusRS485GridView.Refresh();
+
             }));
 
         private void WorkTestTimer_Tick(object sender, EventArgs e)
@@ -1417,16 +1540,16 @@ namespace RMDebugger
             realTimeWorkingTest += 1;
             RefreshGridTask();
             ChangeWorkTestTime(realTimeWorkingTest);
-            if (TimerTestBox.Checked && setTimerTest == 0)
+            if (TimerSettingsTestBox.Checked && setTimerTest == 0)
             {
                 Options.RS485TestState = false;
-                if (GetMessageTestBox.Checked)
-                {
-                    NotifyMessage.BalloonTipTitle = "Время истекло!";
-                    NotifyMessage.BalloonTipText = $"Время истекло, тест завершен";
-                    NotifyMessage.ShowBalloonTip(10);
-                }
+                if (Options.showMessages)
+                    NotifyMessage.ShowBalloonTip(5,
+                        "Время истекло!",
+                        "Время истекло, тест завершен",
+                        ToolTipIcon.Info);
             }
+            
         }
 
         async private Task ConnectInterfaceAndStartTest(string[] interfaceSettings, List<DeviceClass> devices)
@@ -1451,92 +1574,42 @@ namespace RMDebugger
 
         async private Task StartTestNew(ForTests forTests)
         {
+            //37
+
             do
             {
-                for (int i = 0; i < 2 && Options.RS485TestState && Options.mainIsAvailable; i++)
+                for (int i = 0; i < 4 && Options.RS485TestState && Options.mainIsAvailable; i++)
                 {
                     foreach (DeviceClass device in forTests.ListDeviceClass)
                     {
-                        /*await Task.Delay(1);*/
                         if (!Options.RS485TestState || !Options.mainIsAvailable) break;
-                        device.devTx += 1;
+                        if (ClearBufferSettingsTestBox.Checked) forTests.clearBuffer();
                         switch (i)
                         {
                             case 0:
                                 await forTests.GetDataFromDevice(device, CmdOutput.WHO_ARE_YOU);
                                 break;
-                            /*case 1:
-                                break;*/
                             case 1:
+                                if (RadioSettingsTestBox.Checked)
+                                    await forTests.GetRadioDataFromDevice(device, CmdOutput.GRAPH_GET_NEAR);
+                                else continue;
+                                break;
+                            case 2:
                                 await forTests.GetDataFromDevice(device, CmdOutput.STATUS);
                                 break;
-                            /*case 3:
+                            case 3:
+                                if (RadioSettingsTestBox.Checked)
+                                    await forTests.GetRadioDataFromDevice(device, CmdOutput.ONLINE_DIST_TOF);
+                                else continue;
                                 break;
-                            case 4:
-                                break;*/
                         }
+                        await Task.Delay(1);
                     }
                 }
             }
             while (Options.RS485TestState && Options.mainIsAvailable);
         }
 
-        /*async private Task StartTest(ForTests forTests)
-        {
-            do
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    foreach (DeviceClass device in forTests.ListDeviceClass)
-                    {
-                        if (!Options.RS485TestState || !Options.mainIsAvailable) return;
-                        byte[] rmSign = device.devSign.GetBytes();
-                        List<int> replyCodes;
-                        switch (i)
-                        {
-                            case 0:
-                                FillGridResults(await forTests.RS485Test(rmSign, CmdOutput.WHO_ARE_YOU, device.devType), device.devIndexRow);
-                                break;
-                            *//*case 1:
-                                if (RadioCheckTestBox.Checked)
-                                {
-                                    replyCodes = await forTests.RadioTest(rmSign, CmdOutput.GRAPH_GET_NEAR, dataGrid);
-                                    foreach (int code in replyCodes)
-                                        FillGridResults(code, device.devIndexRow);
-                                }
-                                break;*/
-                            /*case 3:
-                                if (RadioCheckTestBox.Checked)
-                                {
-                                    replyCodes = await forTests.RadioTest(rmSign, CmdOutput.ONLINE_DIST_TOF, dataGrid);
-                                    foreach (int code in replyCodes)
-                                        FillGridResults(code, device.devIndexRow);
-                                }
-                                break;*//*
-                            case 4:
-                                Tuple<int, TimeSpan?, int?> data = await forTests.GetWorkTimeAndVersion(rmSign, device.devType);
-                                FillGridResults(data.Item1, device.devIndexRow);
-                                if (data.Item2 is null || data.Item3 is null) break;
-                                else
-                                {
-                                    TimeSpan time = (TimeSpan)data.Item2;
-                                    Invoke((MethodInvoker)(() =>
-                                    {
-                                        StatusRM485GridView[(int)RS485Columns.WorkTime, device.devIndexRow].Value =
-                                        $"{time.Days}d " +
-                                        $"{time.Hours}h " +
-                                        $": {time.Minutes}m " +
-                                        $": {time.Seconds}s";
-                                        StatusRM485GridView[(int)RS485Columns.Version, device.devIndexRow].Value = data.Item3;
-                                    }));
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
-            while (Options.RS485TestState && Options.mainIsAvailable);
-        }*/
         // //Add signature from Target numeric
 
         async private void AddTargetSignID(object sender, EventArgs e)
@@ -1577,8 +1650,8 @@ namespace RMDebugger
         private void AfterRS485ManualScanEvent(bool sw)
         {
             AfterAnyAutoEvent(sw);
-            StatusRM485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
-            StatusRM485GridView.AllowUserToDeleteRows =
+            StatusRS485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
+            StatusRS485GridView.AllowUserToDeleteRows =
                 minSigToScan.Enabled = 
                 maxSigToScan.Enabled =
                 StartTestRSButton.Enabled =  // <----------
@@ -1620,7 +1693,6 @@ namespace RMDebugger
             AddToGridDevices(devices);
         }
 
-
         // //Auto scan
         async private void AutoScanToTestClick(object sender, EventArgs e)
         {
@@ -1640,8 +1712,8 @@ namespace RMDebugger
         private void AfterRS485AutoScanEvent(bool sw)
         {
             AfterAnyAutoEvent(sw);
-            StatusRM485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
-            StatusRM485GridView.AllowUserToDeleteRows =
+            StatusRS485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
+            StatusRS485GridView.AllowUserToDeleteRows =
                 extendedMenuPanel.Enabled = !sw;
         }
         async private Task AutoScanAdd()
@@ -1683,10 +1755,12 @@ namespace RMDebugger
             if (minSigToScan.Value >= maxSigToScan.Value)
                 maxSigToScan.Value = minSigToScan.Value;
         }
+
+        // //ExtendedMenu
         private void ShowExtendedMenu_Click(object sender, EventArgs e)
         {
             bool hideMenu = ShowExtendedMenu.Text == "Show &menu";
-            StatusRM485GridView.Columns[0].Visible = hideMenu;
+            StatusRS485GridView.Columns[0].Visible = hideMenu;
             extendedMenuPanel.Location = hideMenu
                 ? new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y - 147)
                 : new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y + 147);
@@ -1694,13 +1768,23 @@ namespace RMDebugger
             ToolTipHelper.SetToolTip(ShowExtendedMenu, hideMenu ? "Скрыть расширенное меню" : "Показать расширенное меню");
             ShowExtendedMenu.Text = hideMenu ? "Hide &menu" : "Show &menu";
         }
+        private void ClearDataStatusRM_Click(object sender, EventArgs e) => testerData.Clear();
+        private void ClearInfoTestRS485Click(object sender, EventArgs e)
+        {
+            foreach (DeviceClass device in testerData)
+                device.Reset();
+            RefreshGridTask();
+            realTimeWorkingTest = 0;
+            ChangeWorkTestTime(realTimeWorkingTest);
+        }
         private void MoreInfoTestRS485Click(object sender, EventArgs e)
         {
             bool sw = MoreInfoTestRS485.Text == "More info";
-            StatusRM485GridView.Columns[(int)RS485Columns.NoReply].Visible = sw;
-            StatusRM485GridView.Columns[(int)RS485Columns.BadReply].Visible = sw;
-            StatusRM485GridView.Columns[(int)RS485Columns.BadCrc].Visible = sw;
-            StatusRM485GridView.Columns[(int)RS485Columns.BadRadio].Visible = sw;
+            StatusRS485GridView.Columns[(int)RS485Columns.NoReply].Visible = sw;
+            StatusRS485GridView.Columns[(int)RS485Columns.BadReply].Visible = sw;
+            StatusRS485GridView.Columns[(int)RS485Columns.BadCrc].Visible = sw;
+            StatusRS485GridView.Columns[(int)RS485Columns.BadRadio].Visible = sw;
+            StatusRS485GridView.Columns[(int)RS485Columns.Nearby].Visible = sw;
             MoreInfoTestRS485.Text = sw ? "Hide info" : "More info";
         }
         private void ChangeWorkTestTime(int seconds)
@@ -1717,17 +1801,17 @@ namespace RMDebugger
         }
         private string GetLogFromTestRM485()
         {
-            if (StatusRM485GridView.Rows.Count > 0)
+            if (StatusRS485GridView.Rows.Count > 0)
             {
                 DateTime time = DateTime.Now;
                 int tX = 0;
                 int rX = 0;
                 int errors = 0;
-                for (int i = 0; i < StatusRM485GridView.Rows.Count; i++)
+                for (int i = 0; i < StatusRS485GridView.Rows.Count; i++)
                 {
-                    tX += (int)StatusRM485GridView[(int)RS485Columns.Tx, i].Value;
-                    rX += (int)StatusRM485GridView[(int)RS485Columns.Rx, i].Value;
-                    errors += (int)StatusRM485GridView[(int)RS485Columns.Errors, i].Value;
+                    tX += (int)StatusRS485GridView[(int)RS485Columns.Tx, i].Value;
+                    rX += (int)StatusRS485GridView[(int)RS485Columns.Rx, i].Value;
+                    errors += (int)StatusRS485GridView[(int)RS485Columns.Errors, i].Value;
                 }
                 string log =
                     $"Время создания лога\t\t\t{time}\n" +
@@ -1738,8 +1822,8 @@ namespace RMDebugger
 
                 //"Испытуемые: sig, sig, sig... sig"
                 Dictionary<ushort, int> signDataIndex = new Dictionary<ushort, int>();
-                for (int i = 0; i < StatusRM485GridView.Rows.Count; i++)
-                    signDataIndex[Convert.ToUInt16(StatusRM485GridView[(int)RS485Columns.Sign, i].Value)] = i;
+                for (int i = 0; i < StatusRS485GridView.Rows.Count; i++)
+                    signDataIndex[Convert.ToUInt16(StatusRS485GridView[(int)RS485Columns.Sign, i].Value)] = i;
 
                 signDataIndex = signDataIndex.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
                 log += $"Количество испытуемых: {signDataIndex.Count}\n";
@@ -1749,24 +1833,24 @@ namespace RMDebugger
                     foreach (ushort key in signDataIndex.Keys)
                     {
                         int i = signDataIndex[key];
-                        if ((int)StatusRM485GridView[(int)RS485Columns.Errors, i].Value > 0)
+                        if ((int)StatusRS485GridView[(int)RS485Columns.Errors, i].Value > 0)
                         {
-                            ushort sign = Convert.ToUInt16(StatusRM485GridView[(int)RS485Columns.Sign, i].Value);
-                            string type = Convert.ToString(StatusRM485GridView[(int)RS485Columns.Type, i].Value);
-                            int noReply = (int)StatusRM485GridView[(int)RS485Columns.NoReply, i].Value;
-                            int badReply = (int)StatusRM485GridView[(int)RS485Columns.BadReply, i].Value;
-                            int badCRC = (int)StatusRM485GridView[(int)RS485Columns.BadCrc, i].Value;
-                            int badRadio = (int)StatusRM485GridView[(int)RS485Columns.BadRadio, i].Value;
+                            ushort sign = Convert.ToUInt16(StatusRS485GridView[(int)RS485Columns.Sign, i].Value);
+                            string type = Convert.ToString(StatusRS485GridView[(int)RS485Columns.Type, i].Value);
+                            int noReply = (int)StatusRS485GridView[(int)RS485Columns.NoReply, i].Value;
+                            int badReply = (int)StatusRS485GridView[(int)RS485Columns.BadReply, i].Value;
+                            int badCRC = (int)StatusRS485GridView[(int)RS485Columns.BadCrc, i].Value;
+                            int badRadio = (int)StatusRS485GridView[(int)RS485Columns.BadRadio, i].Value;
                             log += $"Информация об устройстве типа {type} с сигнатурой {sign}:\n" +
-                                   $"Состояние: {StatusRM485GridView[(int)RS485Columns.Status, i].Value}\n" +
-                                   $"Версия прошивки устройства: {StatusRM485GridView[(int)RS485Columns.Version, i].Value}\n" +
-                                   $"Количество отправленных пакетов устройству: {Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.Tx, i].Value)}\n" +
-                                   $"Количество принятых пакетов от устройства: {Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.Rx, i].Value)}\n";
+                                   $"Состояние: {StatusRS485GridView[(int)RS485Columns.Status, i].Value}\n" +
+                                   $"Версия прошивки устройства: {StatusRS485GridView[(int)RS485Columns.Version, i].Value}\n" +
+                                   $"Количество отправленных пакетов устройству: {Convert.ToInt32(StatusRS485GridView[(int)RS485Columns.Tx, i].Value)}\n" +
+                                   $"Количество принятых пакетов от устройства: {Convert.ToInt32(StatusRS485GridView[(int)RS485Columns.Rx, i].Value)}\n";
                             log += noReply > 0 ? $"Пропустил опрос: {noReply}\n" : "";
                             log += badReply > 0 ? $"Проблемы с ответом: {badReply}\n" : "";
                             log += badCRC > 0 ? $"Проблемы с CRC: {badCRC}\n" : "";
                             log += badRadio > 0 ? $"Проблемы с Radio: {badRadio}\n" : "";
-                            log += $"Процент ошибок: {Math.Round(Convert.ToDouble(StatusRM485GridView[(int)RS485Columns.PercentErrors, i].Value), 3)}\n\n\n";
+                            log += $"Процент ошибок: {Math.Round(Convert.ToDouble(StatusRS485GridView[(int)RS485Columns.PercentErrors, i].Value), 3)}\n\n\n";
                         }
                     }
                 else log += "В следствии прогона ошибок не обнаружено.\n\n";
@@ -1774,8 +1858,6 @@ namespace RMDebugger
             }
             else return "Empty";
         }
-        private void TimerTestBox_CheckedChanged(object sender, EventArgs e)
-            => GetMessageTestBox.Visible = timerPanelTest.Visible = TimerTestBox.Checked;
         private void numericSecondsTest_ValueChanged(object sender, EventArgs e)
         {
             if (numericSecondsTest.Value == 60)
@@ -1802,319 +1884,80 @@ namespace RMDebugger
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        private void TaskForChangedRows()
+        //Extra Buttons
+        private void AfterSendExtraButtonEvent(bool sw)
         {
-            StartTestRSButton.Enabled =
-                SaveLogTestRS485.Enabled =
-                StatusRM485GridView.Rows.Count > 0;
+            SerUdpPages.Enabled =
+                BaudRate.Enabled =
+                dataBits.Enabled =
+                Parity.Enabled =
+                stopBits.Enabled =
+                ButtonsPanel.Enabled =
+                SignaturePanel.Enabled =
+                RMData.Enabled = !sw;
+            DinoRunningProcessOk.Enabled =
+                DinoRunningProcessOk.Visible = sw;
         }
-        private void offTabsExcept(TabControl tab, TabPage exc)
+        async private void SendCommandFromExtraButton(CmdOutput cmdOutput)
         {
-            Action action = () =>
-            {
-                foreach (TabPage t in tab.TabPages)
-                {
-                    if (t == exc)
-                    {
-                        t.Text = $"↓{t.Text}↓";
-                        continue;
-                    }
-                    t.Enabled = false;
-                }
-            };
-            if (InvokeRequired) BeginInvoke(action);
-            else action();
+            AfterSendExtraButtonEvent(true);
+            await Task.Run(() => SendCommandFromButtonTask(cmdOutput));
+            AfterSendExtraButtonEvent(false);
         }
-        private void onTabPages(TabControl tab)
+        async private Task SendCommandFromButtonTask(CmdOutput cmdOutput)
         {
-            Action action = () =>
-            {
-                foreach (TabPage page in tab.TabPages)
-                {
-                    if (page.Enabled == false)
-                        page.Enabled = true;
-                    page.Text = page.Text.Replace("↓", "");
-                }
-            };
-            if (InvokeRequired) BeginInvoke(action);
-            else action();
-        }
-        private void SetProperties()
-        {
-            Invoke((MethodInvoker)(() =>
-            {
-                NeedThrough.Checked = Settings.Default.ThroughRM485;
-                TargetSignID.Value = Settings.Default.MainSignatureID;
-                ThroughSignID.Value = Settings.Default.ThroughSignatureID;
-                numericPort.Value = Settings.Default.UDPGatePort;
-                HexPageSize.Value = Settings.Default.LastPageSize;
-                IPaddressBox.Text = Settings.Default.UDPGateIP;
-                HexPathBox.Items.Add(Settings.Default.LastPathToHex);
-                if (HexPathBox.Items.Count != 0) HexPathBox.SelectedItem = HexPathBox.Items[0];
-                ThroughOrNot();
-                TypeFilterBox.SelectedIndex = 0;
-                if (Settings.Default.LastPortName != string.Empty && comPort.Items.Contains(Settings.Default.LastPortName))
-                    comPort.Text = Settings.Default.LastPortName;
-                BaudRate.Text = Settings.Default.LastBaudRate.ToString();
-            }));
-        }
-
-        private void DefaultConfigGrid()
-        {
-            BeginInvoke((MethodInvoker)(() =>
-            {
-                foreach (string key in fieldsDict.Keys)
-                {
-                    int row = ConfigDataGrid.Rows.Add(key);
-                    ConfigDataGrid.Rows[row].Cells[0].ReadOnly = true;
-                    ConfigDataGrid.Rows[row].Cells[3].ReadOnly = false;
-                    ConfigDataGrid.Rows[row].Cells[3].ToolTipText = GetDescription(fieldsDict[key]);
-                }
-                ConfigDataGrid.Rows.Add();
-                ConfigDataGrid.Rows[ConfigDataGrid.Rows.Count - 1].Cells[1].ReadOnly = true;
-                ConfigDataGrid.Rows[ConfigDataGrid.Rows.Count - 1].Cells[3].ReadOnly = true;
-            }));
-        }
-
-        
-        private void StatusGridView_DoubleClick(object sender, EventArgs e) => StatusRM485GridView.ClearSelection();
-        private void StatusGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e) => TaskForChangedRows();
-        private void StatusGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e) => TaskForChangedRows();
-        private void ClearDataStatusRM_Click(object sender, EventArgs e) => testerData.Clear();
-
-
-
-
-
-
-
-        private void ClearInfoTestRS485Click(object sender, EventArgs e)
-        {
-            foreach (DeviceClass device in testerData)
-                device.Reset();
-            RefreshGridTask();
-            realTimeWorkingTest = 0;
-            ChangeWorkTestTime(realTimeWorkingTest);
-        }
-
-
-        private void FillGridResults(int code, int index)
-        {
-            Invoke((MethodInvoker)(() =>
-            {
-                StatusRM485GridView[(int)RS485Columns.Tx, index].Value = Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.Tx, index].Value) + 1;
-                switch (code)
-                {
-                    case 1:
-                        {
-                            StatusRM485GridView[(int)RS485Columns.NoReply, index].Value = Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.NoReply, index].Value) + 1;
-                            break;
-                        }
-                    case 2:
-                        {
-                            StatusRM485GridView[(int)RS485Columns.BadCrc, index].Value = Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.BadCrc, index].Value) + 1;
-                            break;
-                        }
-                    case 3:
-                        {
-                            StatusRM485GridView[(int)RS485Columns.BadReply, index].Value = Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.BadReply, index].Value) + 1;
-                            break;
-                        }
-                    case 4:
-                        {
-                            StatusRM485GridView[(int)RS485Columns.BadRadio, index].Value = Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.BadRadio, index].Value) + 1;
-                            break;
-                        }
-                    case 10:
-                        {
-                            StatusRM485GridView[(int)RS485Columns.Rx, index].Value = Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.Rx, index].Value) + 1;
-                            break;
-                        }
-                }
-
-                int Errors = Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.NoReply, index].Value) +
-                    Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.BadCrc, index].Value) +
-                    Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.BadReply, index].Value) +
-                    Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.BadRadio, index].Value);
-
-                StatusRM485GridView[(int)RS485Columns.Errors, index].Value = Errors;
-                int txGrid = Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.Tx, index].Value);
-                int rxGrid = Convert.ToInt32(StatusRM485GridView[(int)RS485Columns.Rx, index].Value);
-
-                StatusRM485GridView[(int)RS485Columns.PercentErrors, index].Value = 100.00 - (100.00 * rxGrid / txGrid);
-
-                double PercentErrors = Convert.ToDouble(StatusRM485GridView[(int)RS485Columns.PercentErrors, index].Value);
-
-                Color statusColor = GetErrorColor(PercentErrors);
-                StatusRM485GridView.Rows[index].DefaultCellStyle.BackColor = statusColor;
-                if (statusColor == Color.White) StatusRM485GridView[(int)RS485Columns.Status, index].Value = "Good";
-                else StatusRM485GridView[(int)RS485Columns.Status, index].Value = "Bad";
-            }));
-        }
-        private Color GetErrorColor(double percent)
-        {
-            if (percent >= 5) return Color.Red;
-            else if (percent >= 3) return Color.Yellow;
-            else if (percent >= 1) return Color.GreenYellow;
-            else return Color.White;
-        }
-
-
-        
-
-
-
-        
-
-
-        
-        private void NotifyMessage_Click(object sender, EventArgs e) => this.WindowState = FormWindowState.Normal;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        async private void SetOnlineButton_Click(object sender, EventArgs e) =>
-             await Task.Run(() => SendCommandFromButton(new CommandsOutput(Options.mainInterface), CmdOutput.ONLINE));
-        async private void ResetButton_Click(object sender, EventArgs e) =>
-             await Task.Run(() => SendCommandFromButton(new CommandsOutput(Options.mainInterface), CmdOutput.RESET));
-        async private void SetBootloaderStartButton_Click(object sender, EventArgs e) =>
-             await Task.Run(() => SendCommandFromButton(new CommandsOutput(Options.mainInterface), CmdOutput.START_BOOTLOADER));
-        async private void SetBootloaderStopButton_Click(object sender, EventArgs e) =>
-             await Task.Run(() => SendCommandFromButton(new CommandsOutput(Options.mainInterface), CmdOutput.STOP_BOOTLOADER));
-        async private Task SendCommandFromButton(CommandsOutput CO, CmdOutput cmdOutput)
-        {
+            CommandsOutput cOutput = new CommandsOutput(Options.mainInterface);
             byte[] cmdOut;
             switch (cmdOutput)
             {
                 case CmdOutput.ONLINE:
                     {
-                        cmdOut = CO.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, (byte)SetOnlineFreqNumeric.Value);
-                        if (NeedThrough.Checked) cmdOut = CO.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_THROUGH);
+                        cmdOut = cOutput.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, (byte)SetOnlineFreqNumeric.Value);
+                        if (NeedThrough.Checked) cmdOut = cOutput.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_THROUGH);
                         break;
                     }
                 case CmdOutput.START_BOOTLOADER:
                 case CmdOutput.STOP_BOOTLOADER:
                     {
-                        cmdOut = CO.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, 0xff);
-                        if (NeedThrough.Checked) cmdOut = CO.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_PROG);
+                        cmdOut = cOutput.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, 0xff);
+                        if (NeedThrough.Checked) cmdOut = cOutput.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_PROG);
                         break;
                     }
                 default:
                     {
-                        cmdOut = CO.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, 0xff);
-                        if (NeedThrough.Checked) cmdOut = CO.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_THROUGH);
+                        cmdOut = cOutput.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, 0xff);
+                        if (NeedThrough.Checked) cmdOut = cOutput.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_THROUGH);
                         break;
                     }
             }
-            BeginInvoke((MethodInvoker)(() =>
-            {
-                SerUdpPages.Enabled = false;
-                ButtonsPanel.Enabled = false;
-                SignaturePanel.Enabled = false;
-                RMData.Enabled = false;
-            }));
-            Tuple<byte[], ProtocolReply> reply = null;
-            CmdMaxSize cmdSize;
-            Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out cmdSize);
+            Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out CmdMaxSize cmdSize);
             int size = !NeedThrough.Checked ? (int)cmdSize : (int)cmdSize + 6;
             do
             {
                 try
                 {
-                    reply = await CO.GetData(cmdOut, size, 50);
-                    ToMessageStatus($"{reply.Item2}");
+                    Tuple<byte[], ProtocolReply> reply = await cOutput.GetData(cmdOut, size, 50);
+                    ToReplyStatus($"{reply.Item2}");
                     if (cmdOutput == CmdOutput.ONLINE
                         && Methods.CheckResult(reply.Item1) != RmResult.Ok)
                     {
-                        ToMessageStatus($"{Methods.CheckResult(reply.Item1)}");
+                        ToReplyStatus($"{Methods.CheckResult(reply.Item1)}");
                         continue;
                     }
 
-                    NotifyMessage.BalloonTipTitle = "Кнопка отработана";
-                    NotifyMessage.BalloonTipText = $"Успешно отправлена команда {cmdOutput}";
-                    NotifyMessage.ShowBalloonTip(10);
-
+                    ToMessageStatus($"Успешно отправлена команда {cmdOutput}");
+                    if (Options.showMessages)
+                        NotifyMessage.ShowBalloonTip(5, 
+                            "Кнопка отработана", 
+                            $"Успешно отправлена команда {cmdOutput}", 
+                            ToolTipIcon.Info);
                     break;
                 }
-                catch (Exception ex) { ToMessageStatus(ex.Message); }
+                catch (Exception ex) { ToReplyStatus(ex.Message); }
                 finally { await Task.Delay((int)AutoExtraButtonsTimeout.Value); }
             }
             while (AutoExtraButtons.Checked);
         }
-
-        private void HexUploadFilename_DoubleClick(object sender, EventArgs e) => PasswordBox.Visible = !PasswordBox.Visible;
-        private void ConfigDataGrid_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
-            => e.Cancel = ConfigDataGrid[0, e.Row.Index].Value is null;
-        private void ClearGridButton_Click(object sender, EventArgs e)
-            => BeginInvoke((MethodInvoker)(() => {
-                for (int i = 0; i < ConfigDataGrid.Rows.Count - 1; i++)
-                    if (Convert.ToBoolean(ConfigDataGrid[(int)ConfigColumns.enabled, i].Value))
-                    {
-                        ConfigDataGrid[(int)ConfigColumns.ConfigLoad, i].Value = null;
-                        ConfigDataGrid[(int)ConfigColumns.ConfigUpload, i].Value = null;
-                    }
-            }));
 
     }
 }

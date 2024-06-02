@@ -13,16 +13,28 @@ using CRC16;
 
 namespace RMDebugger
 {
-    internal class CommandsOutput
+    internal class CommandsOutput : IDisposable
     {
         protected delegate void SendDataDelegate(byte[] cmdOut);
         protected delegate Task<byte[]> ReceiveDataDelegate(int length, int ms = 250);
+        public delegate void ClearBufferDelegate();
         public CommandsOutput(object sender) { GetTypeDevice(sender); }
+        public virtual void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+        }
+
 
         protected SerialPort Port;
         protected Socket Sock;
+        protected NetworkStream SockStream;
         protected SendDataDelegate sendData;
         protected ReceiveDataDelegate receiveData;
+        public ClearBufferDelegate clearBuffer;
 
         protected void GetTypeDevice(object sender)
         {
@@ -31,12 +43,14 @@ namespace RMDebugger
                 Port = ser;
                 sendData += (byte[] data) => Port.Write(data, 0, data.Length);
                 receiveData = SerialReceiveData;
+                clearBuffer = SerialClearBuffer;
             }
             else if (sender is Socket sock)
             {
                 Sock = sock;
                 sendData += (byte[] data) => Sock.Send(data);
                 receiveData = SocketReceiveData;
+                clearBuffer = SocketClearBuffer;
             }
         }
         public byte[] ReturnWithoutThrough(byte[] cmdIn)
@@ -68,6 +82,12 @@ namespace RMDebugger
             cmdIn.CopyTo(cmdOut, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(cmdOut);
         }
+        public void SerialClearBuffer() {
+            if (Port.IsOpen && Port.BytesToRead > 0) Port.DiscardInBuffer();
+        }
+        public void SocketClearBuffer() {
+            if (Sock.Connected && Sock.Available > 0) Sock.Receive(new byte[Sock.Available]);
+        }
         async private Task<byte[]> SocketReceiveData(int length, int ms = 250)
         {
             DateTime t0 = DateTime.Now;
@@ -75,7 +95,7 @@ namespace RMDebugger
             int bytes;
             do
             {
-                bytes = Sock.Connected ? Sock.Available : 0;
+                bytes = Sock.Available;
                 tstop = DateTime.Now - t0;
             }
             while (bytes < length && tstop.Milliseconds <= ms);
@@ -90,7 +110,7 @@ namespace RMDebugger
             int bytes;
             do
             {
-                bytes = Port.IsOpen ? Port.BytesToRead : 0;
+                bytes = Port.BytesToRead;
                 tstop = DateTime.Now - t0;
             }
             while (bytes < length && tstop.Milliseconds <= ms);
@@ -158,7 +178,10 @@ namespace RMDebugger
                                           new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
                 : Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
 
-            reply = cmdMain == CmdInput.LOAD_DATA_PAGE ? Methods.GetDataReply(cmdIn, cmdOut) : reply;
+            reply = 
+                (reply == ProtocolReply.Ok && cmdMain == CmdInput.LOAD_DATA_PAGE)
+                ? Methods.GetDataReply(cmdIn, cmdOut) 
+                : reply;
 
             Methods.ToLogger(cmdOut, cmdIn, reply);
 

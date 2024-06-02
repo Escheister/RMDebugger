@@ -164,6 +164,16 @@
         llyuNVsAAAAASUVORK5CYII=
 </value>
   </data>
+  <data name="HexUploadButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAAs0lE
+        QVQ4T2P4//8/2RiroHyDfAAQI8MAbOpQOEBFBkD8AIj/Y8EgcQNk9egaP0AV4sIgebgByJpRbCzeUIys
+        CRk/QNEMFAD5EUURCJx4cOK/9QRrFHEoBocBTDMIoiiAgU8/Pv1v3NGIIgfEDUApwpphAM0bxGkG2Zy6
+        IhVFDohRNGP1864bu/7rduiiiEMxws8gDBRACW0stsEwamhDNZMfz0gGkJ7CkDFQEelpmzT8nwEAhuwE
+        llyuNVsAAAAASUVORK5CYII=
+</value>
+  </data>
   <data name="HexPathButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
@@ -173,16 +183,6 @@
         6vIY7oP56ADdAJwYZiA6oIoBs0oYDID0B7BhxOA8hp1Q7RADgAHZBqRXggIPF56Wz1AAooGuWQg0YApU
         O9QLeQyPZuUzJKBrQsYgA6YUMTgD1b6cVcCgDdUONSCf4Rw2TcgY7IJchupZeQwnoFohAOyFAoY2bJqQ
         McgAoFePAl0QD9UKATPyGe5BXUEQA9U+7i1k4IRqHXDAwAAANSDaAOvc+eMAAAAASUVORK5CYII=
-</value>
-  </data>
-  <data name="HexUploadButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
-        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAAs0lE
-        QVQ4T2P4//8/2RiroHyDfAAQI8MAbOpQOEBFBkD8AIj/Y8EgcQNk9egaP0AV4sIgebgByJpRbCzeUIys
-        CRk/QNEMFAD5EUURCJx4cOK/9QRrFHEoBocBTDMIoiiAgU8/Pv1v3NGIIgfEDUApwpphAM0bxGkG2Zy6
-        IhVFDohRNGP1864bu/7rduiiiEMxws8gDBRACW0stsEwamhDNZMfz0gGkJ7CkDFQEelpmzT8nwEAhuwE
-        llyuNVsAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="ClearGridButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -269,7 +269,7 @@
         SuzDZzMM4zMAbAM2m2GYKAMI4SHgAkKYpgasAEkSgSFJmTLAwAAAvNajeAJQm+sAAAAASUVORK5CYII=
 </value>
   </data>
-  <data name="RadioCheckTestBox.ToolTip" xml:space="preserve">
+  <data name="RadioSettingsTestBox.ToolTip" xml:space="preserve">
     <value>Включение в тестирование таких команд как Get Near и Dist Tof
 При отправке команды Get Near, при наличии больше 1 устройства в таблице, включается условие, при котором, если соседние устройства не обнаруживаются по радио, засчитывается ошибка всех пакетов, отправленных этой командой.</value>
   </data>
@@ -357,6 +357,9 @@
   <metadata name="RadioErrorStatusRM.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <metadata name="RadioNearbyStatusRM.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <metadata name="WorkTimeStatusRM.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -405,18 +408,6 @@
         oQTvmhCMcZQHS1iyQ++K0Q+MxScyz4MymdBBSO8L0wLBfINxDiQRuG/AAtGI+c0iMWEqTM7YMD6YRfIL
         U2Fhj6svtUYdEIn5znq5rtvGxgmSRUYgkrsVlgLcRA74PakuwOlDgjEm3GovugkkR+RVFG7/VznOG4Kq
         csht2ePHAAAAAElFTkSuQmCC
-</value>
-  </data>
-  <data name="settingsToolStrip.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFTSURBVDhPtZNLTsJQFIa7BKNxUFr7CGygrkNBd8DExzaE
-        segK6ERYgbb70ZQ41BXg98NPGgjqRE9yck//xzn3Xi7Bv0We52Ny6RwZ/jmyLLshZ3EcH7JWaZoOlTSo
-        jc2ksXw7IK6TJHllLTEsoij6xFx0u91T1WAN3BTsbW8TwLkENAlZBwgfVStVg/XNleTMtjYQHag7ecHU
-        E0QP2oknT4RRn+tbx7FtHYAjRFUYhh+eNiGfEUa9Xi+Gr4SJk0ZaeWxfNVhCDnVebVNTZDQdeHrj4xTS
-        ymO6bSDytwYasq/BiKx986sj8F2pic012L04/yK1PLavA3JziZcyuUmjVC2MHZzR4J3Gx7a1gUiPpNQ2
-        WfuaplqpGmxgbkrObWsDcPOQpkxdPSSft/C2F3Cld3lr23YguFL3TqdzxPqCcPcpP31r3g1MutjNn+nO
-        8F9HEHwBdd6Gxe7UlGgAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="dataBits.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -483,12 +474,43 @@
         EAVAmoAGXCdLMx0BAwMAtsUo2xfNN28AAAAASUVORK5CYII=
 </value>
   </data>
-  <data name="PinButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="DinoRunningProcessOk.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABDSURBVDhPYxgFuIGiouJ/KJM8ADKAAH4AVYodgBTJyclJ
-        4sIgeahS7IAkA4Cc/VgwHV2ADVDFAAKYcCxAmcMbMDAAAICtPqLoUunJAAAAAElFTkSuQmCC
+        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
+        VOgv6+wYVFTc5TqMIcD47fSAEAkAADs=
 </value>
+  </data>
+  <data name="AutoExtraButtons.ToolTip" xml:space="preserve">
+    <value>При установке галочки, отправка команд будет осуществляться автоматически 
+с выставленным периодом времени пока не будет получен успешный ответ 
+или снята галочка.
+При снятии галочки, отправка команд будет осуществляться по кнопке в ручном 
+режиме и так же будут остановлены все отправки с кнопок, если они были 
+запущены.</value>
   </data>
   <data name="SetBootloaderStopButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -515,15 +537,6 @@
         jkoX2PCE+RW6hee7VWz7zyj1CZUVgYkzia7hAAAAAElFTkSuQmCC
 </value>
   </data>
-  <data name="SetOnlineButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
-        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAAjElE
-        QVQ4T2PACdIj/kNZqGyiwcAZkBb+AKwBGwbJEQRghdGSWDFIjiAYeAPSwl8wpEQZYGjOiDAEyj2HqsID
-        0sKXM6SFtWAYkBrWypAWsRSqCg/IipIHGvIEbAjIJWDXgAwMf8yQFioHVUUAZIbLAm1bBNT0HooXMqRE
-        y0BlSQDp4Q1gTDYYCQYwMAAAtpNgvRFzzzkAAAAASUVORK5CYII=
-</value>
-  </data>
   <data name="SetBootloaderStartButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
@@ -537,19 +550,20 @@
         bltcmAtybKq1kBkakbHekr/REmcWFis7MMAfMevpdmQFrZIAAAAASUVORK5CYII=
 </value>
   </data>
-  <data name="AutoExtraButtons.ToolTip" xml:space="preserve">
-    <value>При установке галочки, отправка команд будет осуществляться автоматически 
-с выставленным периодом времени пока не будет получен успешный ответ 
-или снята галочка.
-При снятии галочки, отправка команд будет осуществляться по кнопке в ручном 
-режиме и так же будут остановлены все отправки с кнопок, если они были 
-запущены.</value>
+  <data name="SetOnlineButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAAjElE
+        QVQ4T2PACdIj/kNZqGyiwcAZkBb+AKwBGwbJEQRghdGSWDFIjiAYeAPSwl8wpEQZYGjOiDAEyj2HqsID
+        0sKXM6SFtWAYkBrWypAWsRSqCg/IipIHGvIEbAjIJWDXgAwMf8yQFioHVUUAZIbLAm1bBNT0HooXMqRE
+        y0BlSQDp4Q1gTDYYCQYwMAAAtpNgvRFzzzkAAAAASUVORK5CYII=
+</value>
   </data>
   <metadata name="MirrorColor.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>455, 17</value>
+    <value>474, 17</value>
   </metadata>
   <metadata name="ErrorMessage.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>666, 17</value>
+    <value>590, 17</value>
   </metadata>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -677,10 +691,10 @@
 </value>
   </data>
   <metadata name="NotifyMessage.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>791, 17</value>
+    <value>715, 17</value>
   </metadata>
   <metadata name="notifyMessageStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 57</value>
+    <value>1109, 17</value>
   </metadata>
   <data name="OpenDebugFromToolStrip.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -829,9 +843,9 @@
 </value>
   </data>
   <metadata name="WorkTestTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>924, 17</value>
+    <value>848, 17</value>
   </metadata>
   <metadata name="saveFileDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>1042, 20</value>
+    <value>980, 17</value>
   </metadata>
 </root>

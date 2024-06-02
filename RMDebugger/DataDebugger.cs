@@ -1,5 +1,7 @@
-﻿using StaticSettings;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
+using StaticSettings;
+using System.Linq;
 
 namespace RMDebugger
 {
@@ -8,31 +10,34 @@ namespace RMDebugger
         public DataDebuggerForm()
         {
             InitializeComponent();
+            AddEvents();
         }
-        private void ClearLogger_Click(object sender, System.EventArgs e)
-            => BeginInvoke((MethodInvoker)(() => LogBox.Clear() ));
-        private void errorsToolStripMenuItem_Click(object sender, System.EventArgs e) => CheckFlags(sender);
-        private void allToolStripMenuItem_Click(object sender, System.EventArgs e) => CheckFlags(sender);
+        private void AddEvents()
+        {
+            this.FormClosed += (s, e) => Options.debugForm = null;
+            LogBox.TextChanged += (s, e) => {
+                if (LogBox.Lines.Length > 512)
+                {
+                    string[] lineArray = LogBox.Lines;
+                    List<string> lineList = lineArray.ToList();
+                    lineList.RemoveRange(0, 25);
+                    LogBox.Lines = lineList.ToArray();
+                }
+            };
+            SaveLogger.Click += (s, e) => {
+                saveFileDialog.RestoreDirectory = true;
+                if (saveFileDialog.ShowDialog() != DialogResult.Cancel)
+                    System.IO.File.WriteAllText(saveFileDialog.FileName, LogBox.Text);
+            };
+            ClearLogger.Click += (s, e) => LogBox.Clear();
+            errorsFlagToolStrip.Click += (s, e) => CheckFlags(s);
+            allFlagToolStrip.Click += (s, e) => CheckFlags(s);
+        }
         private void CheckFlags(object sender)
         {
-            BeginInvoke((MethodInvoker)(() =>
-            {
-                allToolStripMenuItem.Checked = errorsToolStripMenuItem.Checked = false;
-                ToolStripMenuItem item = (ToolStripMenuItem)sender;
-                item.Checked = true;
-            }));
-        }
-        private void SaveLogger_Click(object sender, System.EventArgs e)
-        {
-            saveFileDialog.RestoreDirectory = true;
-            if (saveFileDialog.ShowDialog() == DialogResult.Cancel)
-                return;
-            System.IO.File.WriteAllText(saveFileDialog.FileName, LogBox.Text);
-        }
-
-        private void DataDebuggerForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Options.debugForm = null;
+            allFlagToolStrip.Checked = errorsFlagToolStrip.Checked = false;
+            ToolStripMenuItem item = (ToolStripMenuItem)sender;
+            item.Checked = true;
         }
     }
 }

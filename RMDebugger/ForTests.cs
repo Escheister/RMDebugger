@@ -2,19 +2,20 @@
 using System.Threading.Tasks;
 using System;
 
+using System.Drawing;
 using SearchProtocol;
+using StaticSettings;
 using StaticMethods;
 using ProtocolEnums;
-using StaticSettings;
 using CRC16;
-using System.ComponentModel;
 
 
 namespace RMDebugger
 {
     internal class ForTests : Searching
     {
-        public ForTests(object sender, List<DeviceClass> _listDeviceClass) : base (sender) => listDeviceClass = _listDeviceClass;
+        public delegate byte[] BuildCmdDelegate(CmdOutput cmdOutput);
+        public ForTests(object sender, List<DeviceClass> _listDeviceClass) : base(sender) => listDeviceClass = _listDeviceClass;
         private List<DeviceClass> listDeviceClass;
         public List<DeviceClass> ListDeviceClass { get { return listDeviceClass; } }
 
@@ -24,53 +25,20 @@ namespace RMDebugger
             sendData(cmdOut);
             Enum.TryParse(Enum.GetName(typeof(CmdOutput), (CmdOutput)((cmdOut[2] << 8) | cmdOut[3])), out CmdInput cmdMain);
             byte[] cmdIn = await receiveData(size, ms);
-            ProtocolReply reply = Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
-            if (!CRC16_CCITT_FALSE.CRC_check(cmdIn)) reply = ProtocolReply.WCrc;
+            ProtocolReply reply = GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
             Methods.ToLogger(cmdOut, cmdIn, reply);
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
         }
 
-        private bool CheckIn(Dictionary<int, Tuple<int, int, DevType>> mainDict, Dictionary<int, int> secondDict)
+        private ProtocolReply GetReply(byte[] bufferIn, byte[] rmSign, CmdInput cmdMain)
         {
-            foreach (int key in secondDict.Keys)
-                if (mainDict.ContainsKey(key)) return true;
-            return false;
+            if (bufferIn.Length == 0) return ProtocolReply.Null;
+            if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;
+            if (!Methods.SignatureEqual(bufferIn, rmSign)) return ProtocolReply.WSign;
+            if (!Methods.CmdInputEqual(bufferIn, cmdMain)) return ProtocolReply.WCmd;
+            return ProtocolReply.Ok;
         }
-        private int GetCode(ProtocolReply reply)
-        {
-            switch (reply)
-            {
-                case ProtocolReply.Ok: return 10;
-                case ProtocolReply.Null: return 1;
-                case ProtocolReply.WCrc: return 2;
-                default: return 3;
-            }
-        }
-        async public Task<List<int>> RadioTest(byte[] rmSign, CmdOutput cmdOutput, Dictionary<int, Tuple<int, int, DevType>> rmGrid)
-        {
-            Dictionary<int, int> radioData = new Dictionary<int, int>();
-            List<int> replyCodes = new List<int>();
-            Tuple<byte[], ProtocolReply> reply;
 
-            Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out CmdMaxSize cmdInSize);
-
-            byte ix = 0x00;
-            do
-            {
-                byte[] cmdOut = FormatCmdOut(rmSign, cmdOutput, ix);
-                reply = await GetDataTest(cmdOut, (int)cmdInSize, 50);
-                replyCodes.Add(GetCode(reply.Item2));
-                if (reply.Item2 != ProtocolReply.Ok) return replyCodes;
-                ix = reply.Item1[4];
-                if (cmdOutput == CmdOutput.GRAPH_GET_NEAR)
-                    AddKeys(radioData, GET_NEAR(reply.Item1));
-            }
-            while (ix != 0x00 && replyCodes.Count <= 5);
-            if (rmGrid.Count > 1 && cmdOutput == CmdOutput.GRAPH_GET_NEAR)
-                if (CheckIn(rmGrid, radioData) == false)
-                    for (int i = 0; i < replyCodes.Count; i++) replyCodes[i] = 4;
-            return replyCodes;
-        }
         private int GetSizeCMD(CmdOutput cmdOutput, DevType devType)
         {
             switch (devType)
@@ -98,10 +66,14 @@ namespace RMDebugger
             {
                 case ProtocolReply.Ok: return true;
                 case ProtocolReply.Null:
-                    device.devNoReply += 1;
+                    device.devNoReply++;
                     break;
                 case ProtocolReply.WCrc:
-                    device.devBadCRC += 1;
+                    device.devBadCRC++;
+                    break;
+                case ProtocolReply.WCmd:
+                case ProtocolReply.WSign:
+                    device.devBadReply++;
                     break;
             }
             return false;
@@ -112,6 +84,7 @@ namespace RMDebugger
             Tuple <byte[], ProtocolReply> reply = await GetDataTest(
                 FormatCmdOut(device.devSign.GetBytes(), cmdOutput, 0xff), 
                 GetSizeCMD(cmdOutput, device.devType), 100);
+            device.devTx++;
             if (!AddValueToDevice(device, reply.Item2)) return;
             if (cmdOutput == CmdOutput.STATUS)
             {
@@ -128,11 +101,47 @@ namespace RMDebugger
                 }
                 catch
                 {
-                    device.devBadReply += 1;
-                    return;
+                    device.devBadReply++; 
+                    return; 
                 }
             }
-            device.devRx += 1;
+            device.devRx++;
+        }
+        async public Task GetRadioDataFromDevice(DeviceClass device, CmdOutput cmdOutput)
+        {
+            Dictionary<int, int> radioData = new Dictionary<int, int>();
+            Tuple<byte[], ProtocolReply> reply;
+            Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out CmdMaxSize cmdInSize);
+            byte ix = 0x00;
+            int iteration = 1;
+            do
+            {
+                byte[] cmdOut = FormatCmdOut(device.devSign.GetBytes(), cmdOutput, ix);
+                reply = await GetDataTest(cmdOut, (int)cmdInSize, 100);
+                device.devTx++;
+                if (!AddValueToDevice(device, reply.Item2)) break;
+                try
+                {
+                    ix = reply.Item1[4];
+                    if (cmdOutput == CmdOutput.GRAPH_GET_NEAR)
+                    {
+                        Dictionary<int, int> tempDict = GET_NEAR(reply.Item1);
+                        if (ListDeviceClass.Count > 1 && tempDict.Count == 0)
+                        {
+                            device.devBadRadio++;
+                            device.devNearbyDevs = tempDict.Count;
+                            System.Windows.Forms.MessageBox.Show(BitConverter.ToString(reply.Item1));
+                            return;
+                        }
+                        AddKeys(radioData, tempDict);
+                    }
+                }
+                catch  { device.devBadReply++; }
+                device.devRx++;
+            }
+            while (ix != 0x00 && iteration <= 5);
+            if (cmdOutput == CmdOutput.GRAPH_GET_NEAR)
+                device.devNearbyDevs = radioData.Count;
         }
 
 
@@ -156,44 +165,82 @@ namespace RMDebugger
     {
         public DeviceClass() { }
 
+        public Dictionary<int, DevType> GetNear;
+
+        /// <summary>
+        /// Signature, distance, power
+        /// </summary>
+        public int[] DistTof;
+
         public void Reset()
         {
             DeviceRx = 0;
             devTx = 0;
-            devErrors = 0;
             devBadCRC = 0;
             devBadRadio = 0;
             devBadReply = 0;
             devNoReply = 0;
+            devNearbyDevs = 0;
             devWorkTime = string.Empty;
             devStatus = string.Empty;
         }
-
+        public Color statusColor;
         public string devInterface { get; set; }
         public int devSign { get; set; }
         public DevType devType { get; set; }
         public string devStatus { get; set; }
         public int devTx { get; set; }
-
-        private int DeviceRx;
-        public int devRx
+        private double SetPercentErrors()
         {
+            try {
+                return 100.000 - (100.000 * DeviceRx / devTx);
+            } catch (DivideByZeroException) {
+                return 0;
+            }
+        }
+        private int DeviceRx;
+        public int devRx 
+        { 
             get => DeviceRx;
-            set {
-                DeviceRx = value; 
-                try
-                {
-                    devPercentErrors = 100.000 - (100.000 * DeviceRx / devTx);
-                }
-                catch (DivideByZeroException)
-                {
-                    devPercentErrors = 0;
-                }
+            set
+            {
+                DeviceRx = value;
+                devPercentErrors = SetPercentErrors();
                 devStatus = devPercentErrors >= 1.000 ? "Bad" : "Good";
             }
         }
-        public int devErrors { get; set; }
-        public double devPercentErrors { get; set; }
+        private int DeviceErrors;
+        public int devErrors
+        {
+            get => DeviceErrors;
+            set
+            {
+                DeviceErrors = value;
+                devPercentErrors = SetPercentErrors();
+                devStatus = devPercentErrors >= 1.000 ? "Bad" : "Good";
+            }
+        }
+        private double DevPercentErrors;
+        public double devPercentErrors
+        {
+            get => DevPercentErrors;
+            set
+            {
+                DevPercentErrors = value;
+                if (DevPercentErrors >= 4.5) statusColor = Color.Red;
+                else if (DevPercentErrors >= 4) statusColor = Color.OrangeRed;
+                else if (DevPercentErrors >= 3.5) statusColor = Color.Orange;
+                else if (DevPercentErrors >= 3) statusColor = Color.Gold;
+                else if (DevPercentErrors >= 2.5) statusColor = Color.Yellow;
+                else if (DevPercentErrors >= 2) statusColor = Color.GreenYellow;
+                else if (DevPercentErrors >= 1.5) statusColor = Color.Lime;
+                else if (DevPercentErrors >= 1) statusColor = Color.LightGreen;
+                else if (DevPercentErrors >= 0.5) statusColor = Color.PaleTurquoise;
+                else statusColor = Color.White;
+            }
+        }
+
+        private int SetError() => devErrors = DeviceNoReply + DeviceBadCRC + DeviceBadReply + DeviceBadRadio;
 
         private int DeviceNoReply;
         public int devNoReply
@@ -201,7 +248,7 @@ namespace RMDebugger
             get => DeviceNoReply;
             set {
                 DeviceNoReply = value;
-                devErrors = value;
+                SetError();
             }
         }
 
@@ -211,7 +258,7 @@ namespace RMDebugger
             get => DeviceBadReply;
             set {
                 DeviceBadReply = value;
-                devErrors = value;
+                SetError();
             }
         }
 
@@ -221,7 +268,7 @@ namespace RMDebugger
             get => DeviceBadCRC;
             set {
                 DeviceBadCRC = value;
-                devErrors = value;
+                SetError();
             }
         }
 
@@ -231,10 +278,10 @@ namespace RMDebugger
             get => DeviceBadRadio;
             set {
                 DeviceBadRadio = value;
-                devErrors = value;
+                SetError();
             }
         }
-
+        public int devNearbyDevs { get; set; }
         public string devWorkTime { get; set; }
         public int devVer { get; set; }
     }
