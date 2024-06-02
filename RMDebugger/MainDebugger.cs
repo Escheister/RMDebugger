@@ -151,13 +151,6 @@ namespace RMDebugger
             SetBootloaderStopButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.STOP_BOOTLOADER);
         }
 
-        private void HexTimeout_ValueChanged(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void CellValueChangedRS485(object sender, DataGridViewRowPrePaintEventArgs e)
-            => StatusRS485GridView.Rows[e.RowIndex].DefaultCellStyle.BackColor = testerData[e.RowIndex].statusColor;
 
         //********************
         private void MainFormLoad(object sender, EventArgs e)
@@ -897,9 +890,9 @@ namespace RMDebugger
 
                 ToMessageStatus("Bootload OK");
 
-
                 boot.PageSize = (int)HexPageSize.Value;
                 int startFrom = boot.HexQueue.Count();
+
                 Stopwatch stopwatchQueue = new Stopwatch();
                 stopwatchQueue.Start();
 
@@ -1382,12 +1375,12 @@ namespace RMDebugger
         //RS485 test
         private void StatusGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e) => TaskForChangedRows();
         private void StatusGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e) => TaskForChangedRows();
-        private void TaskForChangedRows()
-        {
-            StartTestRSButton.Enabled =
+        private void TaskForChangedRows() 
+            => StartTestRSButton.Enabled =
                 SaveLogTestRS485.Enabled =
                 StatusRS485GridView.Rows.Count > 0;
-        }
+        private void CellValueChangedRS485(object sender, DataGridViewRowPrePaintEventArgs e)
+            => StatusRS485GridView.Rows[e.RowIndex].DefaultCellStyle.BackColor = testerData[e.RowIndex].statusColor;
         private bool GetDevices(out Dictionary<string, List<DeviceClass>> interfacesDict)
         {
             interfacesDict = new Dictionary<string, List<DeviceClass>>();
@@ -1574,8 +1567,6 @@ namespace RMDebugger
 
         async private Task StartTestNew(ForTests forTests)
         {
-            //37
-
             do
             {
                 for (int i = 0; i < 4 && Options.RS485TestState && Options.mainIsAvailable; i++)
