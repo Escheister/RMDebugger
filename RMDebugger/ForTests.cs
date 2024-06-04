@@ -130,7 +130,6 @@ namespace RMDebugger
                         {
                             device.devBadRadio++;
                             device.devNearbyDevs = tempDict.Count;
-                            System.Windows.Forms.MessageBox.Show(BitConverter.ToString(reply.Item1));
                             return;
                         }
                         AddKeys(radioData, tempDict);

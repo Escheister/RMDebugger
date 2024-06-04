@@ -920,7 +920,6 @@ namespace RMDebugger
                             $"Файл {Path.GetFileName(Options.hexPath)} успешно загружен на устройство за " + timeUplod,
                             ToolTipIcon.Info);
                 }
-
             }
         }
         private void HexPathButton_Click(object sender, EventArgs e)
@@ -1567,8 +1566,7 @@ namespace RMDebugger
 
         async private Task StartTestNew(ForTests forTests)
         {
-            do
-            {
+            do {
                 for (int i = 0; i < 4 && Options.RS485TestState && Options.mainIsAvailable; i++)
                 {
                     foreach (DeviceClass device in forTests.ListDeviceClass)
@@ -1949,6 +1947,5 @@ namespace RMDebugger
             }
             while (AutoExtraButtons.Checked);
         }
-
     }
 }
