@@ -31,7 +31,6 @@ namespace RMDebugger
 
         protected SerialPort Port;
         protected Socket Sock;
-        protected NetworkStream SockStream;
         protected SendDataDelegate sendData;
         protected ReceiveDataDelegate receiveData;
         public ClearBufferDelegate clearBuffer;

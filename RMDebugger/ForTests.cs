@@ -142,35 +142,13 @@ namespace RMDebugger
             if (cmdOutput == CmdOutput.GRAPH_GET_NEAR)
                 device.devNearbyDevs = radioData.Count;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
+
+
+
     internal class DeviceClass
     {
         public DeviceClass() { }
-
-        public Dictionary<int, DevType> GetNear;
-
-        /// <summary>
-        /// Signature, distance, power
-        /// </summary>
-        public int[] DistTof;
-
         public void Reset()
         {
             DeviceRx = 0;

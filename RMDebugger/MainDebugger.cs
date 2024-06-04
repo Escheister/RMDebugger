@@ -511,10 +511,10 @@ namespace RMDebugger
         }
         private void IPaddressBox_TextChanged(object sender, EventArgs e)
         {
-            Options.pingOk = false;
+            Options.pingOk =
+                Connect.Enabled = false;
             bool ipCorrect = IPAddress.TryParse(IPaddressBox.Text, out IPAddress ipAddr);
-            PingButton.Enabled =
-                Connect.Enabled = ipCorrect;
+            PingButton.Enabled = ipCorrect;
             if (ipCorrect) ErrorMessage.Clear();
             else ErrorMessage.SetError(label13, $"Неверно задан параметр IP Address");
             Connect.Text = "Connect";
@@ -537,7 +537,7 @@ namespace RMDebugger
             if (reply.Status != IPStatus.Success) return;
             try
             {
-                for (int reconnect = 0; reconnect <= 5 && Options.pingOk;)
+                for (int reconnect = 0; reconnect <= 10 && Options.pingOk;)
                 {
                     reply = await ping.SendPingAsync(ip, timeout, buffer, pingOptions);
                     if (reply.Status != IPStatus.Success) reconnect++;
