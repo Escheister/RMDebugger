@@ -2,7 +2,6 @@
 using System;
 
 using ProtocolEnums;
-using StaticMethods;
 
 namespace RMDebugger
 {
@@ -58,7 +57,7 @@ namespace RMDebugger
                         {
                             byte[] location = new byte[8];
                             Array.Copy(cmdIn, 6, location, 0, location.Length);
-                            data["Location"] = Methods.CheckSymbols(ByteArrayParse(location, 0x00));
+                            data["Location"] = CheckSymbols(ByteArrayParse(location, 0x00));
                             data["Zone"] = $"{(int)cmdIn[14]}";
                             switch ((int)cmdIn[14])
                             {
@@ -89,9 +88,9 @@ namespace RMDebugger
                             Array.Copy(cmdIn, 6, lampID, 0, lampID.Length);
                             byte[] fio = new byte[16];
                             Array.Copy(cmdIn, 12, fio, 0, fio.Length);
-                            data["Lamp"] = Methods.CheckSymbols(ByteArrayParse(lampID, 0x00));
+                            data["Lamp"] = CheckSymbols(ByteArrayParse(lampID, 0x00));
                             data["PUID"] = $"{(cmdIn[11] << 8) | cmdIn[10]}";
-                            data["Fio"] = Methods.CheckSymbols(ByteArrayParse(fio, 0x00));
+                            data["Fio"] = CheckSymbols(ByteArrayParse(fio, 0x00));
                         }
                         else if (cmd == UID.STATUS)
                         {
@@ -136,7 +135,7 @@ namespace RMDebugger
                         {
                             byte[] location = new byte[16];
                             Array.Copy(cmdIn, 6, location, 0, location.Length);
-                            data["Location"] = Methods.CheckSymbols(ByteArrayParse(location, 0x00));
+                            data["Location"] = CheckSymbols(ByteArrayParse(location, 0x00));
                         }
                         else if (cmd == UID.STATUS)
                             goto case DevType.RM485;
@@ -151,7 +150,7 @@ namespace RMDebugger
                             byte[] location = new byte[16];
                             Array.Copy(cmdIn, 7, location, 0, location.Length);
                             location = ByteArrayParse(location, 0x00);
-                            data["Location"] = Methods.CheckSymbols(location);
+                            data["Location"] = CheckSymbols(location);
                             data["Version"] = $"{(cmdIn[cmdIn.Length - 3] << 8) | cmdIn[cmdIn.Length - 4]}";
                         }
                         else if (cmd == UID.STATUS)

@@ -127,11 +127,15 @@
     enum InfoGrid { Signature, Type, Version, Radio, Location, Fio, Date }
 
     enum ConfigCheckList { None, uInt16=5, len4=4, len16=16 }
-    enum ConfigColumns { ConfigColumn, enabled, ConfigLoad, ConfigUpload }
+    enum ConfigColumns   { ConfigColumn, enabled, ConfigLoad, ConfigUpload }
 
     enum RmResult : byte
     {
         Error = 0x00,
         Ok = 0x01
     }
+
+    enum LogState { DEBUGState, ERRORState }
+    enum LogSize   { lowestBuffer = 256, smallBuffer=512, normalBuffer=1024, mediumBuffer=2048, largeBuffer=4096}
+    enum LogLinesRemove { lowestBuffer = 32, smallBuffer = 64, normalBuffer = 128, mediumBuffer = 256, largeBuffer = 512}
 }

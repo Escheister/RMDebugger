@@ -1355,14 +1355,12 @@
             // 
             // TestPages
             // 
-            this.TestPages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.TestPages.Controls.Add(this.RS485Page);
+            this.TestPages.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TestPages.Location = new System.Drawing.Point(3, 3);
             this.TestPages.Name = "TestPages";
             this.TestPages.SelectedIndex = 0;
-            this.TestPages.Size = new System.Drawing.Size(302, 256);
+            this.TestPages.Size = new System.Drawing.Size(302, 260);
             this.TestPages.TabIndex = 0;
             // 
             // RS485Page
@@ -1373,7 +1371,7 @@
             this.RS485Page.Location = new System.Drawing.Point(4, 22);
             this.RS485Page.Name = "RS485Page";
             this.RS485Page.Padding = new System.Windows.Forms.Padding(3);
-            this.RS485Page.Size = new System.Drawing.Size(294, 230);
+            this.RS485Page.Size = new System.Drawing.Size(294, 234);
             this.RS485Page.TabIndex = 0;
             this.RS485Page.Text = "RS485";
             // 
@@ -1393,7 +1391,7 @@
             this.extendedMenuPanel.Controls.Add(this.ShowExtendedMenu);
             this.extendedMenuPanel.Controls.Add(this.StartTestRSButton);
             this.extendedMenuPanel.Controls.Add(this.AutoScanToTest);
-            this.extendedMenuPanel.Location = new System.Drawing.Point(0, 61);
+            this.extendedMenuPanel.Location = new System.Drawing.Point(0, 65);
             this.extendedMenuPanel.Margin = new System.Windows.Forms.Padding(0);
             this.extendedMenuPanel.Name = "extendedMenuPanel";
             this.extendedMenuPanel.Size = new System.Drawing.Size(294, 169);
@@ -1866,7 +1864,7 @@
             this.StatusRS485GridView.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.StatusRS485GridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.StatusRS485GridView.ShowCellToolTips = false;
-            this.StatusRS485GridView.Size = new System.Drawing.Size(290, 205);
+            this.StatusRS485GridView.Size = new System.Drawing.Size(290, 209);
             this.StatusRS485GridView.TabIndex = 21;
             this.StatusRS485GridView.TabStop = false;
             this.StatusRS485GridView.VirtualMode = true;

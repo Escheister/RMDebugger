@@ -5,7 +5,6 @@ using System.Linq;
 using System.IO;
 using System;
 
-using StaticMethods;
 using RMDebugger;
 using CRC16;
 
@@ -76,7 +75,7 @@ namespace BootloaderProtocol
         {
             byte[] loadField = new byte[4 + data.Length];
             _targetSign.CopyTo(loadField, 0);
-            Methods.uShortToTwoBytes((ushort)CmdOutput.LOAD_DATA_PAGE).CopyTo(loadField, 2);
+            ((ushort)CmdOutput.LOAD_DATA_PAGE).GetBytes().CopyTo(loadField, 2);
             data.CopyTo(loadField, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(loadField);
         }

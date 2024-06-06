@@ -8,7 +8,6 @@ using System;
 using System.Threading.Tasks;
 using StaticSettings;
 using ProtocolEnums;
-using StaticMethods;
 using CRC16;
 
 namespace RMDebugger
@@ -64,6 +63,92 @@ namespace RMDebugger
             Encoding.GetEncoding("koi8r").GetBytes(text).CopyTo(koi8, 0);
             return koi8;
         }
+        protected string CheckSymbols(byte[] array)
+        {
+            string text = "";
+            foreach (byte b in array)
+                text += b == 0xff ? string.Empty : Encoding.GetEncoding("koi8r").GetString(new byte[] { b });
+            return text == string.Empty ? "Empty" : text;
+        }
+        protected virtual ProtocolReply GetReply(byte[] bufferIn, byte[] rmSign, CmdInput cmdMain)
+        {
+            if (bufferIn.Length == 0) return ProtocolReply.Null;
+            if (Options.checkCrc && !CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;
+            if (!SignatureEqual(bufferIn, rmSign)) return ProtocolReply.WSign;
+            if (!CmdInputEqual(bufferIn, cmdMain)) return ProtocolReply.WCmd;
+            return ProtocolReply.Ok;
+        }
+        protected ProtocolReply GetReply(byte[] bufferIn, byte[] rmThrough, CmdInput cmdThrough, byte[] rmSign, CmdInput cmdMain)
+        {
+            if (bufferIn.Length == 0) return ProtocolReply.Null;
+            if (Options.checkCrc && !CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;
+            if (!SignatureEqual(bufferIn, rmThrough, rmSign)) return ProtocolReply.WSign;
+            if (!CmdInputEqual(bufferIn, cmdThrough, cmdMain)) return ProtocolReply.WCmd;
+            return ProtocolReply.Ok;
+        }
+        protected ProtocolReply GetDataReply(byte[] bufferIn, byte[] bufferOut)
+        {
+            if (!DataEqual(bufferIn, bufferOut)) return ProtocolReply.WData;
+            return ProtocolReply.Ok;
+        }
+        protected bool SignatureEqual(byte[] bufferIn, byte[] rmSign)
+        {
+            try
+            {
+                byte[] targetSign = new byte[2] { bufferIn[0], bufferIn[1] };
+                return Enumerable.SequenceEqual(rmSign, targetSign);
+            }
+            catch { return false; }
+        }
+        protected bool SignatureEqual(byte[] bufferIn, byte[] rmThrough, byte[] rmSign)
+        {
+            try
+            {
+                byte[] throughSign = new byte[2] { bufferIn[0], bufferIn[1] };
+                byte[] targetSign = new byte[2] { bufferIn[4], bufferIn[5] };
+                return Enumerable.SequenceEqual(rmSign, targetSign)
+                    && Enumerable.SequenceEqual(rmThrough, throughSign);
+            }
+            catch { return false; }
+        }
+        protected bool CmdInputEqual(byte[] bufferIn, CmdInput cmdMain)
+        {
+            try { return cmdMain == (CmdInput)((bufferIn[2] << 8) | bufferIn[3]); }
+            catch { return false; }
+        }
+        protected bool CmdInputEqual(byte[] bufferIn, CmdInput cmdThrough, CmdInput cmdMain)
+        {
+            try
+            {
+                return cmdMain == (CmdInput)((bufferIn[6] << 8) | bufferIn[7])
+                    && cmdThrough == (CmdInput)((bufferIn[2] << 8) | bufferIn[3]);
+            }
+            catch { return false; }
+        }
+        protected bool DataEqual(byte[] bufferIn, byte[] bufferOut)
+        {
+            try
+            {
+                int start = 4;
+                int crap = 6;
+                if (Options.through)
+                {
+                    start += 8;
+                    crap += 12;
+                }
+                byte[] data_out = new byte[bufferOut.Length - crap];
+                byte[] data_in = new byte[bufferOut.Length - crap];
+                Array.Copy(bufferOut, start, data_out, 0, data_out.Length);
+                Array.Copy(bufferIn, start, data_in, 0, data_in.Length);
+                return Enumerable.SequenceEqual(data_out, data_in);
+            }
+            catch { return false; }
+        }
+        public RmResult CheckResult(byte[] bufferIn)
+        {
+            try { return (RmResult)bufferIn[bufferIn.Length - 3]; }
+            catch { return RmResult.Error; }
+        }
         public byte[] FormatCmdOut(byte[] rmSign, CmdOutput cmd, byte ix = 0x00, bool crc = true)
         {
             List<byte> data = new List<byte>();
@@ -77,7 +162,7 @@ namespace RMDebugger
         {
             byte[] cmdOut = new byte[cmdIn.Length + 4];
             rmThrough.CopyTo(cmdOut, 0);
-            Methods.uShortToTwoBytes((ushort)cmd).CopyTo(cmdOut, 2);
+            ((ushort)cmd).GetBytes().CopyTo(cmdOut, 2);
             cmdIn.CopyTo(cmdOut, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(cmdOut);
         }
@@ -134,6 +219,9 @@ namespace RMDebugger
                     break;
             }
         }
+
+
+
         async public Task<Tuple<RmResult, ProtocolReply>> GetResult(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");
@@ -148,17 +236,16 @@ namespace RMDebugger
             byte[] cmdIn = receiveTask.Result;
 
             ProtocolReply reply = Options.through
-                ? Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
+                ? GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
                                           new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
-                : Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
+                : GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
 
-            Methods.ToLogger(cmdOut, cmdIn, reply);
+            ToLogger(cmdOut, cmdIn, reply);
 
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
 
-            return new Tuple<RmResult, ProtocolReply>(Methods.CheckResult(cmdIn), reply);
+            return new Tuple<RmResult, ProtocolReply>(CheckResult(cmdIn), reply);
         }
-
         async public Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");
@@ -173,20 +260,29 @@ namespace RMDebugger
             byte[] cmdIn = receiveTask.Result;
 
             ProtocolReply reply = Options.through 
-                ? Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
+                ? GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
                                           new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
-                : Methods.GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
+                : GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
 
             reply = 
                 (reply == ProtocolReply.Ok && cmdMain == CmdInput.LOAD_DATA_PAGE)
-                ? Methods.GetDataReply(cmdIn, cmdOut) 
+                ? GetDataReply(cmdIn, cmdOut) 
                 : reply;
 
-            Methods.ToLogger(cmdOut, cmdIn, reply);
+            ToLogger(cmdOut, cmdIn, reply);
 
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
 
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
+        }
+        protected void ToLogger(byte[] cmdOut, byte[] cmdIn, ProtocolReply reply)
+        {
+            if (Options.debugForm is null) return;
+            if ((Options.logState == LogState.ERRORState && reply != ProtocolReply.Ok)
+                    || Options.logState == LogState.DEBUGState)
+                Options.debugForm?.AddToQueue(
+                    $"{Options.workTimer.Elapsed.TotalMilliseconds:0000000000}:{"send",-6}->  {cmdOut.GetStringOfBytes()}\n" +
+                    $"{Options.workTimer.Elapsed.TotalMilliseconds:0000000000}:{reply,-6}<-  {cmdIn.GetStringOfBytes()}\n");
         }
     }
 }

@@ -20,10 +20,8 @@ using BootloaderProtocol;
 using StaticSettings;
 using SearchProtocol;
 using ProtocolEnums;
-using StaticMethods;
 using File_Verifier;
 using CSV;
-using System.Drawing.Printing;
 
 namespace RMDebugger
 {
@@ -50,6 +48,8 @@ namespace RMDebugger
         public MainDebugger()
         {
             InitializeComponent();
+            Options.workTimer = new Stopwatch();
+            Options.workTimer.Start();
             Options.debugger = this;
             NotifyMessage.Text = this.Text = $"{Assembly.GetEntryAssembly().GetName().Name} {Assembly.GetEntryAssembly().GetName().Version}";
             AddEvents();
@@ -903,7 +903,6 @@ namespace RMDebugger
                     if (!await GetReplyFromDevice(cmdConfirmData, taskDelay: true, delayMs: 10)) return;
                     BeginInvoke((MethodInvoker)(() =>
                     {
-                        //100.000 - (100.000 * DeviceRx / devTx);
                         UpdateBar.Value = boot.HexQueue.Count() > 0 ? Convert.ToInt32(100.000 - (100.000 * boot.HexQueue.Count() / startFrom)) : 0;
                         BytesStart.Text = (startFrom - boot.HexQueue.Count()).ToString();
                     }));
@@ -1134,7 +1133,7 @@ namespace RMDebugger
                 {
                     byte[] tempData = new byte[data.Length - 6 - fieldLen];
                     Array.Copy(data, 4+fieldLen, tempData, 0, tempData.Length);
-                    dataValue = Methods.CheckSymbols(tempData);
+                    dataValue = config.GetSymbols(tempData);
                     clr = Color.GreenYellow;
                 }
                 catch
@@ -1928,9 +1927,9 @@ namespace RMDebugger
                     Tuple<byte[], ProtocolReply> reply = await cOutput.GetData(cmdOut, size, 50);
                     ToReplyStatus($"{reply.Item2}");
                     if (cmdOutput == CmdOutput.ONLINE
-                        && Methods.CheckResult(reply.Item1) != RmResult.Ok)
+                        && cOutput.CheckResult(reply.Item1) != RmResult.Ok)
                     {
-                        ToReplyStatus($"{Methods.CheckResult(reply.Item1)}");
+                        ToReplyStatus($"{cOutput.CheckResult(reply.Item1)}");
                         continue;
                     }
 

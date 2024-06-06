@@ -5,7 +5,6 @@ using System;
 using System.Drawing;
 using SearchProtocol;
 using StaticSettings;
-using StaticMethods;
 using ProtocolEnums;
 using CRC16;
 
@@ -26,16 +25,16 @@ namespace RMDebugger
             Enum.TryParse(Enum.GetName(typeof(CmdOutput), (CmdOutput)((cmdOut[2] << 8) | cmdOut[3])), out CmdInput cmdMain);
             byte[] cmdIn = await receiveData(size, ms);
             ProtocolReply reply = GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
-            Methods.ToLogger(cmdOut, cmdIn, reply);
+            ToLogger(cmdOut, cmdIn, reply);
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
         }
 
-        private ProtocolReply GetReply(byte[] bufferIn, byte[] rmSign, CmdInput cmdMain)
+        protected override ProtocolReply GetReply(byte[] bufferIn, byte[] rmSign, CmdInput cmdMain)
         {
             if (bufferIn.Length == 0) return ProtocolReply.Null;
             if (!CRC16_CCITT_FALSE.CRC_check(bufferIn)) return ProtocolReply.WCrc;
-            if (!Methods.SignatureEqual(bufferIn, rmSign)) return ProtocolReply.WSign;
-            if (!Methods.CmdInputEqual(bufferIn, cmdMain)) return ProtocolReply.WCmd;
+            if (!SignatureEqual(bufferIn, rmSign)) return ProtocolReply.WSign;
+            if (!CmdInputEqual(bufferIn, cmdMain)) return ProtocolReply.WCmd;
             return ProtocolReply.Ok;
         }
 

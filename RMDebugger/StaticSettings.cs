@@ -1,4 +1,7 @@
-﻿using RMDebugger;
+﻿using System.Diagnostics;
+
+using ProtocolEnums;
+using RMDebugger;
 
 namespace StaticSettings
 {
@@ -6,31 +9,15 @@ namespace StaticSettings
     {
         public static DataDebuggerForm debugForm = null;
         public static MainDebugger debugger = null;
-        /// <summary>
-        /// Interfaces
-        /// </summary>
+        public static Stopwatch workTimer;
+
         //Socket
-/*        public static IPAddress iPAddr { get; set; }
-        public static ushort uPort { get; set; } = 0;*/
         public static bool pingOk { get; set; } = false;
-        //Serial
-/*        public static string comPort { get; set; } 
-        public static int baudRate { get; set; } = 38400;
-        public static byte dataBits { get; set; } = 8;
-        public static Parity parityCom { get; set; } = Parity.None;
-        public static StopBits stopBits { get; set; } = StopBits.One;*/
 
         //interfaces
         public static object mainInterface;
         public static bool mainIsAvailable = false;
 
-
-        /// <summary>
-        /// Signature settings
-        /// </summary>
-        /*        public static bool through {  get; set; } = false;
-                public static ushort signatureID { get; set; } = 0;
-                public static ushort signatureThrough { get; set; } = 1;*/
         public static bool through { get; set; } = false;
         public static bool showMessages {  get; set; }
 
@@ -58,18 +45,9 @@ namespace StaticSettings
         public static bool RS485TestState { get; set; } = false;
         public static bool RS485ManualScanState { get; set; } = false;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        //Logger
+        public static LogState logState { get; set; } = LogState.ERRORState;
+        public static LogSize logSize { get; set; } = LogSize.smallBuffer;
+        public static int linesRemove { get; set; } = (int)LogLinesRemove.smallBuffer;
     }
 }
