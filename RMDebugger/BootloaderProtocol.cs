@@ -75,7 +75,7 @@ namespace BootloaderProtocol
         {
             byte[] loadField = new byte[4 + data.Length];
             _targetSign.CopyTo(loadField, 0);
-            ((ushort)CmdOutput.LOAD_DATA_PAGE).GetBytes().CopyTo(loadField, 2);
+            ((ushort)CmdOutput.LOAD_DATA_PAGE).GetReverseBytes().CopyTo(loadField, 2);
             data.CopyTo(loadField, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(loadField);
         }

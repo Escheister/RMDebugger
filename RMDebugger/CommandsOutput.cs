@@ -162,7 +162,7 @@ namespace RMDebugger
         {
             byte[] cmdOut = new byte[cmdIn.Length + 4];
             rmThrough.CopyTo(cmdOut, 0);
-            ((ushort)cmd).GetBytes().CopyTo(cmdOut, 2);
+            ((ushort)cmd).GetReverseBytes().CopyTo(cmdOut, 2);
             cmdIn.CopyTo(cmdOut, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(cmdOut);
         }

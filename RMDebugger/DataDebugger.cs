@@ -91,9 +91,8 @@ namespace RMDebugger
 
         private void AppendTimer_Tick(object sender, EventArgs e)
         {
-            if (linesQueue.Count > 0)
-                while (linesQueue.Count > 0 && linesQueue.TryDequeue(out string line))
-                    LogBox.AppendText(line);
+            while (linesQueue.Count > 0 && linesQueue.TryDequeue(out string line))
+                LogBox.AppendText(line);
         }
     }
 }

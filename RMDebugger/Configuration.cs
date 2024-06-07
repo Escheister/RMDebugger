@@ -1,6 +1,6 @@
 ﻿using ProtocolEnums;
-using CRC16;
 using RMDebugger;
+using CRC16;
 
 namespace ConfigurationProtocol
 {
@@ -43,7 +43,7 @@ namespace ConfigurationProtocol
         {
             byte[] loadField = new byte[4 + field.Length];
             _targetSign.CopyTo(loadField, 0);
-            ((ushort)CmdOutput.GET_CONFIG_FIELD).GetBytes().CopyTo(loadField, 2);
+            ((ushort)CmdOutput.GET_CONFIG_FIELD).GetReverseBytes().CopyTo(loadField, 2);
             field.CopyTo(loadField, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(loadField);
         }
@@ -51,7 +51,7 @@ namespace ConfigurationProtocol
         {
             byte[] loadField = new byte[4 + field.Length + value.Length];
             _targetSign.CopyTo(loadField, 0);
-            ((ushort)CmdOutput.SET_CONFIG).GetBytes().CopyTo(loadField, 2);
+            ((ushort)CmdOutput.SET_CONFIG).GetReverseBytes().CopyTo(loadField, 2);
             field.CopyTo(loadField, 4);
             value.CopyTo(loadField, 4 + field.Length);
             return new CRC16_CCITT_FALSE().CRC_calc(loadField);

@@ -68,7 +68,7 @@
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.toolStrip1.Size = new System.Drawing.Size(582, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(582, 27);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -80,14 +80,14 @@
             this.ERRORState});
             this.statesStrip.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.statesStrip.Name = "statesStrip";
-            this.statesStrip.Size = new System.Drawing.Size(46, 22);
+            this.statesStrip.Size = new System.Drawing.Size(46, 24);
             this.statesStrip.Text = "State";
             // 
             // DEBUGState
             // 
             this.DEBUGState.CheckOnClick = true;
             this.DEBUGState.Name = "DEBUGState";
-            this.DEBUGState.Size = new System.Drawing.Size(111, 22);
+            this.DEBUGState.Size = new System.Drawing.Size(180, 22);
             this.DEBUGState.Text = "DEBUG";
             // 
             // ERRORState
@@ -96,18 +96,18 @@
             this.ERRORState.CheckOnClick = true;
             this.ERRORState.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ERRORState.Name = "ERRORState";
-            this.ERRORState.Size = new System.Drawing.Size(111, 22);
+            this.ERRORState.Size = new System.Drawing.Size(180, 22);
             this.ERRORState.Text = "ERROR";
             // 
             // stateLabel
             // 
             this.stateLabel.Name = "stateLabel";
-            this.stateLabel.Size = new System.Drawing.Size(0, 22);
+            this.stateLabel.Size = new System.Drawing.Size(0, 24);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
             // 
             // bufferStrip
             // 
@@ -121,7 +121,7 @@
             this.bufferStrip.Image = ((System.Drawing.Image)(resources.GetObject("bufferStrip.Image")));
             this.bufferStrip.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bufferStrip.Name = "bufferStrip";
-            this.bufferStrip.Size = new System.Drawing.Size(75, 22);
+            this.bufferStrip.Size = new System.Drawing.Size(75, 24);
             this.bufferStrip.Text = "Buffer Size";
             // 
             // lowestBuffer
@@ -164,33 +164,35 @@
             // bufferLabel
             // 
             this.bufferLabel.Name = "bufferLabel";
-            this.bufferLabel.Size = new System.Drawing.Size(0, 22);
+            this.bufferLabel.Size = new System.Drawing.Size(0, 24);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
             // 
             // ClearLogger
             // 
             this.ClearLogger.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.ClearLogger.AutoSize = false;
             this.ClearLogger.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.ClearLogger.Image = global::RMDebugger.Properties.Resources.Eraser;
             this.ClearLogger.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.ClearLogger.Name = "ClearLogger";
-            this.ClearLogger.Size = new System.Drawing.Size(23, 22);
+            this.ClearLogger.Size = new System.Drawing.Size(24, 24);
             this.ClearLogger.Text = "toolStripButton1";
             this.ClearLogger.ToolTipText = "Clear logs";
             // 
             // SaveLogger
             // 
             this.SaveLogger.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.SaveLogger.AutoSize = false;
             this.SaveLogger.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.SaveLogger.Image = global::RMDebugger.Properties.Resources.SaveAs;
             this.SaveLogger.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
             this.SaveLogger.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.SaveLogger.Name = "SaveLogger";
-            this.SaveLogger.Size = new System.Drawing.Size(23, 22);
+            this.SaveLogger.Size = new System.Drawing.Size(24, 24);
             this.SaveLogger.Text = "toolStripButton1";
             this.SaveLogger.ToolTipText = "Save logs to";
             // 
@@ -202,11 +204,11 @@
             this.LogBox.Font = new System.Drawing.Font("Consolas", 8.25F);
             this.LogBox.ForeColor = System.Drawing.Color.White;
             this.LogBox.HideSelection = false;
-            this.LogBox.Location = new System.Drawing.Point(0, 25);
+            this.LogBox.Location = new System.Drawing.Point(0, 27);
             this.LogBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.LogBox.Name = "LogBox";
             this.LogBox.ReadOnly = true;
-            this.LogBox.Size = new System.Drawing.Size(582, 374);
+            this.LogBox.Size = new System.Drawing.Size(582, 372);
             this.LogBox.TabIndex = 1;
             this.LogBox.Text = "";
             // 
@@ -230,6 +232,7 @@
             this.Controls.Add(this.LogBox);
             this.Controls.Add(this.toolStrip1);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.Location = new System.Drawing.Point(100, 100);
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MinimumSize = new System.Drawing.Size(598, 438);
             this.Name = "DataDebuggerForm";

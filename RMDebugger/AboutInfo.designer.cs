@@ -32,12 +32,11 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.verBox = new System.Windows.Forms.TextBox();
-            this.whatsNewBox = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // crcBox
             // 
-            this.crcBox.Location = new System.Drawing.Point(125, 24);
+            this.crcBox.Location = new System.Drawing.Point(18, 33);
             this.crcBox.MaxLength = 10;
             this.crcBox.Name = "crcBox";
             this.crcBox.ReadOnly = true;
@@ -48,7 +47,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(229, 9);
+            this.label1.Location = new System.Drawing.Point(122, 18);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(41, 13);
             this.label1.TabIndex = 1;
@@ -57,7 +56,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(228, 51);
+            this.label2.Location = new System.Drawing.Point(121, 60);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(42, 13);
             this.label2.TabIndex = 2;
@@ -65,7 +64,7 @@
             // 
             // verBox
             // 
-            this.verBox.Location = new System.Drawing.Point(125, 66);
+            this.verBox.Location = new System.Drawing.Point(18, 75);
             this.verBox.MaxLength = 10;
             this.verBox.Name = "verBox";
             this.verBox.ReadOnly = true;
@@ -73,31 +72,11 @@
             this.verBox.TabIndex = 3;
             this.verBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // whatsNewBox
-            // 
-            this.whatsNewBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.whatsNewBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.whatsNewBox.DetectUrls = false;
-            this.whatsNewBox.Font = new System.Drawing.Font("Microsoft Tai Le", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.whatsNewBox.Location = new System.Drawing.Point(9, 90);
-            this.whatsNewBox.Margin = new System.Windows.Forms.Padding(0);
-            this.whatsNewBox.Name = "whatsNewBox";
-            this.whatsNewBox.ReadOnly = true;
-            this.whatsNewBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.whatsNewBox.ShortcutsEnabled = false;
-            this.whatsNewBox.Size = new System.Drawing.Size(490, 256);
-            this.whatsNewBox.TabIndex = 4;
-            this.whatsNewBox.TabStop = false;
-            this.whatsNewBox.Text = "";
-            // 
             // AboutInfo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(499, 346);
-            this.Controls.Add(this.whatsNewBox);
+            this.ClientSize = new System.Drawing.Size(284, 113);
             this.Controls.Add(this.verBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -111,7 +90,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "About";
             this.TopMost = true;
-            this.Load += new System.EventHandler(this.crc_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -123,6 +101,5 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox verBox;
-        private System.Windows.Forms.RichTextBox whatsNewBox;
     }
 }
