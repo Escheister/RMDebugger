@@ -59,13 +59,6 @@ namespace RMDebugger
             Load += MainFormLoad;
             FormClosed += MainFormClosed;
 
-            PasswordBox.TextChanged += (s, e) => 
-                ResetButton.Visible =    
-                SetBootloaderStopButton.Visible = 
-                SetBootloaderStartButton.Visible = 
-                PasswordBox.Text == "198237645";
-
-
             windowPinToolStrip.CheckedChanged += (s, e) =>
             {
                 this.TopMost = windowPinToolStrip.Checked;
@@ -74,6 +67,13 @@ namespace RMDebugger
             transparentToolStrip.CheckedChanged += (s, e) => this.Opacity = transparentToolStrip.Checked ? 0.95 : 1;
             messagesToolStrip.CheckedChanged += (s, e) => Options.showMessages = messagesToolStrip.Checked;
             HexTimeout.ValueChanged += (s, e) => Options.hexTimeout = (int)HexTimeout.Value;
+            extendedButtonsToolStrip.CheckedChanged += (s, e) =>
+            {
+                ResetButton.Visible =
+                SetBootloaderStopButton.Visible =
+                SetBootloaderStartButton.Visible = extendedButtonsToolStrip.Checked;
+            };
+
 
             comPort.SelectedIndexChanged += (s, e) => mainPort.PortName = comPort.SelectedItem.ToString();
             BaudRate.SelectedIndexChanged += (s, e) => BaudRateSelectedIndexChanged(s, e);
@@ -817,7 +817,6 @@ namespace RMDebugger
         }
 
         //Hex uploader
-        private void HexUploadFilename_DoubleClick(object sender, EventArgs e) => PasswordBox.Visible = !PasswordBox.Visible;
         async private void HexUploadButtonClick(object sender, EventArgs e)
         {
             Options.HexUploadState = !Options.HexUploadState;
@@ -959,7 +958,6 @@ namespace RMDebugger
                 BytesEnd.Text = linesCount.ToString();
             }
             HexUploadButton.Enabled = exists;
-            HexUploadFilename.Text = exists ? $"Filename: {Path.GetFileName(HexPathBox.Text)}" : string.Empty;
         }
 
 

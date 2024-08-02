@@ -107,7 +107,6 @@
             this.HexUploadButton = new System.Windows.Forms.Button();
             this.HexTimeout = new System.Windows.Forms.NumericUpDown();
             this.HexPageSize = new System.Windows.Forms.NumericUpDown();
-            this.HexUploadFilename = new System.Windows.Forms.Label();
             this.HexPathBox = new System.Windows.Forms.ComboBox();
             this.BytesEnd = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -179,7 +178,6 @@
             this.RadioNearbyStatusRM = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.WorkTimeStatusRM = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.VerStatusRM = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.PasswordBox = new System.Windows.Forms.TextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.MessageStatus = new System.Windows.Forms.ToolStripStatusLabel();
@@ -210,6 +208,7 @@
             this.transparentToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.messagesToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.windowPinToolStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.extendedButtonsToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.clearSettingsToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -766,7 +765,6 @@
             this.HexUpdatePage.Controls.Add(this.HexUploadButton);
             this.HexUpdatePage.Controls.Add(this.HexTimeout);
             this.HexUpdatePage.Controls.Add(this.HexPageSize);
-            this.HexUpdatePage.Controls.Add(this.HexUploadFilename);
             this.HexUpdatePage.Controls.Add(this.HexPathBox);
             this.HexUpdatePage.Controls.Add(this.BytesEnd);
             this.HexUpdatePage.Controls.Add(this.label8);
@@ -884,17 +882,6 @@
             0,
             0,
             0});
-            // 
-            // HexUploadFilename
-            // 
-            this.HexUploadFilename.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.HexUploadFilename.Location = new System.Drawing.Point(1, 220);
-            this.HexUploadFilename.Name = "HexUploadFilename";
-            this.HexUploadFilename.Size = new System.Drawing.Size(304, 13);
-            this.HexUploadFilename.TabIndex = 25;
-            this.HexUploadFilename.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.HexUploadFilename.DoubleClick += new System.EventHandler(this.HexUploadFilename_DoubleClick);
             // 
             // HexPathBox
             // 
@@ -2100,21 +2087,6 @@
             this.VerStatusRM.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.VerStatusRM.Width = 30;
             // 
-            // PasswordBox
-            // 
-            this.PasswordBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.PasswordBox.BackColor = System.Drawing.Color.White;
-            this.PasswordBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.PasswordBox.Location = new System.Drawing.Point(3, 58);
-            this.PasswordBox.Margin = new System.Windows.Forms.Padding(0);
-            this.PasswordBox.MaxLength = 16;
-            this.PasswordBox.Name = "PasswordBox";
-            this.PasswordBox.Size = new System.Drawing.Size(155, 13);
-            this.PasswordBox.TabIndex = 26;
-            this.PasswordBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.PasswordBox.UseSystemPasswordChar = true;
-            this.PasswordBox.Visible = false;
-            // 
             // statusStrip1
             // 
             this.statusStrip1.BackColor = System.Drawing.Color.White;
@@ -2396,7 +2368,7 @@
             this.saveToRegToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("saveToRegToolStripMenuItem.Image")));
             this.saveToRegToolStripMenuItem.Name = "saveToRegToolStripMenuItem";
             this.saveToRegToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.saveToRegToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.saveToRegToolStripMenuItem.Size = new System.Drawing.Size(184, 26);
             this.saveToRegToolStripMenuItem.Text = "Save in PC";
             this.saveToRegToolStripMenuItem.ToolTipText = "Выполняет сохранение настройки пользователя в реестр";
             this.saveToRegToolStripMenuItem.Click += new System.EventHandler(this.saveToRegToolStripMenuItem_Click);
@@ -2406,7 +2378,7 @@
             this.loadFromPCToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("loadFromPCToolStripMenuItem.Image")));
             this.loadFromPCToolStripMenuItem.Name = "loadFromPCToolStripMenuItem";
             this.loadFromPCToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.loadFromPCToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.loadFromPCToolStripMenuItem.Size = new System.Drawing.Size(184, 26);
             this.loadFromPCToolStripMenuItem.Text = "Load from PC";
             this.loadFromPCToolStripMenuItem.ToolTipText = "Выполняет загрузку настройки пользователя из реестра";
             // 
@@ -2415,24 +2387,25 @@
             this.deleteSaveFromPCToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("deleteSaveFromPCToolStripMenuItem.Image")));
             this.deleteSaveFromPCToolStripMenuItem.Name = "deleteSaveFromPCToolStripMenuItem";
             this.deleteSaveFromPCToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.deleteSaveFromPCToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.deleteSaveFromPCToolStripMenuItem.Size = new System.Drawing.Size(184, 26);
             this.deleteSaveFromPCToolStripMenuItem.Text = "Delete from PC";
             this.deleteSaveFromPCToolStripMenuItem.ToolTipText = "Выполняет удаление настройки пользователя из реестра\r\n";
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(151, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(181, 6);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.transparentToolStrip,
             this.messagesToolStrip,
-            this.windowPinToolStrip});
+            this.windowPinToolStrip,
+            this.extendedButtonsToolStrip});
             this.toolStripMenuItem1.Image = global::RMDebugger.Properties.Resources.Settings;
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(154, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(184, 26);
             this.toolStripMenuItem1.Text = "Settings";
             // 
             // transparentToolStrip
@@ -2443,7 +2416,7 @@
             this.transparentToolStrip.CheckOnClick = true;
             this.transparentToolStrip.CheckState = System.Windows.Forms.CheckState.Checked;
             this.transparentToolStrip.Name = "transparentToolStrip";
-            this.transparentToolStrip.Size = new System.Drawing.Size(138, 22);
+            this.transparentToolStrip.Size = new System.Drawing.Size(180, 22);
             this.transparentToolStrip.Text = "Transparent";
             this.transparentToolStrip.ToolTipText = "Прозрачность основного окна";
             // 
@@ -2455,7 +2428,7 @@
             this.messagesToolStrip.CheckOnClick = true;
             this.messagesToolStrip.CheckState = System.Windows.Forms.CheckState.Checked;
             this.messagesToolStrip.Name = "messagesToolStrip";
-            this.messagesToolStrip.Size = new System.Drawing.Size(138, 22);
+            this.messagesToolStrip.Size = new System.Drawing.Size(180, 22);
             this.messagesToolStrip.Text = "Messages";
             this.messagesToolStrip.ToolTipText = "Всплывающие сообщения";
             // 
@@ -2464,20 +2437,27 @@
             this.windowPinToolStrip.BackColor = System.Drawing.Color.White;
             this.windowPinToolStrip.CheckOnClick = true;
             this.windowPinToolStrip.Name = "windowPinToolStrip";
-            this.windowPinToolStrip.Size = new System.Drawing.Size(138, 22);
+            this.windowPinToolStrip.Size = new System.Drawing.Size(180, 22);
             this.windowPinToolStrip.Text = "Window pin";
             this.windowPinToolStrip.ToolTipText = "Обычное состояние окна";
+            // 
+            // extendedButtonsToolStrip
+            // 
+            this.extendedButtonsToolStrip.CheckOnClick = true;
+            this.extendedButtonsToolStrip.Name = "extendedButtonsToolStrip";
+            this.extendedButtonsToolStrip.Size = new System.Drawing.Size(180, 22);
+            this.extendedButtonsToolStrip.Text = "Extended buttons";
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(151, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(181, 6);
             // 
             // clearSettingsToolStrip
             // 
             this.clearSettingsToolStrip.Image = ((System.Drawing.Image)(resources.GetObject("clearSettingsToolStrip.Image")));
             this.clearSettingsToolStrip.Name = "clearSettingsToolStrip";
-            this.clearSettingsToolStrip.Size = new System.Drawing.Size(154, 22);
+            this.clearSettingsToolStrip.Size = new System.Drawing.Size(184, 26);
             this.clearSettingsToolStrip.Text = "Clear settings";
             this.clearSettingsToolStrip.ToolTipText = "Выполняет сброс всех настроек, которые были сохранены пользователем ранее";
             this.clearSettingsToolStrip.Click += new System.EventHandler(this.clearSettingsToolStripMenuItem_Click);
@@ -2717,7 +2697,6 @@
             this.ExtraButtonsGroup.Controls.Add(this.label15);
             this.ExtraButtonsGroup.Controls.Add(this.AutoExtraButtonsTimeout);
             this.ExtraButtonsGroup.Controls.Add(this.AutoExtraButtons);
-            this.ExtraButtonsGroup.Controls.Add(this.PasswordBox);
             this.ExtraButtonsGroup.Controls.Add(this.ButtonsPanel);
             this.ExtraButtonsGroup.Enabled = false;
             this.ExtraButtonsGroup.Location = new System.Drawing.Point(9, 223);
@@ -3159,7 +3138,6 @@
         private System.Windows.Forms.Button AddSignatureIDToTest;
         private System.Windows.Forms.ErrorProvider ErrorMessage;
         private System.Windows.Forms.NotifyIcon NotifyMessage;
-        private System.Windows.Forms.Label HexUploadFilename;
         private System.Windows.Forms.TabPage InfoPage;
         private System.Windows.Forms.TreeView InfoTree;
         private System.Windows.Forms.Panel InfoTreePanel;
@@ -3178,7 +3156,6 @@
         private System.Windows.Forms.Button InfoClearGrid;
         private System.Windows.Forms.Button InfoSaveToCSVButton;
         private System.Windows.Forms.DataGridView InfoFieldsGrid;
-        private System.Windows.Forms.TextBox PasswordBox;
         private System.Windows.Forms.CheckBox RadioSettingsTestBox;
         public System.Windows.Forms.NumericUpDown maxSigToScan;
         public System.Windows.Forms.NumericUpDown minSigToScan;
@@ -3260,5 +3237,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn InfoFieldRow;
         private System.Windows.Forms.DataGridViewTextBoxColumn InfoValueRow;
         private System.Windows.Forms.CheckBox ClearBufferSettingsTestBox;
+        private System.Windows.Forms.ToolStripMenuItem extendedButtonsToolStrip;
     }
 }
