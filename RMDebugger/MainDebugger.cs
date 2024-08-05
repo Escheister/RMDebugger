@@ -2017,10 +2017,5 @@ namespace RMDebugger
             }
             while (AutoExtraButtons.Checked);
         }
-
-        private void HexUploadFilename_DoubleClick(object sender, EventArgs e)
-        {
-
-        }
     }
 }
