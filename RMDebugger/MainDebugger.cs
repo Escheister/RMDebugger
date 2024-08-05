@@ -600,6 +600,8 @@ namespace RMDebugger
             MirrorBox.Enabled = 
                 MirrorColorButton.Enabled = 
                 RS485Page.Enabled =
+                RMLRModeCheck.Enabled =
+                RMLRRepeatCount.Enabled =
                 ExtendedBox.Enabled = !Options.through;
             ThroughSignID.Enabled = Options.through;
         }
@@ -1147,6 +1149,9 @@ namespace RMDebugger
                     {
                         await config.GetData(rgbBuzz, (int)CmdMaxSize.PGLR_RGB);
                         config._targetSign = new byte[2] { reply.Item1[4], reply.Item1[5] };
+                        int rmpAddr = reply.Item1[5] << 8 | reply.Item1[4];
+                        if (Options.showMessages)
+                            NotifyMessage.ShowBalloonTip(5, "Найдена метка RMP", $"Найдена метка RMP с сигнатурой: {rmpAddr}", ToolTipIcon.Info);
                         break;
                     }
                 }
