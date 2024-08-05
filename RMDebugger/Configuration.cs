@@ -14,6 +14,7 @@ namespace ConfigurationProtocol
             _targetSign = targetSign;
             buildCmdLoadDelegate += ConfigLoad;
             buildCmdUploadDelegate += ConfigUpload;
+            through = false;
         }
         public Configuration(object sender, byte[] targetSign, byte[] throughSign) : base(sender)
         {
@@ -21,8 +22,9 @@ namespace ConfigurationProtocol
             _throughSign = throughSign;
             buildCmdLoadDelegate += ConfigLoadThrough;
             buildCmdUploadDelegate += ConfigUploadThrough;
+            through = true;
         }
-        private byte[] _throughSign;
+        public byte[] _throughSign;
         public byte[] _targetSign;
         public BuildCmdLoadDelegate buildCmdLoadDelegate;
         public BuildCmdUploadDelegate buildCmdUploadDelegate;

@@ -22,6 +22,7 @@ using SearchProtocol;
 using ProtocolEnums;
 using File_Verifier;
 using CSV;
+using CRC16;
 
 namespace RMDebugger
 {
@@ -131,7 +132,11 @@ namespace RMDebugger
 
             LoadConfigButton.Click += LoadConfigButtonClick;
             UploadConfigButton.Click += UploadConfigButtonClick;
-
+            RMLRModeCheck.CheckedChanged += (s, e) => RMLRRepeatCount.Visible = RMLRModeCheck.Checked;
+            RMLRRed.CheckedChanged += (s, e) => Options.RMLRRed = RMLRRed.Checked;
+            RMLRGreen.CheckedChanged += (s, e) => Options.RMLRGreen = RMLRGreen.Checked;
+            RMLRBlue.CheckedChanged += (s, e) => Options.RMLRBlue = RMLRBlue.Checked;
+            RMLRBuzzer.CheckedChanged += (s, e) => Options.RMLRBuzzer = RMLRBuzzer.Checked;
             InfoTree.NodeMouseClick += InfoTreeNodeClick;
 
             StartTestRSButton.Click += StartTestRSButtonClick;
@@ -594,7 +599,7 @@ namespace RMDebugger
             Options.through = NeedThrough.Checked;
             MirrorBox.Enabled = 
                 MirrorColorButton.Enabled = 
-                RS485Page.Enabled = 
+                RS485Page.Enabled =
                 ExtendedBox.Enabled = !Options.through;
             ThroughSignID.Enabled = Options.through;
         }
@@ -958,6 +963,7 @@ namespace RMDebugger
                 BytesEnd.Text = linesCount.ToString();
             }
             HexUploadButton.Enabled = exists;
+            HexUploadFilename.Text = exists ? $"Filename: {Path.GetFileName(HexPathBox.Text)}" : string.Empty;
         }
 
 
@@ -1087,8 +1093,10 @@ namespace RMDebugger
                 return fields.Count > 0;
             }
 
+            bool activeFields = GetEnabledFields(out Dictionary<string, int> fields);
+
             Options.ConfigLoadState = !Options.ConfigLoadState;
-            if (Options.ConfigLoadState && GetEnabledFields(out Dictionary<string, int> fields))
+            if ((Options.ConfigLoadState && activeFields) || RMLRModeCheck.Checked)
             {
                 AfterLoadConfigEvent(true);
                 offTabsExcept(RMData, ConfigPage);
@@ -1105,15 +1113,65 @@ namespace RMDebugger
                 SignaturePanel.Enabled =
                 UploadConfigButton.Enabled =
                 ClearGridButton.Enabled =
+                RMLRModeCheck.Enabled =
                 ConfigFactoryCheck.Enabled = !sw;
             LoadConfigButton.Text = sw ? "Stop" : "Load from device";
             LoadConfigButton.Image = sw ? Resources.StatusStopped : Resources.CloudDownload;
         }
+
+        async private Task<bool> RMLRMode(Configuration config)
+        {
+            byte[] RMLRRgbFormat(byte[] rmSign, byte count, CmdOutput cmd)
+            {
+                List<byte> data = new List<byte>();
+                data.AddRange(rmSign);
+                data.AddRange(BitConverter.GetBytes((ushort)cmd).Reverse());
+                data.Add(RMLRRed.Checked ? count : (byte)0);
+                data.Add(RMLRGreen.Checked ? count : (byte)0);
+                data.Add(RMLRBlue.Checked ? count : (byte)0);
+                data.Add(RMLRBuzzer.Checked ? count : (byte)0);
+                return new CRC16_CCITT_FALSE().CRC_calc(data.ToArray());
+            }
+
+            Tuple<byte[], ProtocolReply> reply;
+            byte[] cmdOut = config.FormatCmdOut(config._targetSign, CmdOutput.PGLR_Reg, 0xff);
+            byte[] rgbBuzz = RMLRRgbFormat(config._targetSign, (byte)RMLRRepeatCount.Value, CmdOutput.PGLR_RGB);
+            while (true)
+            {
+                if (!Options.ConfigLoadState && !Options.ConfigUploadState) return false;
+                try
+                {
+                    reply = await config.GetData(cmdOut, (int)CmdMaxSize.PGLR_Reg);
+                    ToReplyStatus(reply.Item2.ToString());
+                    if (reply.Item1.Length == 10)
+                    {
+                        await config.GetData(rgbBuzz, (int)CmdMaxSize.PGLR_RGB);
+                        config._targetSign = new byte[2] { reply.Item1[4], reply.Item1[5] };
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ToReplyStatus(ex.Message);
+                    if (ex.Message == "devNull") return false;
+                }
+                await Task.Delay(50);
+            }
+            return true;
+        }
+
         async private Task LoadField(Dictionary<string, int> fields)
         {
             Configuration config = NeedThrough.Checked
                 ? new Configuration(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
                 : new Configuration(Options.mainInterface, TargetSignID.GetBytes());
+
+            if (RMLRModeCheck.Checked)
+            {
+                if (await RMLRMode(config))
+                    config = new Configuration(Options.mainInterface, config._targetSign, TargetSignID.GetBytes());
+                else return;
+            }
 
             Dictionary<string, (byte[], int)> cmdsOut = new Dictionary<string, (byte[], int)>();
             foreach(string key in fields.Keys)
@@ -1121,7 +1179,7 @@ namespace RMDebugger
                 byte[] cmdOut = config.buildCmdLoadDelegate(key);
                 int valueLen = fieldsDict.ContainsKey(key) ? (int)fieldsDict[key] + 1 : 17;
                 int dataCount = valueLen + (key.Length + 1) + 6;
-                if (Options.through) dataCount += 4;
+                if (config.through) dataCount += 4;
                 cmdsOut[key] = (cmdOut, dataCount);
             }
 
@@ -1161,7 +1219,7 @@ namespace RMDebugger
                     }
                     await Task.Delay(50);
                 }
-                TryParseData(Options.through 
+                TryParseData(config.through
                         ? config.ReturnWithoutThrough(reply.Item1) 
                         : reply.Item1, key.Length + 1, 
                     out string dataValue, out Color clr);
@@ -1186,8 +1244,10 @@ namespace RMDebugger
                 return fields.Count > 0;
             }
 
+            bool activeFields = GetEnabledFieldsAndValues(out Dictionary<string, (int, string)> fields);
+
             Options.ConfigUploadState = !Options.ConfigUploadState;
-            if (Options.ConfigUploadState && GetEnabledFieldsAndValues(out Dictionary<string, (int, string)> fields))
+            if ((Options.ConfigUploadState && activeFields) || RMLRModeCheck.Checked)
             {
                 AfterUploadConfigEvent(true);
                 offTabsExcept(RMData, ConfigPage);
@@ -1204,6 +1264,7 @@ namespace RMDebugger
                 SignaturePanel.Enabled =
                 LoadConfigButton.Enabled =
                 ClearGridButton.Enabled =
+                RMLRModeCheck.Enabled =
                 ConfigFactoryCheck.Enabled = !sw;
             UploadConfigButton.Text = sw ? "Stop" : "Upload to device";
             UploadConfigButton.Image = sw ? Resources.StatusStopped : Resources.CloudUpload;
@@ -1214,7 +1275,14 @@ namespace RMDebugger
                 ? new Configuration(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
                 : new Configuration(Options.mainInterface, TargetSignID.GetBytes());
 
-            int sizeAwaitData = Options.through 
+            if (RMLRModeCheck.Checked)
+            {
+                if (await RMLRMode(config))
+                    config = new Configuration(Options.mainInterface, config._targetSign, TargetSignID.GetBytes());
+                else return;
+            }
+
+            int sizeAwaitData = config.through
                 ? (int)CmdMaxSize.ONLINE + 4 
                 : (int)CmdMaxSize.ONLINE;
 
@@ -1244,7 +1312,7 @@ namespace RMDebugger
                         ToMessageStatus($"{key} : {reply.Item1}");
                         if (reply.Item1 == RmResult.Ok)
                         {
-                            if (key == "addr") TargetSignID.Value = Convert.ToInt32(fields[key].Item2);
+                            if (key == "addr" && !RMLRModeCheck.Checked) TargetSignID.Value = Convert.ToInt32(fields[key].Item2);
                             ColoredRow(fields[key].Item1, ConfigDataGrid, Color.GreenYellow);
                             break;
                         }
@@ -1943,6 +2011,11 @@ namespace RMDebugger
                 finally { await Task.Delay((int)AutoExtraButtonsTimeout.Value); }
             }
             while (AutoExtraButtons.Checked);
+        }
+
+        private void HexUploadFilename_DoubleClick(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -33,6 +33,7 @@ namespace RMDebugger
         protected SendDataDelegate sendData;
         protected ReceiveDataDelegate receiveData;
         public ClearBufferDelegate clearBuffer;
+        public bool through = true;
 
         protected void GetTypeDevice(object sender)
         {
@@ -212,10 +213,12 @@ namespace RMDebugger
                     CmdOutput cmdTwo = (CmdOutput)((cmdOut[6] << 8) | cmdOut[7]);
                     Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOne), out cmdThrough);
                     Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdTwo), out cmdMain);
+                    through = true;
                     break;
                 default:
                     Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOne), out cmdMain);
-                    cmdThrough = CmdInput.ROUTING_THROUGH;
+                    cmdThrough = CmdInput.ROUTING_RS485;
+                    through = false;
                     break;
             }
         }
@@ -235,7 +238,7 @@ namespace RMDebugger
 
             byte[] cmdIn = receiveTask.Result;
 
-            ProtocolReply reply = Options.through
+            ProtocolReply reply = through
                 ? GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
                                           new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
                 : GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
@@ -259,7 +262,7 @@ namespace RMDebugger
 
             byte[] cmdIn = receiveTask.Result;
 
-            ProtocolReply reply = Options.through 
+            ProtocolReply reply = through
                 ? GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
                                           new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
                 : GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);

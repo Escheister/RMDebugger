@@ -36,6 +36,8 @@
         WHO_ARE_YOU = 0x0101,
         RESET = 0x0701,
         STATUS = 0x0302,
+        PGLR_Reg = 0x3001,
+        PGLR_RGB = 0x3003,
     }
     enum CmdInput : ushort  // Reply
     {
@@ -44,17 +46,19 @@
         ROUTING_GET = 0x8202,
         ROUTING_THROUGH = 0x8210, 
         ROUTING_PROG = 0x8211,
+        ROUTING_RS485 = 0x82ff,
         START_BOOTLOADER = 0x9002, 
         LOAD_DATA_PAGE = 0x9004,
         UPDATE_DATA_PAGE = 0x9006, 
         STOP_BOOTLOADER = 0x9008,
         SET_CONFIG = 0x8311,
         GET_CONFIG_FIELD = 0x8312,
-        THROUGH = 0x8210,
         ONLINE = 0x8921,
         WHO_ARE_YOU = 0x8101,
         RESET = 0x8701,
         STATUS = 0x8302,
+        PGLR_Reg = 0xb002,
+        PGLR_RGB = 0xb004,
     }
     enum dataSize : int { ONLINE_DIST_TOF = 5, GRAPH_GET_NEAR = 3, }
     enum cmdSize : int { ONLINE_DIST_TOF = 9, GRAPH_GET_NEAR = 7, }
@@ -67,6 +71,8 @@
         RESET = 6,
         STATUS = 32,
         ROUTING_GET = 6,
+        PGLR_Reg = 10,
+        PGLR_RGB = 6,
     }
     enum UID : byte { WHO_ARE_YOU = 0x01, STATUS = 0x02, }
 
