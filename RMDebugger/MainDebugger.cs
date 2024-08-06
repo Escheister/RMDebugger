@@ -1148,18 +1148,18 @@ namespace RMDebugger
             }
 
             Tuple<byte[], ProtocolReply> reply;
-            byte[] cmdOut = config.FormatCmdOut(config._targetSign, CmdOutput.PGLR_REGISTRATION, 0xff);
-            byte[] rgbBuzz = RMLRRgbFormat(config._targetSign, (byte)RMLRRepeatCount.Value, CmdOutput.PGLR_RGB);
+            byte[] cmdOut = config.FormatCmdOut(config._targetSign, CmdOutput.RMLR_REGISTRATION, 0xff);
+            byte[] rgbBuzz = RMLRRgbFormat(config._targetSign, (byte)RMLRRepeatCount.Value, CmdOutput.RMLR_RGB);
             while (true)
             {
                 if (!Options.ConfigLoadState && !Options.ConfigUploadState) return false;
                 try
                 {
-                    reply = await config.GetData(cmdOut, (int)CmdMaxSize.PGLR_REGISTRATION);
+                    reply = await config.GetData(cmdOut, (int)CmdMaxSize.RMLR_REGISTRATION);
                     ToReplyStatus(reply.Item2.ToString());
                     if (reply.Item1.Length == 10)
                     {
-                        await config.GetData(rgbBuzz, (int)CmdMaxSize.PGLR_RGB);
+                        await config.GetData(rgbBuzz, (int)CmdMaxSize.RMLR_RGB);
                         config._targetSign = new byte[2] { reply.Item1[4], reply.Item1[5] };
                         if (Options.showMessages)
                             NotifyMessage.ShowBalloonTip(

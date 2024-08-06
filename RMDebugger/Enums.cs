@@ -37,8 +37,8 @@
         LOAD_DATA_PAGE = 0x1003, 
         UPDATE_DATA_PAGE = 0x1005, 
         STOP_BOOTLOADER = 0x1007,
-        PGLR_REGISTRATION = 0x3001,
-        PGLR_RGB = 0x3003,
+        RMLR_REGISTRATION = 0x3001,
+        RMLR_RGB = 0x3003,
     }
     enum CmdInput : ushort  // Reply
     {
@@ -58,8 +58,8 @@
         LOAD_DATA_PAGE = 0x9004,
         UPDATE_DATA_PAGE = 0x9006, 
         STOP_BOOTLOADER = 0x9008,
-        PGLR_REGISTRATION = 0xB002,
-        PGLR_RGB = 0xB004,
+        RMLR_REGISTRATION = 0xB002,
+        RMLR_RGB = 0xB004,
     }
     enum dataSize : int { ONLINE_DIST_TOF = 5, GRAPH_GET_NEAR = 3, }
     enum cmdSize : int { ONLINE_DIST_TOF = 9, GRAPH_GET_NEAR = 7, }
@@ -72,8 +72,8 @@
         ONLINE_DIST_TOF = 69,
         RESET = 6,
         ONLINE = 7,
-        PGLR_REGISTRATION = 10,
-        PGLR_RGB = 6,
+        RMLR_REGISTRATION = 10,
+        RMLR_RGB = 6,
     }
     enum UID : byte { GRAPH_WHO_ARE_YOU = 0x01, STATUS = 0x02, }
 
