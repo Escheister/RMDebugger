@@ -217,7 +217,7 @@ namespace RMDebugger
                     break;
                 default:
                     Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOne), out cmdMain);
-                    cmdThrough = CmdInput.ROUTING_RS485;
+                    cmdThrough = CmdInput.NONE;
                     through = false;
                     break;
             }
@@ -267,10 +267,9 @@ namespace RMDebugger
                                           new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
                 : GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
 
-            reply = 
-                (reply == ProtocolReply.Ok && cmdMain == CmdInput.LOAD_DATA_PAGE)
-                ? GetDataReply(cmdIn, cmdOut) 
-                : reply;
+            reply = (reply == ProtocolReply.Ok && cmdMain == CmdInput.LOAD_DATA_PAGE)
+                    ? GetDataReply(cmdIn, cmdOut) 
+                    : reply;
 
             ToLogger(cmdOut, cmdIn, reply);
 

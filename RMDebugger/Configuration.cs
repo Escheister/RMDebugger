@@ -28,6 +28,7 @@ namespace ConfigurationProtocol
         public byte[] _targetSign;
         public BuildCmdLoadDelegate buildCmdLoadDelegate;
         public BuildCmdUploadDelegate buildCmdUploadDelegate;
+        public bool factory { get; set; } = false;
 
 
         private byte[] ValueToKOI8R(string value, int size, bool factory=false)
@@ -45,7 +46,7 @@ namespace ConfigurationProtocol
         {
             byte[] loadField = new byte[4 + field.Length];
             _targetSign.CopyTo(loadField, 0);
-            ((ushort)CmdOutput.GET_CONFIG_FIELD).GetReverseBytes().CopyTo(loadField, 2);
+            ((ushort)CmdOutput.GET_CONFIG).GetReverseBytes().CopyTo(loadField, 2);
             field.CopyTo(loadField, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(loadField);
         }
@@ -71,4 +72,5 @@ namespace ConfigurationProtocol
 
         public string GetSymbols(byte[] array) => CheckSymbols(array);
     }
+
 }

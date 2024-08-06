@@ -143,8 +143,6 @@ namespace RMDebugger
         }
     }
 
-
-
     internal class DeviceClass
     {
         public DeviceClass() { }

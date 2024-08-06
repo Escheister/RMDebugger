@@ -60,6 +60,17 @@ namespace RMDebugger
             Load += MainFormLoad;
             FormClosed += MainFormClosed;
 
+            KeyDown += (s, e) =>
+            {
+                if (e.KeyValue == (char)Keys.F11)
+                {
+                    if (this.WindowState == FormWindowState.Normal)
+                        this.WindowState = FormWindowState.Maximized;
+                    else
+                        this.WindowState = FormWindowState.Normal;
+                }
+            };
+
             windowPinToolStrip.CheckedChanged += (s, e) =>
             {
                 this.TopMost = windowPinToolStrip.Checked;
@@ -1116,6 +1127,7 @@ namespace RMDebugger
                 UploadConfigButton.Enabled =
                 ClearGridButton.Enabled =
                 RMLRModeCheck.Enabled =
+                RMLRRepeatCount.Enabled =
                 ConfigFactoryCheck.Enabled = !sw;
             LoadConfigButton.Text = sw ? "Stop" : "Load from device";
             LoadConfigButton.Image = sw ? Resources.StatusStopped : Resources.CloudDownload;
@@ -1136,22 +1148,24 @@ namespace RMDebugger
             }
 
             Tuple<byte[], ProtocolReply> reply;
-            byte[] cmdOut = config.FormatCmdOut(config._targetSign, CmdOutput.PGLR_Reg, 0xff);
+            byte[] cmdOut = config.FormatCmdOut(config._targetSign, CmdOutput.PGLR_REGISTRATION, 0xff);
             byte[] rgbBuzz = RMLRRgbFormat(config._targetSign, (byte)RMLRRepeatCount.Value, CmdOutput.PGLR_RGB);
             while (true)
             {
                 if (!Options.ConfigLoadState && !Options.ConfigUploadState) return false;
                 try
                 {
-                    reply = await config.GetData(cmdOut, (int)CmdMaxSize.PGLR_Reg);
+                    reply = await config.GetData(cmdOut, (int)CmdMaxSize.PGLR_REGISTRATION);
                     ToReplyStatus(reply.Item2.ToString());
                     if (reply.Item1.Length == 10)
                     {
                         await config.GetData(rgbBuzz, (int)CmdMaxSize.PGLR_RGB);
                         config._targetSign = new byte[2] { reply.Item1[4], reply.Item1[5] };
-                        int rmpAddr = reply.Item1[5] << 8 | reply.Item1[4];
                         if (Options.showMessages)
-                            NotifyMessage.ShowBalloonTip(5, "Найдена метка RMP", $"Найдена метка RMP с сигнатурой: {rmpAddr}", ToolTipIcon.Info);
+                            NotifyMessage.ShowBalloonTip(
+                                5, "Найдена метка RMP", 
+                                $"Найдена метка RMP с сигнатурой: {reply.Item1[5] << 8 | reply.Item1[4]}", 
+                                ToolTipIcon.Info);
                         break;
                     }
                 }
@@ -1171,7 +1185,7 @@ namespace RMDebugger
                 ? new Configuration(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
                 : new Configuration(Options.mainInterface, TargetSignID.GetBytes());
 
-            if (RMLRModeCheck.Checked)
+            if (RMLRModeCheck.Checked && !NeedThrough.Checked)
             {
                 if (await RMLRMode(config))
                     config = new Configuration(Options.mainInterface, config._targetSign, TargetSignID.GetBytes());
@@ -1270,6 +1284,7 @@ namespace RMDebugger
                 LoadConfigButton.Enabled =
                 ClearGridButton.Enabled =
                 RMLRModeCheck.Enabled =
+                RMLRRepeatCount.Enabled = 
                 ConfigFactoryCheck.Enabled = !sw;
             UploadConfigButton.Text = sw ? "Stop" : "Upload to device";
             UploadConfigButton.Image = sw ? Resources.StatusStopped : Resources.CloudUpload;
@@ -1280,7 +1295,7 @@ namespace RMDebugger
                 ? new Configuration(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
                 : new Configuration(Options.mainInterface, TargetSignID.GetBytes());
 
-            if (RMLRModeCheck.Checked)
+            if (RMLRModeCheck.Checked && !NeedThrough.Checked)
             {
                 if (await RMLRMode(config))
                     config = new Configuration(Options.mainInterface, config._targetSign, TargetSignID.GetBytes());
@@ -1381,7 +1396,7 @@ namespace RMDebugger
                     e.Node.Expand();
                     return;
                 case "WhoAreYouInfo":
-                    GetInfoAboutDevice(CmdOutput.WHO_ARE_YOU, e.Node);
+                    GetInfoAboutDevice(CmdOutput.GRAPH_WHO_ARE_YOU, e.Node);
                     break;
                 case "StatusInfo":
                     GetInfoAboutDevice(CmdOutput.STATUS, e.Node);
@@ -1646,7 +1661,7 @@ namespace RMDebugger
                         switch (i)
                         {
                             case 0:
-                                await forTests.GetDataFromDevice(device, CmdOutput.WHO_ARE_YOU);
+                                await forTests.GetDataFromDevice(device, CmdOutput.GRAPH_WHO_ARE_YOU);
                                 break;
                             case 1:
                                 if (RadioSettingsTestBox.Checked)
@@ -1729,12 +1744,14 @@ namespace RMDebugger
             {
                 Searching search = new Searching(Options.mainInterface);
                 List<DeviceClass> devices = new List<DeviceClass>();
+                int newDevices = 0;
                 for (int i = (int)minSigToScan.Value; i <= maxSigToScan.Value && Options.RS485ManualScanState; i++)
                 {
+                    string deviceCount = newDevices > 0 ? $" (Catched: {newDevices})" : "";
                     Tuple<byte[], ProtocolReply> replyes;
                     try
                     {
-                        ToMessageStatus($"Signature: {i}");
+                        ToMessageStatus($"Signature: {i} {deviceCount}");
                         replyes = await search.GetData(
                             search.FormatCmdOut(i.GetBytes(),
                             CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 25);
@@ -1744,6 +1761,7 @@ namespace RMDebugger
                             devType = search.GetType(replyes.Item1),
                             devVer = search.GetVersion(replyes.Item1)
                         });
+                        newDevices++;
                     }
                     catch { }
                 }

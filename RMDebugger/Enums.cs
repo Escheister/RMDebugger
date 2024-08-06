@@ -21,60 +21,61 @@
     }
     enum CmdOutput : ushort // Request
     {
+        NONE = 0x0000,
+        GRAPH_WHO_ARE_YOU = 0x0101,
         GRAPH_GET_NEAR = 0x0102, 
-        ONLINE_DIST_TOF = 0x0303,
         ROUTING_GET = 0x0202,
+        ROUTING_THROUGH = 0x0210,
         ROUTING_PROG = 0x0211,
+        STATUS = 0x0302,
+        ONLINE_DIST_TOF = 0x0303,
+        SET_CONFIG = 0x0311,
+        GET_CONFIG = 0x0312,
+        RESET = 0x0701,
+        ONLINE = 0x0921,
         START_BOOTLOADER = 0x1000, 
         LOAD_DATA_PAGE = 0x1003, 
         UPDATE_DATA_PAGE = 0x1005, 
         STOP_BOOTLOADER = 0x1007,
-        SET_CONFIG = 0x0311,
-        GET_CONFIG_FIELD = 0x0312,
-        ROUTING_THROUGH = 0x0210,
-        ONLINE = 0x0921,
-        WHO_ARE_YOU = 0x0101,
-        RESET = 0x0701,
-        STATUS = 0x0302,
-        PGLR_Reg = 0x3001,
+        PGLR_REGISTRATION = 0x3001,
         PGLR_RGB = 0x3003,
     }
     enum CmdInput : ushort  // Reply
     {
+        NONE = 0x0000,
+        GRAPH_WHO_ARE_YOU = 0x8101,
         GRAPH_GET_NEAR = 0x8102, 
-        ONLINE_DIST_TOF = 0x8303,
         ROUTING_GET = 0x8202,
         ROUTING_THROUGH = 0x8210, 
         ROUTING_PROG = 0x8211,
-        ROUTING_RS485 = 0x82ff,
+        STATUS = 0x8302,
+        ONLINE_DIST_TOF = 0x8303,
+        SET_CONFIG = 0x8311,
+        GET_CONFIG = 0x8312,
+        RESET = 0x8701,
+        ONLINE = 0x8921,
         START_BOOTLOADER = 0x9002, 
         LOAD_DATA_PAGE = 0x9004,
         UPDATE_DATA_PAGE = 0x9006, 
         STOP_BOOTLOADER = 0x9008,
-        SET_CONFIG = 0x8311,
-        GET_CONFIG_FIELD = 0x8312,
-        ONLINE = 0x8921,
-        WHO_ARE_YOU = 0x8101,
-        RESET = 0x8701,
-        STATUS = 0x8302,
-        PGLR_Reg = 0xb002,
-        PGLR_RGB = 0xb004,
+        PGLR_REGISTRATION = 0xB002,
+        PGLR_RGB = 0xB004,
     }
     enum dataSize : int { ONLINE_DIST_TOF = 5, GRAPH_GET_NEAR = 3, }
     enum cmdSize : int { ONLINE_DIST_TOF = 9, GRAPH_GET_NEAR = 7, }
     enum CmdMaxSize : int
     {
-        WHO_ARE_YOU = 30,
+        GRAPH_WHO_ARE_YOU = 30,
         GRAPH_GET_NEAR = 43,
-        ONLINE_DIST_TOF = 69,
-        ONLINE = 7,
-        RESET = 6,
-        STATUS = 32,
         ROUTING_GET = 6,
-        PGLR_Reg = 10,
+        STATUS = 32,
+        ONLINE_DIST_TOF = 69,
+        RESET = 6,
+        ONLINE = 7,
+        PGLR_REGISTRATION = 10,
         PGLR_RGB = 6,
     }
-    enum UID : byte { WHO_ARE_YOU = 0x01, STATUS = 0x02, }
+    enum UID : byte { GRAPH_WHO_ARE_YOU = 0x01, STATUS = 0x02, }
 
     enum FileCheck : int 
     { 
@@ -119,13 +120,13 @@
     }
     enum RM485MaxSize : int
     {
-        WHO_ARE_YOU = 21,
+        GRAPH_WHO_ARE_YOU = 21,
         STATUS = 14,
         ROUTING_GET = 6,
     }
     enum RMHMaxSize : int
     {
-        WHO_ARE_YOU = 26,
+        GRAPH_WHO_ARE_YOU = 26,
         STATUS = 14,
         ROUTING_GET = 6,
     }

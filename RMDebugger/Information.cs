@@ -53,7 +53,7 @@ namespace RMDebugger
             {
                 case DevType.RM485:
                     {
-                        if (cmd == UID.WHO_ARE_YOU)
+                        if (cmd == UID.GRAPH_WHO_ARE_YOU)
                         {
                             byte[] location = new byte[8];
                             Array.Copy(cmdIn, 6, location, 0, location.Length);
@@ -82,7 +82,7 @@ namespace RMDebugger
                     }
                 case DevType.RMP:
                     {
-                        if (cmd == UID.WHO_ARE_YOU)
+                        if (cmd == UID.GRAPH_WHO_ARE_YOU)
                         {
                             byte[] lampID = new byte[4];
                             Array.Copy(cmdIn, 6, lampID, 0, lampID.Length);
@@ -131,7 +131,7 @@ namespace RMDebugger
                     }*/
                 case DevType.RMH:
                     {
-                        if (cmd == UID.WHO_ARE_YOU)
+                        if (cmd == UID.GRAPH_WHO_ARE_YOU)
                         {
                             byte[] location = new byte[16];
                             Array.Copy(cmdIn, 6, location, 0, location.Length);
@@ -144,7 +144,7 @@ namespace RMDebugger
                     }
                 case DevType.RMTA:
                     {
-                        if (cmd == UID.WHO_ARE_YOU)
+                        if (cmd == UID.GRAPH_WHO_ARE_YOU)
                         {
                             data["Type inside device"] = $"{(DevType)cmdIn[6]}";
                             byte[] location = new byte[16];
