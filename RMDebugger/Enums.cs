@@ -133,8 +133,8 @@
 
     enum InfoGrid { Signature, Type, Version, Radio, Location, Fio, Date }
 
-    enum ConfigCheckList { None, uInt16=5, len4=4, len16=16 }
-    enum ConfigColumns   { ConfigColumn, enabled, ConfigLoad, ConfigUpload }
+    enum ConfigRule { NoRule, uInt16=5, len4=4, len16=16 }
+    enum ConfigColumns { ConfigColumn, enabled, ConfigLoad, ConfigUpload }
 
     enum RmResult : byte
     {

@@ -26,9 +26,7 @@ namespace SearchProtocol
                 : (int)cmdOutSize;
             Tuple<byte[], ProtocolReply> requestData = await GetData(cmdOut, cmdInSize, 50);
 
-            requestData = Options.through
-                ? new Tuple<byte[], ProtocolReply>(ReturnWithoutThrough(requestData.Item1), requestData.Item2) 
-                : requestData;
+            requestData = new Tuple<byte[], ProtocolReply>(ReturnWithoutThrough(requestData.Item1), requestData.Item2);
 
             switch (cmdOutput)
             {

@@ -27,7 +27,6 @@ namespace RMDebugger
         {
         }
 
-
         protected SerialPort Port;
         protected Socket Sock;
         protected SendDataDelegate sendData;
@@ -42,21 +41,35 @@ namespace RMDebugger
                 Port = ser;
                 sendData += (byte[] data) => Port.Write(data, 0, data.Length);
                 receiveData = SerialReceiveData;
-                clearBuffer = SerialClearBuffer;
+                clearBuffer += () => 
+                { 
+                    if (Port.IsOpen && Port.BytesToRead > 0) 
+                        Port.DiscardInBuffer(); 
+                };
             }
             else if (sender is Socket sock)
             {
                 Sock = sock;
                 sendData += (byte[] data) => Sock.Send(data);
                 receiveData = SocketReceiveData;
-                clearBuffer = SocketClearBuffer;
+                clearBuffer += () => 
+                { 
+                    if (Sock.Connected && Sock.Available > 0) 
+                        Sock.Receive(new byte[Sock.Available]); 
+                };
             }
         }
         public byte[] ReturnWithoutThrough(byte[] cmdIn)
         {
-            byte[] _buffer = new byte[cmdIn.Length - 4];
-            Array.Copy(cmdIn, 4, _buffer, 0, _buffer.Length);
-            return _buffer;
+            if (Enum.TryParse(Enum.GetName(typeof(CmdInput), 
+                (cmdIn[2] << 8) | cmdIn[3]), out CmdInput cmdThrough) 
+                && cmdThrough == CmdInput.ROUTING_THROUGH)
+            {
+                byte[] _buffer = new byte[cmdIn.Length - 4];
+                Array.Copy(cmdIn, 4, _buffer, 0, _buffer.Length);
+                return _buffer;
+            }
+            else return cmdIn;
         }
         protected byte[] EncodeToKOI8R(string text)
         {
@@ -167,12 +180,7 @@ namespace RMDebugger
             cmdIn.CopyTo(cmdOut, 4);
             return new CRC16_CCITT_FALSE().CRC_calc(cmdOut);
         }
-        public void SerialClearBuffer() {
-            if (Port.IsOpen && Port.BytesToRead > 0) Port.DiscardInBuffer();
-        }
-        public void SocketClearBuffer() {
-            if (Sock.Connected && Sock.Available > 0) Sock.Receive(new byte[Sock.Available]);
-        }
+
         async private Task<byte[]> SocketReceiveData(int length, int ms = 250)
         {
             DateTime t0 = DateTime.Now;
@@ -222,9 +230,6 @@ namespace RMDebugger
                     break;
             }
         }
-
-
-
         async public Task<Tuple<RmResult, ProtocolReply>> GetResult(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");

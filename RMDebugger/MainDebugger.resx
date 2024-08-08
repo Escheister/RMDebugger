@@ -123,6 +123,9 @@
   <metadata name="SignDistTof.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <metadata name="DistTofPage.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="AutoDistTof.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -164,6 +167,15 @@
         llyuNVsAAAAASUVORK5CYII=
 </value>
   </data>
+  <metadata name="HexUpdatePage.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="HexCheckCrc.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="HexUploadButton.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <data name="HexUploadButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
@@ -174,6 +186,27 @@
         llyuNVsAAAAASUVORK5CYII=
 </value>
   </data>
+  <metadata name="HexTimeout.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="HexPageSize.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="HexPathBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="BytesEnd.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="label8.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="BytesStart.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="HexPathButton.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <data name="HexPathButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
@@ -188,23 +221,9 @@
   <metadata name="RGBBMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 54</value>
   </metadata>
-  <metadata name="ToolTipHelper.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>347, 17</value>
-  </metadata>
   <data name="RMLRModeCheck.ToolTip" xml:space="preserve">
     <value>Режим RMLR, при котором она сначала должна определить метку RMP, после чего опросить её.
 При нажатии правой кнопкой мыши на эту галочку, выбирается активный светодиод, при определении метки, и будет ли звуковое уведомление у самой RMLR.</value>
-  </data>
-  <data name="ClearGridButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
-        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAA8ElE
-        QVQ4T62RSwrCMBCGuxFvoCg0fdAbdOurN/C18TYqSI/jSm/gzrWCJ/C1FLf6D85IUpvSggM/aZL5vqSt
-        U6bCMGzEcVzjabXyPG8QBMEDWVeW4OSO7/sXSGYQbPG8iaKoztvFBaBLsFJqirQgU6UlDF8FlpSS2GBJ
-        oQTvmhCMcZQHS1iyQ++K0Q+MxScyz4MymdBBSO8L0wLBfINxDiQRuG/AAtGI+c0iMWEqTM7YMD6YRfIL
-        U2Fhj6svtUYdEIn5znq5rtvGxgmSRUYgkrsVlgLcRA74PakuwOlDgjEm3GovugkkR+RVFG7/VznOG4Kq
-        csht2ePHAAAAAElFTkSuQmCC
-</value>
   </data>
   <data name="UploadConfigButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -241,6 +260,9 @@
   </metadata>
   <metadata name="UploadFieldColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
+  </metadata>
+  <metadata name="ConfigClearMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>155, 54</value>
   </metadata>
   <metadata name="InfoFieldRow.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -378,6 +400,9 @@
   </metadata>
   <metadata name="statusStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>126, 17</value>
+  </metadata>
+  <metadata name="statusStrip1.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
   </metadata>
   <metadata name="toolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>242, 17</value>
@@ -706,6 +731,27 @@
   <metadata name="notifyMessageStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>1109, 17</value>
   </metadata>
+  <data name="OpenDebugFromToolStrip.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAA3klE
+        QVQ4T2MYJkBRUfE/OsYlDsJgTYMT4HIuEv+7vLy8B0PsbheG2B1TGOJ3GoM1kgRid4QzxO56zhCzqxeI
+        H0NFiQQwzVE7HBlidmYD8TWoDAQgORWOFRQUfgJpH7DmGKjmuJ3pQIOeMcRt14ZqJQBid4WCNUfsdAIa
+        lArWHLNTBypLAKBrjtn5FMNmdGdD8XGgYkUg/sYQs9cJ7OyYXU8Y4ndoQLURAWJ3zQTi/wyxOw+BQzx6
+        uzpUhggQvU0GqPknxIBdexkid6lCZYgE0bsdgBrPAp3uCRXBAhgYAGpfet+H827HAAAAAElFTkSuQmCC
+</value>
+  </data>
+  <data name="AboutFromToolStrip.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAABEUlE
+        QVQ4T82SSw6CQBBEWXgJN8hH497PRlROpcZ7GOMJFC8h8ST+PYOs9HVoIjPizoWVVAa6q4qmM87P4fv+
+        CG7h3fO8jPMGkyAIhiqpRhzHNYQreMQ4CcOwg8mVk/ep1peiU4sJNe8wNF3XrQsJiErPLfqphKjlDYpj
+        mgfbTO1JbVAOQXuSnlpzINzSmBTCgmVzQXQzuFZrDgLu8q+2WCawa3y9R8BVrTkoZDTom+KqALQN+FBr
+        Dp2ga4urAqj1PyagmFD82MGXgDlacweMP6RxlC1bYiMAYxteZLlqfYPGEkNqh5TN9PecC7WYkBsmIfAM
+        Z7JtWSymPpSxL2L+ehMLYIoQbuAVZnquK8f+AzjOC0Z1bX/qgHHCAAAAAElFTkSuQmCC
+</value>
+  </data>
   <data name="NotifyMessage.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAEAQEAAAAEAIAALHAAAFgAAAIlQTkcNChoKAAAADUlIRFIAAABAAAAAQAgGAAAAqmlx3gAAAAlw
@@ -829,27 +875,6 @@
         gp0jA+/prmy/PXXFJVsZor7XIPL/t0h5cDEt6zZVeu+X1C9dPm9eYwz03xDla6uddnUe3puWrKjGUq2M
         9/61BML+TZEIpGkmQ8PDOApLtjHA0ovj/wPyHoq65tYua8fZcU5x/w873kO6biuZXwAAAABJRU5ErkJg
         gg==
-</value>
-  </data>
-  <data name="OpenDebugFromToolStrip.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
-        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAA3klE
-        QVQ4T2MYJkBRUfE/OsYlDsJgTYMT4HIuEv+7vLy8B0PsbheG2B1TGOJ3GoM1kgRid4QzxO56zhCzqxeI
-        H0NFiQQwzVE7HBlidmYD8TWoDAQgORWOFRQUfgJpH7DmGKjmuJ3pQIOeMcRt14ZqJQBid4WCNUfsdAIa
-        lArWHLNTBypLAKBrjtn5FMNmdGdD8XGgYkUg/sYQs9cJ7OyYXU8Y4ndoQLURAWJ3zQTi/wyxOw+BQzx6
-        uzpUhggQvU0GqPknxIBdexkid6lCZYgE0bsdgBrPAp3uCRXBAhgYAGpfet+H827HAAAAAElFTkSuQmCC
-</value>
-  </data>
-  <data name="AboutFromToolStrip.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
-        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAABEUlE
-        QVQ4T82SSw6CQBBEWXgJN8hH497PRlROpcZ7GOMJFC8h8ST+PYOs9HVoIjPizoWVVAa6q4qmM87P4fv+
-        CG7h3fO8jPMGkyAIhiqpRhzHNYQreMQ4CcOwg8mVk/ep1peiU4sJNe8wNF3XrQsJiErPLfqphKjlDYpj
-        mgfbTO1JbVAOQXuSnlpzINzSmBTCgmVzQXQzuFZrDgLu8q+2WCawa3y9R8BVrTkoZDTom+KqALQN+FBr
-        Dp2ga4urAqj1PyagmFD82MGXgDlacweMP6RxlC1bYiMAYxteZLlqfYPGEkNqh5TN9PecC7WYkBsmIfAM
-        Z7JtWSymPpSxL2L+ehMLYIoQbuAVZnquK8f+AzjOC0Z1bX/qgHHCAAAAAElFTkSuQmCC
 </value>
   </data>
   <metadata name="WorkTestTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
