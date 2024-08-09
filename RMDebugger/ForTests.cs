@@ -7,6 +7,7 @@ using SearchProtocol;
 using StaticSettings;
 using ProtocolEnums;
 using CRC16;
+using System.Windows.Forms;
 
 
 namespace RMDebugger
@@ -22,10 +23,12 @@ namespace RMDebugger
         {
             if (!Options.mainIsAvailable) throw new Exception("No interface");
             sendData(cmdOut);
+            string message = $"{DateTime.Now:dd.HH:mm:ss:fff} : {"send",-6}-> {cmdOut.GetStringOfBytes()}\n";
             Enum.TryParse(Enum.GetName(typeof(CmdOutput), (CmdOutput)((cmdOut[2] << 8) | cmdOut[3])), out CmdInput cmdMain);
             byte[] cmdIn = await receiveData(size, ms);
             ProtocolReply reply = GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
-            ToLogger(cmdOut, cmdIn, reply);
+            message += $"{DateTime.Now:dd.HH:mm:ss:fff} : {reply,-6}<- {cmdIn.GetStringOfBytes()}\n";
+            ToLogger(message, reply);
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
         }
 

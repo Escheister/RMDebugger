@@ -233,7 +233,9 @@ namespace RMDebugger
         async public Task<Tuple<RmResult, ProtocolReply>> GetResult(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");
+
             sendData(cmdOut);
+            string message = $"{DateTime.Now:dd.HH:mm:ss:fff} : {"send",-6}-> {cmdOut.GetStringOfBytes()}\n";
 
             Task<byte[]> receiveTask = receiveData(size, Options.through ? ms * 2 : ms);
 
@@ -248,7 +250,8 @@ namespace RMDebugger
                                           new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
                 : GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
 
-            ToLogger(cmdOut, cmdIn, reply);
+            message += $"{DateTime.Now:dd.HH:mm:ss:fff} : {reply,-6}<- {cmdIn.GetStringOfBytes()}\n";
+            ToLogger(message, reply);
 
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
 
@@ -257,7 +260,9 @@ namespace RMDebugger
         async public Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");
+
             sendData(cmdOut);
+            string message = $"{DateTime.Now:dd.HH:mm:ss:fff} : {"send",-6}-> {cmdOut.GetStringOfBytes()}\n";
 
             Task<byte[]> receiveTask = receiveData(size, Options.through ? ms * 2 : ms);
 
@@ -273,23 +278,22 @@ namespace RMDebugger
                 : GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
 
             reply = (reply == ProtocolReply.Ok && cmdMain == CmdInput.LOAD_DATA_PAGE)
-                    ? GetDataReply(cmdIn, cmdOut) 
+                    ? GetDataReply(cmdIn, cmdOut)
                     : reply;
 
-            ToLogger(cmdOut, cmdIn, reply);
+            message += $"{DateTime.Now:dd.HH:mm:ss:fff} : {reply,-6}<- {cmdIn.GetStringOfBytes()}\n";
+            ToLogger(message, reply);
 
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
 
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
         }
-        protected void ToLogger(byte[] cmdOut, byte[] cmdIn, ProtocolReply reply)
+        protected void ToLogger(string message, ProtocolReply reply)
         {
             if (Options.debugForm is null) return;
             if ((Options.logState == LogState.ERRORState && reply != ProtocolReply.Ok)
-                    || Options.logState == LogState.DEBUGState)
-                Options.debugForm?.AddToQueue(
-                    $"{Options.workTimer.Elapsed.TotalMilliseconds:0000000000}:{"send",-6}->  {cmdOut.GetStringOfBytes()}\n" +
-                    $"{Options.workTimer.Elapsed.TotalMilliseconds:0000000000}:{reply,-6}<-  {cmdIn.GetStringOfBytes()}\n");
+                || Options.logState == LogState.DEBUGState)
+                Options.debugForm?.AddToQueue(message);
         }
     }
 }

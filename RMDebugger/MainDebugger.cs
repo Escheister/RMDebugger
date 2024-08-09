@@ -21,9 +21,8 @@ using StaticSettings;
 using SearchProtocol;
 using ProtocolEnums;
 using File_Verifier;
-using CSV;
 using CRC16;
-using System.Runtime.ConstrainedExecution;
+using CSV;
 
 namespace RMDebugger
 {
@@ -44,8 +43,6 @@ namespace RMDebugger
         public MainDebugger()
         {
             InitializeComponent();
-            Options.workTimer = new Stopwatch();
-            Options.workTimer.Start();
             Options.debugger = this;
             NotifyMessage.Text = this.Text = $"{Assembly.GetEntryAssembly().GetName().Name} {Assembly.GetEntryAssembly().GetName().Version}";
             AddEvents();
@@ -102,6 +99,7 @@ namespace RMDebugger
                 Options.timeoutGetNear = GetNeartimeout.Value;
                 TimeForGetNear.Text = $"{Options.timeoutGetNear} ms";
             };
+
             ManualDistTof.Click += DistTofClick;
             AutoDistTof.Click += DistTofClick;
             DistTofGrid.RowsAdded += (s, e) => ToMessageStatus($"{e.RowCount} devices on Dist Tof.");

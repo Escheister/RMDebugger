@@ -9,7 +9,6 @@ namespace StaticSettings
     {
         public static DataDebuggerForm debugForm = null;
         public static MainDebugger debugger = null;
-        public static Stopwatch workTimer;
 
         //Socket
         public static bool pingOk { get; set; } = false;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using StaticSettings;
 using ProtocolEnums;
 using RMDebugger;
+using System.ComponentModel;
 
 namespace SearchProtocol
 {
