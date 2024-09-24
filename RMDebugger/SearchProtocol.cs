@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
 using System;
 
-using System.Threading.Tasks;
 using StaticSettings;
 using ProtocolEnums;
 using RMDebugger;
-using System.ComponentModel;
 
 namespace SearchProtocol
 {
@@ -13,71 +13,91 @@ namespace SearchProtocol
     {
         public Searching(object sender) : base(sender) { }
 
-        async public Task<Tuple<byte, Dictionary<int, int>>> RequestAndParseNew(CmdOutput cmdOutput, byte ix, byte[] rmSign, byte[] rmThrough)
+        async public Task<List<DeviceData>> GetDataFromDevice(CmdOutput cmdOutput, byte[] rmSign, byte[] rmThrough)
         {
-            Dictionary<int, int> values = new Dictionary<int, int>();
+            List<DeviceData> deviceDataList = new List<DeviceData>();
+            byte ix = 0x00;
+            byte iteration = 1;
             Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out CmdMaxSize cmdOutSize);
-
-            byte[] cmdOut = Options.through
-                ? CmdThroughRm(FormatCmdOut(rmSign, cmdOutput, ix), rmThrough, CmdOutput.ROUTING_THROUGH) 
-                : FormatCmdOut(rmSign, cmdOutput, ix);
-
             int cmdInSize = Options.through
                 ? (int)cmdOutSize + 4
                 : (int)cmdOutSize;
-            Tuple<byte[], ProtocolReply> requestData = await GetData(cmdOut, cmdInSize, 50);
-
-            requestData = new Tuple<byte[], ProtocolReply>(ReturnWithoutThrough(requestData.Item1), requestData.Item2);
-
-            switch (cmdOutput)
+            try
             {
-                case CmdOutput.GRAPH_GET_NEAR:
-                    values = GET_NEAR(requestData.Item1);
-                    break;
-                case CmdOutput.ONLINE_DIST_TOF:
-                    values = DIST_TOF(requestData.Item1);
-                    break;
+                do
+                {
+                    byte[] cmdOut = Options.through
+                        ? CmdThroughRm(FormatCmdOut(rmSign, cmdOutput, ix), rmThrough, CmdOutput.ROUTING_THROUGH)
+                        : FormatCmdOut(rmSign, cmdOutput, ix);
+                    Tuple<byte[], ProtocolReply> requestData = await GetData(cmdOut, cmdInSize, 50);
+                    requestData = new Tuple<byte[], ProtocolReply>(ReturnWithoutThrough(requestData.Item1), requestData.Item2);
+
+                    IEnumerable<DeviceData> _List = GetDataDevices(cmdOutput, requestData.Item1, out ix);
+                    deviceDataList.AddRange(_List);
+                    iteration++;
+                }
+                while (ix != 0x00 && iteration <= 5);
             }
-            return new Tuple<byte, Dictionary<int, int>>(requestData.Item1[4], values);
+            catch { }
+            return deviceDataList;
         }
-        public Dictionary<int, int> AddKeys(Dictionary<int, int> data, Dictionary<int, int> dataOut)
+        protected IEnumerable<DeviceData> GetDataDevices(CmdOutput cmdOutput, byte[] cmdIn, out byte ix)
         {
-            if (dataOut is null) return data;
-            foreach (int key in dataOut.Keys)
-                if (!data.ContainsKey(key)) data[key] = dataOut[key];
+            ix = cmdIn[4];
+            return cmdOutput switch
+            {
+                CmdOutput.GRAPH_GET_NEAR => GetNear(cmdIn.Skip(5).Take(cmdIn.Length - 7)),
+                CmdOutput.ONLINE_DIST_TOF => DistTof(cmdIn.Skip(7).Take(cmdIn.Length - 9)),
+                _ => new List<DeviceData>(),
+            };
+        }
+        protected IEnumerable<DeviceData> GetNear(IEnumerable<byte> cmdIn)
+        {
+            /* data = 3
+             * 0-1 - sign
+             * 2 - type */
+            List<DeviceData> data = new List<DeviceData>();
+            if (cmdIn.Count() >= 3 && cmdIn.Count() % 3 == 0)
+                foreach (IEnumerable<byte> IArray in cmdIn.Split(3)) 
+                    data.Add(new DeviceData((ushort)((IArray.ElementAt(1) << 8) | IArray.ElementAt(0)))
+                    {
+                        devType = (DevType)IArray.ElementAt(2)
+                    });
             return data;
         }
-        private Dictionary<int, int> GetInfoFrom(byte[] bufferIn, CmdInput cmdIn)
+        protected IEnumerable<DeviceData> DistTof(IEnumerable<byte> cmdIn)
         {
-            Enum.TryParse(Enum.GetName(typeof(CmdInput), cmdIn), out cmdSize cmdS);
-            Enum.TryParse(Enum.GetName(typeof(CmdInput), cmdIn), out dataSize dataS);
-            int step = (int)dataS;
-            Dictionary<int, int> dataOut = new Dictionary<int, int>();
-
-            int sizeDataIn = bufferIn.Length - (int)cmdS;
-            byte[] dataIn = new byte[sizeDataIn];
-            if (sizeDataIn == 0) return dataOut;
-
-            Array.Copy(bufferIn, (int)cmdS - 2, dataIn, 0, sizeDataIn);
-
-            if (sizeDataIn >= step && sizeDataIn % step == 0)
-            {
-                int deviceCount = sizeDataIn / step;
-                int[,] deviceArray = new int[deviceCount, step];
-
-                for (int i = 0, j = 0; i < deviceCount; i++)
-                    for (int a = 0; a < step; a++, j++)
-                        deviceArray[i, a] = dataIn[j];
-
-                for (int i = 0; i < deviceCount; i++)
-                    dataOut[(deviceArray[i, 1] << 8) | deviceArray[i, 0]] = Convert.ToUInt16(deviceArray[i, (int)dataS-1]);
-            }
-            return dataOut;
+            /* data = 5
+             * 0-1 - sign
+             * 2-3 - dist
+             * 4   - rssi */
+            List<DeviceData> data = new List<DeviceData>();
+            if (cmdIn.Count() >= 5 && cmdIn.Count() % 5 == 0)
+                foreach (IEnumerable<byte> IArray in cmdIn.Split(5))
+                {
+                    int dist = (IArray.ElementAt(3) << 8) | IArray.ElementAt(2);
+                    byte rssi = IArray.ElementAt(4);
+                    data.Add(new DeviceData((ushort)((IArray.ElementAt(1) << 8) | IArray.ElementAt(0)))
+                    {
+                        devDist = dist > 0 ? $"{dist}" : "",
+                        devRSSI = rssi > 0 ? $"{rssi}" : ""
+                    });
+                }
+                    
+            return data;
         }
-        public Dictionary<int, int> DIST_TOF(byte[] bufferIn) => GetInfoFrom(bufferIn, CmdInput.ONLINE_DIST_TOF);
-        public Dictionary<int, int> GET_NEAR(byte[] bufferIn) => GetInfoFrom(bufferIn, CmdInput.GRAPH_GET_NEAR);
-        public int GetVersion(byte[] bufferIn) => bufferIn[bufferIn.Length - 3] << 8 
-                                                | bufferIn[bufferIn.Length - 4];
+        public int GetVersion(byte[] bufferIn)  => bufferIn[bufferIn.Length - 3] << 8
+                                                |  bufferIn[bufferIn.Length - 4];
         public DevType GetType(byte[] bufferIn) => (DevType)bufferIn[5];
+    }
+    class DeviceData
+    {
+        public DeviceData(ushort sign) => devSign = sign;
+        public ushort devSign { get; set; }
+        public DevType devType { get; set; }
+        public string devDist { get; set; } = string.Empty;
+        public string devRSSI { get; set; } = string.Empty;
+        public bool inOneBus = false;
+        public List<DeviceData> iSee = new List<DeviceData>();
     }
 }

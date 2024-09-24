@@ -18,8 +18,8 @@ namespace RMDebugger
             linesQueue = new ConcurrentQueue<string>();
             AppendTimer.Start();
             AddEvents();
-            SetState(GetItemFromStripManu(statesStrip, Options.logState.ToString()), null);
-            SetSize(GetItemFromStripManu(bufferStrip, Options.logSize.ToString()), null);
+            SetState(GetItemFromStripMenu(statesStrip, Options.logState.ToString()), null);
+            SetSize(GetItemFromStripMenu(bufferStrip, Options.logSize.ToString()), null);
         }
         private void AddEvents()
         {
@@ -31,19 +31,13 @@ namespace RMDebugger
             SaveLogger.Click += (s, e) => {
                 saveFileDialog.RestoreDirectory = true;
                 if (saveFileDialog.ShowDialog() != DialogResult.Cancel)
-                    System.IO.File.WriteAllText(saveFileDialog.FileName, LogBox.Text);
+                    LogBox.SaveFile(saveFileDialog.FileName, RichTextBoxStreamType.PlainText);
             };
             ClearLogger.Click += (s, e) => LogBox.Clear();
-            ERRORState.Click += SetState;
-            DEBUGState.Click += SetState;
-
-            lowestBuffer.Click += SetSize;
-            smallBuffer.Click += SetSize;
-            normalBuffer.Click += SetSize;
-            mediumBuffer.Click += SetSize;
-            largeBuffer.Click += SetSize;
+            foreach (ToolStripDropDownItem item in statesStrip.DropDownItems) item.Click += SetState;
+            foreach (ToolStripDropDownItem item in bufferStrip.DropDownItems) item.Click += SetSize;
         }
-        private object GetItemFromStripManu(ToolStripDropDownButton menu, string enumChoice)
+        private object GetItemFromStripMenu(ToolStripDropDownButton menu, string enumChoice)
             => menu.DropDownItems.Find(enumChoice, false).First();
         private void SetState(object sender, EventArgs e)
         {
@@ -88,7 +82,6 @@ namespace RMDebugger
             bufSize.CheckState = CheckState.Checked;
             bufferLabel.Text = bufSize.Text;
         }
-
         private void AppendTimer_Tick(object sender, EventArgs e)
         {
             while (linesQueue.Count > 0 && linesQueue.TryDequeue(out string line))

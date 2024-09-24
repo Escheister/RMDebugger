@@ -1,8 +1,9 @@
 ﻿using System.Net.NetworkInformation;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.ComponentModel;
+using ConfigurationProtocol;
 using RMDebugger.Properties;
+using System.ComponentModel;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net.Sockets;
@@ -10,17 +11,16 @@ using System.Reflection;
 using Microsoft.Win32;
 using System.IO.Ports;
 using System.Drawing;
+using StaticSettings;
 using System.Linq;
 using System.Net;
 using System.IO;
 using System;
 
-using ConfigurationProtocol;
 using BootloaderProtocol;
-using StaticSettings;
 using SearchProtocol;
-using ProtocolEnums;
 using File_Verifier;
+using ProtocolEnums;
 using CRC16;
 using CSV;
 
@@ -36,6 +36,7 @@ namespace RMDebugger
 
         BindingList<FieldConfiguration> fieldsData = new BindingList<FieldConfiguration>();
         BindingList<DeviceClass> testerData = new BindingList<DeviceClass>();
+        BindingList<DeviceData> deviceData = new BindingList<DeviceData>();
 
         private int setTimerTest;
         private int realTimeWorkingTest = 0;
@@ -44,7 +45,9 @@ namespace RMDebugger
         {
             InitializeComponent();
             Options.debugger = this;
-            NotifyMessage.Text = this.Text = $"{Assembly.GetEntryAssembly().GetName().Name} {Assembly.GetEntryAssembly().GetName().Version}";
+            NotifyMessage.Text = 
+                this.Text = 
+                $"{Assembly.GetEntryAssembly().GetName().Name} {Assembly.GetEntryAssembly().GetName().Version}";
             AddEvents();
         }
         private void AddEvents()
@@ -62,6 +65,9 @@ namespace RMDebugger
                         this.WindowState = FormWindowState.Normal;
                 }
             };
+            StatusRS485GridView.DoubleBuffered(true);
+            ConfigDataGrid.DoubleBuffered(true);
+            SearchGrid.DoubleBuffered(true);
 
             windowPinToolStrip.CheckedChanged += (s, e) =>
             {
@@ -91,33 +97,29 @@ namespace RMDebugger
             Connect.Click += ConnectClick;
             NeedThrough.CheckedChanged += NeedThroughCheckedChanged;
             TargetSignID.ValueChanged += (s, e) => NeedThrough.Enabled = TargetSignID.Value != 0;
-            DistToftimeout.Scroll += (s, e) => {
-                Options.timeoutDistTof = DistToftimeout.Value;
-                TimeForDistTof.Text = $"{Options.timeoutDistTof} ms";
-            };
-            GetNeartimeout.Scroll += (s, e) => {
-                Options.timeoutGetNear = GetNeartimeout.Value;
-                TimeForGetNear.Text = $"{Options.timeoutGetNear} ms";
-            };
+            
 
-            ManualDistTof.Click += DistTofClick;
-            AutoDistTof.Click += DistTofClick;
-            DistTofGrid.RowsAdded += (s, e) => ToMessageStatus($"{e.RowCount} devices on Dist Tof.");
-
-            ManualGetNear.Click += GetNearClick;
-            AutoGetNear.Click += GetNearClick;
-            GetNearGrid.RowsAdded += (s, e) => ToMessageStatus($"{e.RowCount} devices on Get Near.");
-            GetNearGrid.CellContentClick += (s, e) => TargetSignID.Value = Convert.ToDecimal(GetNearGrid[0, e.RowIndex].Value);
-
-
-            MirrorColorButton.Click += (s, e) =>
-            {
+            deviceData.ListChanged += (s, e) => ToMessageStatus($"{deviceData.Count} devices in Search.");
+            SearchAutoButton.Click += SearchButtonClick;
+            SearchManualButton.Click += SearchButtonClick;
+            SearchTimeout.ValueChanged += (s, e) => Options.timeoutSearch = (int)SearchTimeout.Value;
+            SearchChangeColorMenuItem.Click += (s, e) => {
                 if (MirrorColor.ShowDialog() == DialogResult.OK)
                     mirClr = MirrorColor.Color;
             };
-            TypeFilterBox.SelectedIndexChanged += (s, e) => Options.typeOfGetNear = TypeFilterBox.Text;
+            SearchGetNear.CheckedChanged += (s, e) =>
+            {
+                SearchFilterMode.Enabled =
+                    SearchGetNear.Checked;
+                SearchFindSignatireMode.Enabled =
+                    SearchExtendedFindMode.Enabled = !Options.through && SearchGetNear.Checked;
+            };
+            foreach (ToolStripMenuItem item in SearchFilterMenuStrip.Items) item.Click += SearchFilterClick;
+            SearchGrid.DataSource = deviceData;
+            SearchGrid.CellContentClick += (s, e) => TargetSignID.Value = Convert.ToDecimal(SearchGrid[0, e.RowIndex].Value);
+
+
             HexCheckCrc.CheckedChanged += (s, e) => Options.checkCrc = HexCheckCrc.Checked;
-            Options.timeoutDistTof = DistToftimeout.Value;
             HexUploadButton.Click += HexUploadButtonClick;
 
             CloseFromToolStrip.Click += (s, e) => this.Close();
@@ -130,9 +132,8 @@ namespace RMDebugger
                 }
             };
 
-            void AboutButtonClick(object sender, EventArgs e) => new AboutInfo().ShowDialog();
-            AboutButton.Click += AboutButtonClick;
-            AboutFromToolStrip.Click += AboutButtonClick;
+            AboutButton.Click += (s, e) => new AboutInfo().ShowDialog();
+            AboutFromToolStrip.Click += (s, e) => new AboutInfo().ShowDialog();
 
             ConfigDataGrid.DataSource = fieldsData;
             ConfigDataGrid.CellToolTipTextNeeded += (s, e) =>
@@ -174,12 +175,6 @@ namespace RMDebugger
 
             RMLRModeCheck.CheckedChanged += (s, e) => RMLRRepeatCount.Visible = RMLRModeCheck.Checked;
 
-            RMLRRed.CheckedChanged += (s, e) => Options.RMLRRed = RMLRRed.Checked;
-            RMLRGreen.CheckedChanged += (s, e) => Options.RMLRGreen = RMLRGreen.Checked;
-            RMLRBlue.CheckedChanged += (s, e) => Options.RMLRBlue = RMLRBlue.Checked;
-            RMLRBuzzer.CheckedChanged += (s, e) => Options.RMLRBuzzer = RMLRBuzzer.Checked;
-
-
             InfoTree.NodeMouseClick += InfoTreeNodeClick;
 
             StartTestRSButton.Click += StartTestRSButtonClick;
@@ -189,17 +184,21 @@ namespace RMDebugger
 
             ClearInfoTestRS485.Click += ClearInfoTestRS485Click;
             MoreInfoTestRS485.Click += MoreInfoTestRS485Click;
+
             TimerSettingsTestBox.CheckedChanged += (s, e) => timerPanelTest.Visible = TimerSettingsTestBox.Checked;
             StatusRS485GridView.DataSource = testerData;
             StatusRS485GridView.RowPrePaint += CellValueChangedRS485;
+            foreach (ToolStripDropDownItem item in RS485SortMenuStrip.Items) item.Click += ChooseSortedBy;
+            SortByButton.Click += (s, e) => StatusRS485Sort();
+            SortedColumnCombo.SelectedIndex = 0;
+
 
             SetOnlineButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.ONLINE);
             ResetButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.RESET);
             SetBootloaderStartButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.START_BOOTLOADER);
             SetBootloaderStopButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.STOP_BOOTLOADER);
         }
-
-
+        
         //********************
         private void MainFormLoad(object sender, EventArgs e)
         {
@@ -222,7 +221,6 @@ namespace RMDebugger
             HexPathBox.Items.Add(Settings.Default.LastPathToHex);
             if (HexPathBox.Items.Count != 0) HexPathBox.SelectedItem = HexPathBox.Items[0];
             ThroughOrNot();
-            TypeFilterBox.SelectedIndex = 0;
             if (Settings.Default.LastPortName != string.Empty && comPort.Items.Contains(Settings.Default.LastPortName))
                 comPort.Text = Settings.Default.LastPortName;
             BaudRate.Text = Settings.Default.LastBaudRate.ToString();
@@ -256,7 +254,12 @@ namespace RMDebugger
         }
         private void ToMessageStatus(string msg) => BeginInvoke((MethodInvoker)(() => MessageStatus.Text = msg ));
         private void ToReplyStatus(string msg) => BeginInvoke((MethodInvoker)(() => ReplyStatus.Text = msg));
-
+        private void ToDebuggerWindow(string msg, ProtocolReply reply)
+        {
+            if ((Options.logState == LogState.ERRORState && reply != ProtocolReply.Ok)
+                || Options.logState == LogState.DEBUGState)
+                Options.debugForm?.AddToQueue(msg);
+        }
 
         //Update
         async private void CheckUpdates()
@@ -589,8 +592,8 @@ namespace RMDebugger
                 {
                     reply = await ping.SendPingAsync(ip, timeout, buffer, pingOptions);
                     if (reply.Status != IPStatus.Success) reconnect++;
-                    else reconnect = 0;
-                    await Task.Delay(timeout);
+                    else if (reconnect > 0) reconnect = 0;
+                    await Task.Delay(100);
                 }
             }
             catch (Exception ex) { ToMessageStatus(ex.Message.ToString()); }
@@ -640,12 +643,11 @@ namespace RMDebugger
         private void ThroughOrNot()
         {
             Options.through = NeedThrough.Checked;
-            MirrorBox.Enabled = 
-                MirrorColorButton.Enabled = 
-                RS485Page.Enabled =
+            RS485Page.Enabled =
                 RMLRModeCheck.Enabled =
-                RMLRRepeatCount.Enabled =
-                ExtendedBox.Enabled = !Options.through;
+                RMLRRepeatCount.Enabled = !Options.through;
+            SearchFindSignatireMode.Enabled =
+                SearchExtendedFindMode.Enabled = !Options.through && SearchGetNear.Checked;
             ThroughSignID.Enabled = Options.through;
         }
 
@@ -682,173 +684,138 @@ namespace RMDebugger
             else action();
         }
 
-        // method for Get near & Dist Tof
-        async private Task<Dictionary<int, int>> GetDeviceListInfo(Searching search, CmdOutput cmdOutput, byte[] rmSign)
+        //Search
+        private void SearchFilterClick(object sender, EventArgs e)
         {
-            byte ix = 0x00;
-            int iteration = 1;
-            byte[] rmThrough = ThroughSignID.GetBytes();
-            Dictionary<int, int> dataReturn = new Dictionary<int, int>();
-            try
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            Enum.TryParse(item.Text, out DevType type);
+            switch (item.Checked)
             {
+                case true: 
+                    if (!Options.devTypesSearch.Contains(type)) Options.devTypesSearch.Add(type);
+                    break;
+                case false:
+                    if (Options.devTypesSearch.Contains(type)) Options.devTypesSearch.Remove(type);
+                    break;
+            }
+        }
+        async private void SearchButtonClick(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+            bool manual = btn == SearchManualButton;
+            if (btn == SearchAutoButton)
+            {
+                if (Options.autoSearch)
+                {
+                    Options.autoSearch = false;
+                    SearchAutoButton.Enabled = false;
+                    return;
+                }
+                else Options.autoSearch = true;
+            }
+            AfterSearchEvent(true, manual);
+            offTabsExcept(RMData, SearchPage);
+            await Task.Run(() => StartSearchAsync());
+            AfterSearchEvent(false, manual);
+            onTabPages(RMData);
+        }
+        private void AfterSearchEvent(bool sw, bool manual)
+        {
+            AfterAnyAutoEvent(sw);
+            if (!SearchAutoButton.Enabled) SearchAutoButton.Enabled = true;
+            if (manual) SearchAutoButton.Enabled = !sw;
+            else
+            {
+                SearchAutoButton.Text = sw ? "Stop" : "Auto";
+                SearchAutoButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
+            }
+            SearchManualButton.Enabled = !sw;
+        }
+        
+        async private Task StartSearchAsync()
+        {
+            using (Searching search = new Searching(Options.mainInterface))
+            {
+                search.ToReply += ToReplyStatus;
+                search.ToDebug += ToDebuggerWindow;
                 do
                 {
-                    Tuple<byte, Dictionary<int, int>> data = await search.RequestAndParseNew(cmdOutput, ix, rmSign, rmThrough);
-                    ToReplyStatus("Ok");
-                    ix = data.Item1;
-                    iteration++;
-                    search.AddKeys(dataReturn, data.Item2);
-                }
-                while (ix != 0x00 && iteration <= 5);
-            }
-            catch (Exception ex) { ToReplyStatus(ex.Message); }
-            return dataReturn.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
-        }
-
-        //DistTof
-        async private void DistTofClick(object sender, EventArgs e)
-        {
-            Button btn = (Button)sender;
-            bool auto = btn == AutoDistTof;
-            if (auto)
-            {
-                Options.autoDistTof = !Options.autoDistTof;
-                if (Options.autoDistTof)
-                {
-                    AfterDistTofEvent(auto);
-                    offTabsExcept(RMData, DistTofPage);
-                    await Task.Run(() => DistTofAsync(auto));
-                    AfterDistTofEvent(!auto);
-                    onTabPages(RMData);
-                }
-                else AutoDistTof.Enabled = false;
-            }
-            else await DistTofAsync(auto);
-        }
-        private void AfterDistTofEvent(bool sw)
-        {
-            AfterAnyAutoEvent(sw);
-            ManualDistTof.Enabled = !sw;
-            AutoDistTof.Text = sw ? "Stop" : "Auto";
-            AutoDistTof.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
-            if (!AutoDistTof.Enabled) AutoDistTof.Enabled = true;
-        }
-        async private Task DistTofAsync(bool auto)
-        {
-            Searching search = new Searching(Options.mainInterface);
-            do
-            {
-                if (!Options.mainIsAvailable) break;
-                List<DataGridViewRow> rows = new List<DataGridViewRow>();
-                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes());
-                if (data != null)
-                    foreach (int key in data.Keys)
+                    if (!Options.mainIsAvailable) break;
+                    List<DeviceData> data = new List<DeviceData>();
+                    if (SearchGetNear.Checked)
                     {
-                        rows.Add(new DataGridViewRow());
-                        rows[rows.Count - 1].CreateCells(DistTofGrid, key, data[key]);
-                        rows[rows.Count - 1].Height = 18;
+                        data = await search.GetDataFromDevice(CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes(), ThroughSignID.GetBytes());
+                        if ((SearchFindSignatireMode.Checked && SearchFindSignatireMode.Enabled) 
+                            || (SearchExtendedFindMode.Checked && SearchExtendedFindMode.Enabled))
+                        {
+                            List<DeviceData> dataNew = new List<DeviceData>();
+                            foreach (DeviceData device in data)
+                            {
+                                device.inOneBus = await ThisDeviceInOneBus(search, device);
+                                if (SearchExtendedFindMode.Checked && SearchExtendedFindMode.Enabled && device.inOneBus)
+                                {
+                                    device.iSee = await search.GetDataFromDevice(CmdOutput.GRAPH_GET_NEAR, device.devSign.GetBytes(), 0.GetBytes());
+                                    if (device.iSee.Count > 0)
+                                        dataNew.AddRange(device.iSee);
+                                }
+                            }
+                            data.AddRange(dataNew);
+                        }  
                     }
-                Action action = () => {
-                    DistTofGrid.Rows.Clear();
-                    DistTofGrid.Rows.AddRange(rows.ToArray());
-                };
-                if (InvokeRequired) Invoke(action);
-                else action();
-                await Task.Delay(auto ? Options.timeoutDistTof : 50);
-            }
-            while (Options.autoDistTof);
-        }
-
-        //GetNear
-        async private void GetNearClick(object sender, EventArgs e)
-        {
-            Button btn = (Button)sender;
-            bool auto = btn == AutoGetNear;
-            if (auto)
-            {
-                Options.autoGetNear = !Options.autoGetNear;
-                if (Options.autoGetNear)
-                {
-                    AfterGetNearEvent(auto);
-                    offTabsExcept(RMData, GetNearPage);
-                    await Task.Run(() => GetNearAsync(auto));
-                    AfterGetNearEvent(!auto);
-                    onTabPages(RMData);
-                }
-                else AutoGetNear.Enabled = false;
-            }
-            else await Task.Run(() => GetNearAsync(auto));
-        }
-        private void AfterGetNearEvent(bool sw)
-        {
-            AfterAnyAutoEvent(sw);
-            ManualGetNear.Enabled = !sw;
-            AutoGetNear.Text = sw ? "Stop" : "Auto";
-            AutoGetNear.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
-            if (!AutoGetNear.Enabled) AutoGetNear.Enabled = true;
-        }
-        async private Task GetNearAsync(bool auto)
-        {
-            Searching search = new Searching(Options.mainInterface);
-            do
-            {
-                if (!Options.mainIsAvailable) break;
-                List<DataGridViewRow> rows = new List<DataGridViewRow>();
-                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
-                List<int> inOneBus = new List<int>();
-                List<int> outOfBus = new List<int>();
-                List<int> mirrorList = new List<int>();
-
-                if ((ExtendedBox.Checked && ExtendedBox.Enabled)
-                    || (MirrorBox.Checked && MirrorBox.Enabled))
-                {
-                    foreach (int key in data.Keys)
-                        if (ThisDeviceInOneBus(search, key)) inOneBus.Add(key);
-                        else outOfBus.Add(key);
-
-                    foreach (int key in inOneBus)
+                    if (SearchDistTof.Checked)
                     {
-                        Dictionary<int, int> tempData = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, key.GetBytes());
-                        if (MirrorBox.Checked && tempData.ContainsKey((int)TargetSignID.Value)) mirrorList.Add(key);
-                        if (ExtendedBox.Checked) search.AddKeys(data, tempData);
+                        if (data.Count == 0) data = await search.GetDataFromDevice(CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes(), ThroughSignID.GetBytes());
+                        else
+                        {
+                            List<DeviceData> dataDistTof = await search.GetDataFromDevice(CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes(), ThroughSignID.GetBytes());
+                            foreach(DeviceData dDt in dataDistTof)
+                            {
+                                foreach (DeviceData dGn in data)
+                                    if (dDt.devSign == dGn.devSign)
+                                    {
+                                        dGn.devDist = dDt.devDist;
+                                        dGn.devRSSI = dDt.devRSSI;
+                                        break;
+                                    }
+                            }
+                        }
                     }
-                    data = data.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
-                }
-                foreach (int key in data.Keys)
-                {
-                    if (Options.typeOfGetNear != "<Any>"
-                        && ((DevType)data[key]).ToString() != Options.typeOfGetNear || key == TargetSignID.Value) continue;
-                    rows.Add(new DataGridViewRow());
-                    rows[rows.Count - 1].CreateCells(DistTofGrid, key, (DevType)data[key]);
-                    rows[rows.Count - 1].Height = 18;
-                    if (mirrorList.Count > 0)
-                        rows[rows.Count - 1].DefaultCellStyle.BackColor = 
-                            mirrorList.Contains(key) ? mirClr : Color.White;
-                }
-                Action action = () =>
-                {
-                    GetNearGrid.Rows.Clear();
-                    GetNearGrid.Rows.AddRange(rows.ToArray());
-                };
-                if (InvokeRequired) Invoke(action);
-                else action();
+                    data = data.OrderBy(s => s.devSign).GroupBy(a => a.devSign).Select(g => g.First()).ToList();
 
-                if (auto && rows.Count > 0 && KnockKnockBox.Checked)
-                {
-                    Options.autoGetNear = false;
-                    if (Options.showMessages)
-                        NotifyMessage.ShowBalloonTip(5, "Тук-тук!", $"Ответ получен!", ToolTipIcon.Info);
-                }
+                    if (SearchFilterMode.Checked && SearchFilterMode.Enabled && Options.devTypesSearch.Count > 0)
+                        data = data.Where(x => Options.devTypesSearch.Contains(x.devType)).ToList();
 
-                await Task.Delay(auto ? Options.timeoutGetNear : 50);
+                    Action action = () =>
+                    {
+                        deviceData.Clear();
+                        foreach (DeviceData dData in data)
+                        {
+                            deviceData.Add(dData);
+                            if (SearchFindSignatireMode.Checked && SearchFindSignatireMode.Enabled)
+                                SearchGrid.Rows[data.IndexOf(dData)].DefaultCellStyle.BackColor = dData.inOneBus ? mirClr : Color.White;
+                        }
+                        
+                    };
+                    if (InvokeRequired) Invoke(action);
+                    else action();
+
+                    if (SearchKnockMode.Checked && data.Count > 0)
+                    {
+                        Options.autoSearch = false;
+                        if (Options.showMessages)
+                            NotifyMessage.ShowBalloonTip(5, "Тук-тук!", $"Ответ получен!", ToolTipIcon.Info);
+                    }
+                    await Task.Delay(Options.autoSearch ? Options.timeoutSearch : 50);
+                }
+                while (Options.autoSearch);
+                Options.autoSearch = false;
             }
-            while (Options.autoGetNear);
         }
-        private bool ThisDeviceInOneBus(Searching search, int device) {
+        async private Task<bool> ThisDeviceInOneBus(CommandsOutput search, DeviceData device)
+        {
             try {
-                return 
-                    search.GetData(
-                        search.FormatCmdOut(device.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50) != null;
+                await search.GetData(search.FormatCmdOut(device.devSign.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 35);
+                return true;
             }
             catch { return false; }
         }
@@ -899,6 +866,8 @@ namespace RMDebugger
                 ? new BootloaderNew(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
                 : new BootloaderNew(Options.mainInterface, TargetSignID.GetBytes()))
             {
+                boot.ToReply += ToReplyStatus;
+                boot.ToDebug += ToDebuggerWindow;
                 try { boot.SetQueueFromHex(Options.hexPath); }
                 catch (Exception ex) { ToMessageStatus(ex.Message); return; }
 
@@ -912,12 +881,10 @@ namespace RMDebugger
                         try
                         {
                             Tuple<byte[], ProtocolReply> replyes = await boot.GetData(cmdOut, cmdOut.Length, receiveDelay);
-                            ToReplyStatus(replyes.Item2.ToString());
                             return true;
                         }
                         catch (Exception ex)
                         {
-                            ToReplyStatus(ex.Message);
                             if (ex.Message == "devNull") return false;
                             if ((DateTime.Now - t0).Seconds >= Options.hexTimeout)
                             {
@@ -961,7 +928,7 @@ namespace RMDebugger
                 string timeUplod = $"{stopwatchQueue.Elapsed.Minutes:00}:{stopwatchQueue.Elapsed.Seconds:00}:{stopwatchQueue.Elapsed.Milliseconds:000}";
                 if (Options.HexUploadState)
                 {
-                    Invoke((MethodInvoker)(() => { MessageStatus.Text = $"Firmware OK | Uploaded for " + timeUplod; }));
+                    ToMessageStatus($"Firmware OK | Uploaded for " + timeUplod);
                     if (Options.showMessages)
                         NotifyMessage.ShowBalloonTip(5,
                             "Прошивка устройства",
@@ -1109,12 +1076,16 @@ namespace RMDebugger
                 ? new Configuration(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
                 : new Configuration(Options.mainInterface, TargetSignID.GetBytes());
 
+
             if (RMLRModeCheck.Checked && !NeedThrough.Checked)
             {
                 if (await RMLRMode(config))
                     config = new Configuration(Options.mainInterface, config._targetSign, TargetSignID.GetBytes());
                 else return;
             }
+
+            config.ToReply += ToReplyStatus;
+            config.ToDebug += ToDebuggerWindow;
 
             foreach (FieldConfiguration field in fieldsData)
             {
@@ -1134,12 +1105,10 @@ namespace RMDebugger
                             ToMessageStatus($"{field.fieldName}");
                             reply = await config.GetData(cmdOut, sizeData);
                             cmdIn = config.ReturnWithoutThrough(reply.Item1);
-                            ToReplyStatus(reply.Item2.ToString());
                             break;
                         }
                         catch (Exception ex) 
                         {
-                            ToReplyStatus(ex.Message);
                             if (ex.Message == "devNull") return;
                         }
                         await Task.Delay(50);
@@ -1207,6 +1176,9 @@ namespace RMDebugger
                 else return;
             }
 
+            config.ToReply += ToReplyStatus;
+            config.ToDebug += ToDebuggerWindow;
+
             config.factory = ConfigFactoryCheck.Checked;
 
             int sizeData = (int)CmdMaxSize.ONLINE;
@@ -1228,7 +1200,6 @@ namespace RMDebugger
                             try
                             {
                                 reply = await config.GetResult(cmdOut, sizeData);
-                                ToReplyStatus(reply.Item2.ToString());
                                 ToMessageStatus($"{field.fieldName} : {reply.Item1}");
                                 if (reply.Item1 == RmResult.Ok)
                                 {
@@ -1239,7 +1210,6 @@ namespace RMDebugger
                             }
                             catch (Exception ex)
                             {
-                                ToReplyStatus(ex.Message);
                                 if (ex.Message == "devNull") return;
                             }
                             await Task.Delay(50);
@@ -1265,41 +1235,45 @@ namespace RMDebugger
             switch (e.Node.Name)
             {
                 case "GetNearInfo":
-                    Searching search = new Searching(Options.mainInterface);
-                    Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
-                    string radio = data.Count > 0 ? "Ok" : "Null";
-                    e.Node.Nodes.Clear();
-                    TreeNode getnear = new TreeNode($"Radio: {radio}");
-                    e.Node.Nodes.Add(getnear);
-                    InfoFieldsGrid.Rows[(int)InfoGrid.Radio].Cells[1].Value = radio;
-                    if (data.Count > 0)
+                    using (Searching search = new Searching(Options.mainInterface))
                     {
-                        e.Node.Expand();
-                        Dictionary<string, List<int>> typeNodesData = new Dictionary<string, List<int>>();
-                        foreach (int key in data.Keys)
+                        search.ToReply += ToReplyStatus;
+                        search.ToDebug += ToDebuggerWindow;
+                        List<DeviceData> data = await search.GetDataFromDevice(CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes(), ThroughSignID.GetBytes());
+                        string radio = data.Count > 0 ? "Ok" : "Null";
+                        e.Node.Nodes.Clear();
+                        TreeNode getnear = new TreeNode($"Radio: {radio}");
+                        e.Node.Nodes.Add(getnear);
+                        InfoFieldsGrid.Rows[(int)InfoGrid.Radio].Cells[1].Value = radio;
+                        if (data.Count > 0)
                         {
-                            string type = $"{(DevType)data[key]}";
-                            if (!typeNodesData.ContainsKey(type)) typeNodesData[type] = new List<int>();
-                            typeNodesData[type].Add(key);
-                        }
+                            e.Node.Expand();
+                            Dictionary<string, List<int>> typeNodesData = new Dictionary<string, List<int>>();
+                            foreach(DeviceData device in data)
+                            {
+                                string type = $"{device.devType}";
+                                if (!typeNodesData.ContainsKey(type)) typeNodesData[type] = new List<int>();
+                                typeNodesData[type].Add(device.devSign);
+                            }
 
-                        List<TreeNode> typeNodesList = new List<TreeNode>();
-                        foreach (string key in typeNodesData.Keys)
-                        {
-                            TreeNode typeNode = new TreeNode($"{key}: {typeNodesData[key].Count}");
-                            foreach (int sign in typeNodesData[key]) 
-                                typeNode.Nodes.Add(
-                                    new TreeNode($"{sign}") 
-                                    {
-                                        ToolTipText = $"Нажмите на сигнатуру {sign}, что бы опросить",
-                                        ForeColor = SystemColors.HotTrack
-                                    });
-                            typeNodesList.Add(typeNode);
+                            List<TreeNode> typeNodesList = new List<TreeNode>();
+                            foreach (string key in typeNodesData.Keys)
+                            {
+                                TreeNode typeNode = new TreeNode($"{key}: {typeNodesData[key].Count}");
+                                foreach (int sign in typeNodesData[key])
+                                    typeNode.Nodes.Add(
+                                        new TreeNode($"{sign}")
+                                        {
+                                            ToolTipText = $"Нажмите на сигнатуру {sign}, что бы опросить",
+                                            ForeColor = SystemColors.HotTrack
+                                        });
+                                typeNodesList.Add(typeNode);
+                            }
+                            getnear.Nodes.AddRange(typeNodesList.ToArray());
+                            getnear.Expand();
                         }
-                        getnear.Nodes.AddRange(typeNodesList.ToArray());
-                        getnear.Expand();
-                    }
-                    e.Node.Expand();
+                        e.Node.Expand();
+                    };
                     return;
                 case "WhoAreYouInfo":
                     GetInfoAboutDevice(CmdOutput.GRAPH_WHO_ARE_YOU, e.Node);
@@ -1312,29 +1286,31 @@ namespace RMDebugger
         }
         async private void GetInfoAboutDevice(CmdOutput cmdOutput, TreeNode treeNode)
         {
-            Information info = NeedThrough.Checked 
+            using (Information info = NeedThrough.Checked
                 ? new Information(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
-                : new Information(Options.mainInterface, TargetSignID.GetBytes());
-
-            byte[] cmdOut = info.buildCmdDelegate(cmdOutput);
-            int size = !NeedThrough.Checked ? (int)cmdOutput : (int)cmdOutput + 4;
-            treeNode.Nodes.Clear();
-            try
+                : new Information(Options.mainInterface, TargetSignID.GetBytes()))
             {
-                Tuple<byte[], ProtocolReply> reply = await info.GetData(cmdOut, size);
-                ToReplyStatus(reply.Item2.ToString());
-                byte[] cmdIn = info.ReturnWithoutThrough(reply.Item1);
-                Dictionary<string, string> data = info.CmdInParse(cmdIn);
-                data.Add("Date", DateTime.Now.ToString("dd-MM-yy HH:mm"));
-                foreach (string str in data.Keys)
+                info.ToReply += ToReplyStatus;
+                info.ToDebug += ToDebuggerWindow;
+                byte[] cmdOut = info.buildCmdDelegate(cmdOutput);
+                int size = !NeedThrough.Checked ? (int)cmdOutput : (int)cmdOutput + 4;
+                treeNode.Nodes.Clear();
+                try
                 {
-                    treeNode.Nodes.Add($"{str}: {data[str]}");
-                    if (Enum.GetNames(typeof(InfoGrid)).Contains(str))
-                        InfoFieldsGrid.Rows[(int)Enum.Parse(typeof(InfoGrid), str)].Cells[1].Value = data[str];
+                    Tuple<byte[], ProtocolReply> reply = await info.GetData(cmdOut, size);
+                    byte[] cmdIn = info.ReturnWithoutThrough(reply.Item1);
+                    Dictionary<string, string> data = info.CmdInParse(cmdIn);
+                    data.Add("Date", DateTime.Now.ToString("dd-MM-yy HH:mm"));
+                    foreach (string str in data.Keys)
+                    {
+                        treeNode.Nodes.Add($"{str}: {data[str]}");
+                        if (Enum.GetNames(typeof(InfoGrid)).Contains(str))
+                            InfoFieldsGrid.Rows[(int)Enum.Parse(typeof(InfoGrid), str)].Cells[1].Value = data[str];
+                    }
+                    treeNode.Expand();
                 }
-                treeNode.Expand();
-            }
-            catch (Exception ex) { ToReplyStatus(ex.Message); }
+                catch { }
+            };
         }
         private void OpenCloseMenuInfoTree_Click(object sender, EventArgs e)
         {
@@ -1556,6 +1532,7 @@ namespace RMDebugger
 
         async private Task StartTestNew(ForTests forTests)
         {
+            forTests.TestDebug += ToDebuggerWindow;
             do {
                 for (int i = 0; i < 4 && Options.RS485TestState && Options.mainIsAvailable; i++)
                 {
@@ -1589,24 +1566,29 @@ namespace RMDebugger
             while (Options.RS485TestState && Options.mainIsAvailable);
         }
 
+        async Task<DeviceClass> GetDeviceInfo(Searching search, ushort sign)
+        {
+            Tuple<byte[], ProtocolReply> replyes =
+                    await search.GetData(search.FormatCmdOut(sign.GetBytes(), CmdOutput.STATUS, 0xff),
+                        (int)CmdMaxSize.STATUS, 25);
+            return new DeviceClass()
+            {
+                devSign = sign,
+                devType = search.GetType(replyes.Item1),
+                devVer = search.GetVersion(replyes.Item1),
+            };
+        }
+
         // //Add signature from Target numeric
         async private void AddTargetSignID(object sender, EventArgs e)
         {
-            Searching search = new Searching(Options.mainInterface);
-            byte[] cmdOut = search.FormatCmdOut(TargetSignID.GetBytes(), CmdOutput.STATUS, 0xff);
-            Tuple<byte[], ProtocolReply> replyes;
-            try
+            using (Searching search = new Searching(Options.mainInterface))
             {
-                replyes = await search.GetData(cmdOut, (int)CmdMaxSize.STATUS, 50);
-                DeviceClass device = new DeviceClass
-                {
-                    devSign = (int)TargetSignID.Value,
-                    devType = search.GetType(replyes.Item1),
-                    devVer = search.GetVersion(replyes.Item1)
-                };
-                AddToGridDevice(device);
+                search.ToReply += ToReplyStatus;                                                                                                                                                        
+                search.ToDebug += ToDebuggerWindow;
+                try { AddToGridDevice(await GetDeviceInfo(search, (ushort)TargetSignID.Value)); }
+                catch { }
             }
-            catch (Exception ex) { ToReplyStatus(ex.Message); }
         }
 
         // //Manual scan
@@ -1644,32 +1626,27 @@ namespace RMDebugger
         }
         async private Task ManualScanRange()
         {
-            List<DeviceClass> devices = await Task.Run( async () =>
+            List<DeviceClass> devices = await Task.Run(async () =>
             {
-                Searching search = new Searching(Options.mainInterface);
-                List<DeviceClass> devices = new List<DeviceClass>();
-                int newDevices = 0;
-                for (int i = (int)minSigToScan.Value; i <= maxSigToScan.Value && Options.RS485ManualScanState; i++)
+                using (Searching search = new Searching(Options.mainInterface))
                 {
-                    string deviceCount = newDevices > 0 ? $" (Catched: {newDevices})" : "";
-                    Tuple<byte[], ProtocolReply> replyes;
-                    try
+                    search.ToReply += ToReplyStatus;
+                    search.ToDebug += ToDebuggerWindow;
+                    List<DeviceClass> devices = new List<DeviceClass>();
+                    int newDevices = 0;
+                    for (int i = (int)minSigToScan.Value; i <= maxSigToScan.Value && Options.RS485ManualScanState; i++)
                     {
-                        ToMessageStatus($"Signature: {i} {deviceCount}");
-                        replyes = await search.GetData(
-                            search.FormatCmdOut(i.GetBytes(),
-                            CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 25);
-                        devices.Add(new DeviceClass
+                        string deviceCount = newDevices > 0 ? $" (Catched: {newDevices})" : "";
+                        try
                         {
-                            devSign = i,
-                            devType = search.GetType(replyes.Item1),
-                            devVer = search.GetVersion(replyes.Item1)
-                        });
-                        newDevices++;
+                            ToMessageStatus($"Signature: {i} {deviceCount}");
+                            devices.Add(await GetDeviceInfo(search, (ushort)i));
+                            newDevices++;
+                        }
+                        catch { }
                     }
-                    catch { }
-                }
-                return devices;
+                    return devices;
+                };
             });
             AddToGridDevices(devices);
         }
@@ -1701,32 +1678,29 @@ namespace RMDebugger
         {
             List<DeviceClass> devices = await Task.Run(async () =>
             {
-                Searching search = new Searching(Options.mainInterface);
-                List<DeviceClass> devices = new List<DeviceClass>();
-                Dictionary<int, int> data = await GetDeviceListInfo(search, CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes());
-                if (data.Count > 0)
+                using (Searching search = new Searching(Options.mainInterface))
                 {
-                    data[(int)TargetSignID.Value] = 0;
-                    foreach (int sign in data.Keys)
+                    search.ToReply += ToReplyStatus;
+                    search.ToDebug += ToDebuggerWindow;
+                    List<DeviceClass> devices = new List<DeviceClass>();
+                    try
                     {
-                        Tuple<byte[], ProtocolReply> replyes;
-                        try
+                        DeviceClass mainDevice = await GetDeviceInfo(search, (ushort)TargetSignID.Value);
+                        devices.Add(mainDevice);
+                        List<DeviceData> data = await search.GetDataFromDevice(CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes(), null);
+                        foreach (DeviceData device in data)
                         {
-                            ToMessageStatus($"Signature: {sign}");
-                            replyes = await search.GetData(
-                                search.FormatCmdOut(sign.GetBytes(),
-                                CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 25);
-                            devices.Add(new DeviceClass
+                            try
                             {
-                                devSign = sign,
-                                devType = search.GetType(replyes.Item1),
-                                devVer = search.GetVersion(replyes.Item1)
-                            });
+                                devices.Add(await GetDeviceInfo(search, device.devSign));
+                                ToMessageStatus($"Signature: {device.devSign}");
+                            }
+                            catch { }
                         }
-                        catch { }
                     }
+                    catch { }
+                    return devices;
                 }
-                return devices;
             });
             AddToGridDevices(devices);
         }
@@ -1761,12 +1735,48 @@ namespace RMDebugger
         private void MoreInfoTestRS485Click(object sender, EventArgs e)
         {
             bool sw = MoreInfoTestRS485.Text == "More info";
-            StatusRS485GridView.Columns[(int)RS485Columns.NoReply].Visible = sw;
-            StatusRS485GridView.Columns[(int)RS485Columns.BadReply].Visible = sw;
-            StatusRS485GridView.Columns[(int)RS485Columns.BadCrc].Visible = sw;
-            StatusRS485GridView.Columns[(int)RS485Columns.BadRadio].Visible = sw;
-            StatusRS485GridView.Columns[(int)RS485Columns.Nearby].Visible = sw;
+            StatusRS485GridView.Columns[(int)RS485Columns.NoReply].Visible = 
+                StatusRS485GridView.Columns[(int)RS485Columns.BadReply].Visible = 
+                StatusRS485GridView.Columns[(int)RS485Columns.BadCrc].Visible = 
+                StatusRS485GridView.Columns[(int)RS485Columns.BadRadio].Visible = 
+                StatusRS485GridView.Columns[(int)RS485Columns.Nearby].Visible = sw;
             MoreInfoTestRS485.Text = sw ? "Hide info" : "More info";
+        }
+        private BindingList<DeviceClass> GetSortedList()
+        {
+            string property = StatusRS485GridView.GetPropertyByHeader(SortedColumnCombo.SelectedItem);
+            if (byAscMenuItem.Checked)
+                return new BindingList<DeviceClass>(testerData
+                    .OrderBy(x => x[property])
+                    .ToList());
+            else if (byDescMenuItem.Checked)
+                return new BindingList<DeviceClass>(testerData
+                    .OrderByDescending(x => x[property])
+                    .ToList());
+            return null;
+        }
+        private void StatusRS485Sort()
+        {
+            BindingList<DeviceClass> testerDataNew = GetSortedList();
+            testerData.Clear();
+            foreach (DeviceClass device in testerDataNew)
+                testerData.Add(device);
+        }
+        private void ChooseSortedBy(object sender, EventArgs e)
+        {
+            ToolStripMenuItem items = (ToolStripMenuItem)sender;
+            foreach (ToolStripMenuItem item in RS485SortMenuStrip.Items) item.CheckState = CheckState.Unchecked;
+            switch (items.Name)
+            {
+                case "byAscMenuItem":
+                    SortByButton.Image = Resources.SortAscending;
+                    byAscMenuItem.Checked = true;
+                    break;
+                case "byDescMenuItem":
+                    SortByButton.Image = Resources.SortDescending;
+                    byDescMenuItem.Checked = true;
+                    break;
+            }
         }
         private void ChangeWorkTestTime(int seconds)
         {
@@ -1887,57 +1897,57 @@ namespace RMDebugger
         }
         async private Task SendCommandFromButtonTask(CmdOutput cmdOutput)
         {
-            CommandsOutput cOutput = new CommandsOutput(Options.mainInterface);
-            byte[] cmdOut;
-            switch (cmdOutput)
+            using (CommandsOutput cOutput = new CommandsOutput(Options.mainInterface))
             {
-                case CmdOutput.ONLINE:
-                    {
-                        cmdOut = cOutput.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, (byte)SetOnlineFreqNumeric.Value);
-                        if (NeedThrough.Checked) cmdOut = cOutput.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_THROUGH);
-                        break;
-                    }
-                case CmdOutput.START_BOOTLOADER:
-                case CmdOutput.STOP_BOOTLOADER:
-                    {
-                        cmdOut = cOutput.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, 0xff);
-                        if (NeedThrough.Checked) cmdOut = cOutput.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_PROG);
-                        break;
-                    }
-                default:
-                    {
-                        cmdOut = cOutput.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, 0xff);
-                        if (NeedThrough.Checked) cmdOut = cOutput.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_THROUGH);
-                        break;
-                    }
-            }
-            Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out CmdMaxSize cmdSize);
-            int size = !NeedThrough.Checked ? (int)cmdSize : (int)cmdSize + 6;
-            do
-            {
-                try
+                cOutput.ToReply += ToReplyStatus;
+                cOutput.ToDebug += ToDebuggerWindow;
+                byte[] cmdOut;
+                switch (cmdOutput)
                 {
-                    Tuple<byte[], ProtocolReply> reply = await cOutput.GetData(cmdOut, size, 50);
-                    ToReplyStatus($"{reply.Item2}");
-                    if (cmdOutput == CmdOutput.ONLINE
-                        && cOutput.CheckResult(reply.Item1) != RmResult.Ok)
-                    {
-                        ToReplyStatus($"{cOutput.CheckResult(reply.Item1)}");
-                        continue;
-                    }
-
-                    ToMessageStatus($"Успешно отправлена команда {cmdOutput}");
-                    if (Options.showMessages)
-                        NotifyMessage.ShowBalloonTip(5, 
-                            "Кнопка отработана", 
-                            $"Успешно отправлена команда {cmdOutput}", 
-                            ToolTipIcon.Info);
-                    break;
+                    case CmdOutput.ONLINE:
+                        {
+                            cmdOut = cOutput.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, (byte)SetOnlineFreqNumeric.Value);
+                            if (NeedThrough.Checked) cmdOut = cOutput.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_THROUGH);
+                            break;
+                        }
+                    case CmdOutput.START_BOOTLOADER:
+                    case CmdOutput.STOP_BOOTLOADER:
+                        {
+                            cmdOut = cOutput.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, 0xff);
+                            if (NeedThrough.Checked) cmdOut = cOutput.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_PROG);
+                            break;
+                        }
+                    default:
+                        {
+                            cmdOut = cOutput.FormatCmdOut(TargetSignID.GetBytes(), cmdOutput, 0xff);
+                            if (NeedThrough.Checked) cmdOut = cOutput.CmdThroughRm(cmdOut, ThroughSignID.GetBytes(), CmdOutput.ROUTING_THROUGH);
+                            break;
+                        }
                 }
-                catch (Exception ex) { ToReplyStatus(ex.Message); }
-                finally { await Task.Delay((int)AutoExtraButtonsTimeout.Value); }
-            }
-            while (AutoExtraButtons.Checked);
+                Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out CmdMaxSize cmdSize);
+                int size = !NeedThrough.Checked ? (int)cmdSize : (int)cmdSize + 6;
+                do
+                {
+                    try
+                    {
+                        Tuple<byte[], ProtocolReply> reply = await cOutput.GetData(cmdOut, size, 50);
+                        if (cmdOutput == CmdOutput.ONLINE
+                            && cOutput.CheckResult(reply.Item1) != RmResult.Ok)
+                            continue;
+
+                        ToMessageStatus($"Успешно отправлена команда {cmdOutput}");
+                        if (Options.showMessages)
+                            NotifyMessage.ShowBalloonTip(5,
+                                "Кнопка отработана",
+                                $"Успешно отправлена команда {cmdOutput}",
+                                ToolTipIcon.Info);
+                        break;
+                    }
+                    catch { }
+                    finally { await Task.Delay((int)AutoExtraButtonsTimeout.Value); }
+                }
+                while (AutoExtraButtons.Checked);
+            };
         }
     }
 }

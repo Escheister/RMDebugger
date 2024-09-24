@@ -24,8 +24,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>false</MapFileExtensions>
-    <ApplicationRevision>4</ApplicationRevision>
-    <ApplicationVersion>1.9.0.4</ApplicationVersion>
+    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationVersion>1.9.0.5</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -165,6 +165,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="photo_2023-04-04_20-13-58.ico" />
+    <None Include="Resources\SortDescending.png" />
+    <None Include="Resources\SortAscending.png" />
     <None Include="Resources\dinosaur.gif" />
     <None Include="Resources\DeleteTaskList.png" />
     <None Include="Resources\DeleteTable.png" />

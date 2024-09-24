@@ -87,7 +87,7 @@
             // 
             this.DEBUGState.CheckOnClick = true;
             this.DEBUGState.Name = "DEBUGState";
-            this.DEBUGState.Size = new System.Drawing.Size(180, 22);
+            this.DEBUGState.Size = new System.Drawing.Size(111, 22);
             this.DEBUGState.Text = "DEBUG";
             // 
             // ERRORState
@@ -96,7 +96,7 @@
             this.ERRORState.CheckOnClick = true;
             this.ERRORState.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ERRORState.Name = "ERRORState";
-            this.ERRORState.Size = new System.Drawing.Size(180, 22);
+            this.ERRORState.Size = new System.Drawing.Size(111, 22);
             this.ERRORState.Text = "ERROR";
             // 
             // stateLabel
@@ -128,7 +128,7 @@
             // 
             this.lowestBuffer.CheckOnClick = true;
             this.lowestBuffer.Name = "lowestBuffer";
-            this.lowestBuffer.Size = new System.Drawing.Size(180, 22);
+            this.lowestBuffer.Size = new System.Drawing.Size(119, 22);
             this.lowestBuffer.Text = "Lowest";
             // 
             // smallBuffer
@@ -137,28 +137,28 @@
             this.smallBuffer.CheckOnClick = true;
             this.smallBuffer.CheckState = System.Windows.Forms.CheckState.Checked;
             this.smallBuffer.Name = "smallBuffer";
-            this.smallBuffer.Size = new System.Drawing.Size(180, 22);
+            this.smallBuffer.Size = new System.Drawing.Size(119, 22);
             this.smallBuffer.Text = "Small";
             // 
             // normalBuffer
             // 
             this.normalBuffer.CheckOnClick = true;
             this.normalBuffer.Name = "normalBuffer";
-            this.normalBuffer.Size = new System.Drawing.Size(180, 22);
+            this.normalBuffer.Size = new System.Drawing.Size(119, 22);
             this.normalBuffer.Text = "Normal";
             // 
             // mediumBuffer
             // 
             this.mediumBuffer.CheckOnClick = true;
             this.mediumBuffer.Name = "mediumBuffer";
-            this.mediumBuffer.Size = new System.Drawing.Size(180, 22);
+            this.mediumBuffer.Size = new System.Drawing.Size(119, 22);
             this.mediumBuffer.Text = "Medium";
             // 
             // largeBuffer
             // 
             this.largeBuffer.CheckOnClick = true;
             this.largeBuffer.Name = "largeBuffer";
-            this.largeBuffer.Size = new System.Drawing.Size(180, 22);
+            this.largeBuffer.Size = new System.Drawing.Size(119, 22);
             this.largeBuffer.Text = "Large";
             // 
             // bufferLabel
@@ -220,6 +220,7 @@
             // 
             // AppendTimer
             // 
+            this.AppendTimer.Interval = 200;
             this.AppendTimer.Tick += new System.EventHandler(this.AppendTimer_Tick);
             // 
             // DataDebuggerForm

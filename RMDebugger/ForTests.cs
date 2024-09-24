@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Reflection;
+using System.Linq;
 using System;
 
 using System.Drawing;
@@ -7,7 +9,6 @@ using SearchProtocol;
 using StaticSettings;
 using ProtocolEnums;
 using CRC16;
-using System.Windows.Forms;
 
 
 namespace RMDebugger
@@ -16,10 +17,12 @@ namespace RMDebugger
     {
         public delegate byte[] BuildCmdDelegate(CmdOutput cmdOutput);
         public ForTests(object sender, List<DeviceClass> _listDeviceClass) : base(sender) => listDeviceClass = _listDeviceClass;
+        public delegate void TestDebugEvent(string msg, ProtocolReply reply);
+        public event TestDebugEvent TestDebug;
         private List<DeviceClass> listDeviceClass;
         public List<DeviceClass> ListDeviceClass { get { return listDeviceClass; } }
 
-        async private Task<Tuple<byte[], ProtocolReply>> GetDataTest(byte[] cmdOut, int size, int ms = 250)
+        async public override Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 250)
         {
             if (!Options.mainIsAvailable) throw new Exception("No interface");
             sendData(cmdOut);
@@ -28,7 +31,7 @@ namespace RMDebugger
             byte[] cmdIn = await receiveData(size, ms);
             ProtocolReply reply = GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
             message += $"{DateTime.Now:dd.HH:mm:ss:fff} : {reply,-6}<- {cmdIn.GetStringOfBytes()}\n";
-            ToLogger(message, reply);
+            TestDebug?.Invoke(message, reply);
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
         }
 
@@ -69,21 +72,21 @@ namespace RMDebugger
                 case ProtocolReply.Ok: return true;
                 case ProtocolReply.Null:
                     device.devNoReply++;
-                    break;
+                    goto default;
                 case ProtocolReply.WCrc:
                     device.devBadCRC++;
-                    break;
+                    goto default;
                 case ProtocolReply.WCmd:
                 case ProtocolReply.WSign:
                     device.devBadReply++;
-                    break;
+                    goto default;
+                default: return false;
             }
-            return false;
         }
 
         async public Task GetDataFromDevice(DeviceClass device, CmdOutput cmdOutput)
         {
-            Tuple <byte[], ProtocolReply> reply = await GetDataTest(
+            Tuple <byte[], ProtocolReply> reply = await GetData(
                 FormatCmdOut(device.devSign.GetBytes(), cmdOutput, 0xff), 
                 GetSizeCMD(cmdOutput, device.devType), 100);
             device.devTx++;
@@ -109,46 +112,52 @@ namespace RMDebugger
             }
             device.devRx++;
         }
+
         async public Task GetRadioDataFromDevice(DeviceClass device, CmdOutput cmdOutput)
         {
-            Dictionary<int, int> radioData = new Dictionary<int, int>();
+            List<DeviceData> deviceDataList = new List<DeviceData>();
             Tuple<byte[], ProtocolReply> reply;
-            Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out CmdMaxSize cmdInSize);
             byte ix = 0x00;
-            int iteration = 1;
+            byte iteration = 1;
+            Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOutput), out CmdMaxSize cmdOutSize);
             do
             {
                 byte[] cmdOut = FormatCmdOut(device.devSign.GetBytes(), cmdOutput, ix);
-                reply = await GetDataTest(cmdOut, (int)cmdInSize, 100);
+                reply = await GetData(cmdOut, (int)cmdOutSize, 100);
                 device.devTx++;
                 if (!AddValueToDevice(device, reply.Item2)) break;
                 try
                 {
-                    ix = reply.Item1[4];
-                    if (cmdOutput == CmdOutput.GRAPH_GET_NEAR)
+                    IEnumerable<DeviceData> _List = GetDataDevices(cmdOutput, reply.Item1, out ix);
+                    if (cmdOutput == CmdOutput.GRAPH_GET_NEAR && _List.Count() == 0)
                     {
-                        Dictionary<int, int> tempDict = GET_NEAR(reply.Item1);
-                        if (ListDeviceClass.Count > 1 && tempDict.Count == 0)
-                        {
-                            device.devBadRadio++;
-                            device.devNearbyDevs = tempDict.Count;
-                            return;
-                        }
-                        AddKeys(radioData, tempDict);
+                        device.devBadRadio++;
+                        return;
                     }
+                    deviceDataList.AddRange(_List);
+                    iteration++;
+                    device.devRx++;
                 }
-                catch  { device.devBadReply++; }
-                device.devRx++;
+                catch { device.devBadReply++; }
             }
             while (ix != 0x00 && iteration <= 5);
             if (cmdOutput == CmdOutput.GRAPH_GET_NEAR)
-                device.devNearbyDevs = radioData.Count;
+                device.devNearbyDevs = deviceDataList.Count;
         }
     }
 
     internal class DeviceClass
     {
         public DeviceClass() { }
+        public object this[string propertyName]
+        {
+            get
+            {
+                Type myType = typeof(DeviceClass);
+                PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+                return myPropInfo.GetValue(this, null);
+            }
+        }
         public void Reset()
         {
             DeviceRx = 0;
@@ -217,7 +226,12 @@ namespace RMDebugger
             }
         }
 
-        private int SetError() => devErrors = DeviceNoReply + DeviceBadCRC + DeviceBadReply + DeviceBadRadio;
+        private int SetError() => 
+            devErrors = 
+                DeviceNoReply + 
+                DeviceBadCRC + 
+                DeviceBadReply + 
+                DeviceBadRadio;
 
         private int DeviceNoReply;
         public int devNoReply

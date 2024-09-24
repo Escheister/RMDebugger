@@ -120,14 +120,17 @@
   <metadata name="mainPort.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <metadata name="SignDistTof.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
+  <metadata name="SearchFilterMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>694, 54</value>
   </metadata>
   <metadata name="ToolTipHelper.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>347, 17</value>
   </metadata>
+  <metadata name="SearchFindSignatureColorMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>327, 54</value>
+  </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="MirrorColorButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="SearchChangeColorMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
         JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAA/0lE
@@ -138,13 +141,7 @@
         1aTmDAhknRlvNAzjCTxtnKHlXdZSAAAAAElFTkSuQmCC
 </value>
   </data>
-  <metadata name="SignGetNear.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="TypeGetNear.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <data name="AutoGetNear.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="SearchAutoButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
         JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAAs0lE
@@ -154,19 +151,18 @@
         llyuNVsAAAAASUVORK5CYII=
 </value>
   </data>
-  <metadata name="DistTofPage.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="signSearch.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="AutoDistTof.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
-        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAAs0lE
-        QVQ4T2P4//8/2RiroHyDfAAQI8MAbOpQOEBFBkD8AIj/Y8EgcQNk9egaP0AV4sIgebgByJpRbCzeUIys
-        CRk/QNEMFAD5EUURCJx4cOK/9QRrFHEoBocBTDMIoiiAgU8/Pv1v3NGIIgfEDUApwpphAM0bxGkG2Zy6
-        IhVFDohRNGP1864bu/7rduiiiEMxws8gDBRACW0stsEwamhDNZMfz0gGkJ7CkDFQEelpmzT8nwEAhuwE
-        llyuNVsAAAAASUVORK5CYII=
-</value>
-  </data>
+  <metadata name="typeSearch.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="distSearch.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="rssiSearch.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <data name="HexUploadButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
@@ -191,6 +187,14 @@
   <metadata name="ConfigAddField.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="ConfigAddField.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAALElE
+        QVQ4T2OgKZBvkP8PZZIHRg0gwQCQQlIxVCt+QLRCXGDUACoYQAfAwAAADmsrdnmTTREAAAAASUVORK5C
+        YII=
+</value>
+  </data>
   <metadata name="ConfigFieldTextBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -200,7 +204,7 @@
   <metadata name="RMLRModeCheck.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="RGBBMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <metadata name="RMLRMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 54</value>
   </metadata>
   <data name="RMLRModeCheck.ToolTip" xml:space="preserve">
@@ -209,6 +213,24 @@
   </data>
   <metadata name="ConfigFactoryCheck.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
+  </metadata>
+  <metadata name="ConfigDataGrid.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="FieldsColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="EnabledColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="LoadFieldColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="UploadFieldColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="ConfigClearMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>155, 54</value>
   </metadata>
   <metadata name="UploadConfigButton.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -240,30 +262,56 @@
         /G3OBOiq16lCnEkHuLDUdEMe/2YeCeATYLC0UFQVY+QAAAAASUVORK5CYII=
 </value>
   </data>
-  <metadata name="ConfigDataGrid.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="FieldsColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="EnabledColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="LoadFieldColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="UploadFieldColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="ConfigClearMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>155, 54</value>
-  </metadata>
   <metadata name="InfoFieldRow.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="InfoValueRow.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <metadata name="RS485SortMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>533, 54</value>
+  </metadata>
+  <data name="byAscMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAA1ElE
+        QVQ4T2MYhCB2138oCwUoKysbKyoq/gfRUCEcAIcBQM0zgXg+EM+ACuEAWAzQ0tLiUVBQuCMuLs4NNOCe
+        iooKH1QKC8BiAFBzOsj5MAzkp0GlsADsBpyRl5c3ALFBNIgPlsAKcIQB8YAWBiD7H4ahUlgAHhcANeoB
+        8X1gGORBhZBA/HYFMA0zAMaHAqAmd6DmZ0DsCxVCAlG7lRhidr0CarYHGxC92wFIv2SI3S0HkgZFGxA/
+        xJ8KY3Y6QQ35D9Yct9MOKkNCGEAMuY6smcaAgQEAtvZYFGTy7z4AAAAASUVORK5CYII=
+</value>
+  </data>
+  <data name="byDescMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAA10lE
+        QVQ4T2MYZCBupx1DzK7rDDE7naAicKCsrGysqKj4H0RDhdAASHPsrpdA/B9oyCt0Q4CaZwLxfCCeARVC
+        ArG75cCao3c7gA2I3WUPNiRqtxJIWktLi0dBQeGOuLg4N9CAeyoqKnxgfSggfrsCmAYZAAIwPhAANaeD
+        nA/DQH4aVAoLgBmABIAazsjLyxuA2CAaxAdLYAVYDCAN0MIAZP/DMFQKC8DjAqBGPSC+DwyDPKgQFoDD
+        AKAmd6DmZ0DsCxXCAbAYAIo2IH6IOxUiA1qGAQ0AAwMAfJtYFHtOnjMAAAAASUVORK5CYII=
+</value>
+  </data>
+  <data name="SortByButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAA1ElE
+        QVQ4T2MYhCB2138oCwUoKysbKyoq/gfRUCEcAIcBQM0zgXg+EM+ACuEAWAzQ0tLiUVBQuCMuLs4NNOCe
+        iooKH1QKC8BiAFBzOsj5MAzkp0GlsADsBpyRl5c3ALFBNIgPlsAKcIQB8YAWBiD7H4ahUlgAHhcANeoB
+        8X1gGORBhZBA/HYFMA0zAMaHAqAmd6DmZ0DsCxVCAlG7lRhidr0CarYHGxC92wFIv2SI3S0HkgZFGxA/
+        xJ8KY3Y6QQ35D9Yct9MOKkNCGEAMuY6smcaAgQEAtvZYFGTy7z4AAAAASUVORK5CYII=
+</value>
+  </data>
+  <data name="MoreInfoTestRS485.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAABEUlE
+        QVQ4T82SSw6CQBBEWXgJN8hH497PRlROpcZ7GOMJFC8h8ST+PYOs9HVoIjPizoWVVAa6q4qmM87P4fv+
+        CG7h3fO8jPMGkyAIhiqpRhzHNYQreMQ4CcOwg8mVk/ep1peiU4sJNe8wNF3XrQsJiErPLfqphKjlDYpj
+        mgfbTO1JbVAOQXuSnlpzINzSmBTCgmVzQXQzuFZrDgLu8q+2WCawa3y9R8BVrTkoZDTom+KqALQN+FBr
+        Dp2ga4urAqj1PyagmFD82MGXgDlacweMP6RxlC1bYiMAYxteZLlqfYPGEkNqh5TN9PecC7WYkBsmIfAM
+        Z7JtWSymPpSxL2L+ehMLYIoQbuAVZnquK8f+AzjOC0Z1bX/qgHHCAAAAAElFTkSuQmCC
+</value>
+  </data>
   <data name="SaveLogTestRS485.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
@@ -347,7 +395,7 @@
         TkSuQmCC
 </value>
   </data>
-  <metadata name="Interface.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="InterfaceStatusRM.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="SignStatusRM.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -392,9 +440,6 @@
   <metadata name="VerStatusRM.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="SearchMirrorColorMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>327, 54</value>
-  </metadata>
   <metadata name="statusStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>126, 17</value>
   </metadata>
@@ -429,6 +474,18 @@
         JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAAAV0lE
         QVQ4T2PABhQUFI4qKir+h2Eg/zBUijgA0gRlggE6HwMg20YshmpFAJCgnJycJCGMVTMIUNUAGBudhrGh
         WlDBqAHDzgB8mKYGPABJEoEfQLUAAQMDAOE0kkF4hF42AAAAAElFTkSuQmCC
+</value>
+  </data>
+  <data name="toolStripMenuItem1.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA68AAAOvAGVvHJJAAABT0lE
+        QVQ4T7WTzU3DUBCEXQICcSAYx5bdgKkDEuggF37aIJwJVBBfsCsAux+iII6hgvCNM5GV8HeBlUa73tnZ
+        fe9lE/ybJUlyC5bG2OmfLY7jK1CGYbiLr/v9/kigQeNcqRqXbxrEJXgBBYJX/DviPE3TY8Xk5vgpmIHP
+        TUhWKoii6AA/RPygWFBMbmCuAKVlnVG0AzHDnzH1iPheJ/HkiXLEp/rWdSxbGckxRTVYeNoEPFF4mGVZ
+        CC9uYm4BamksbxssIUe6r46pKRKaDjx97uvkqpXGdNdA5G8NNOSrBmPQcDS9fHsFvms1sVjcnTn9Io00
+        lq8Mcv2I5xK5yVxQrBwnOCF+o/G+ZZ1BaEkKHRM/0DTFgicPzWkXKss6I7lepClT20XyfXPFzmkHdMpr
+        yzYN8gJUvV5vD/9M4fYqP34r3jZEetj1n+nG6b+2IPgAzHGHcFUSC1YAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="clearSettingsToolStrip.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -598,7 +655,7 @@
     <value>590, 17</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>145</value>
+    <value>175</value>
   </metadata>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

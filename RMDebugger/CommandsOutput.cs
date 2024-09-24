@@ -17,6 +17,12 @@ namespace RMDebugger
         protected delegate void SendDataDelegate(byte[] cmdOut);
         protected delegate Task<byte[]> ReceiveDataDelegate(int length, int ms = 250);
         public delegate void ClearBufferDelegate();
+
+        public delegate void GetReplyEvent(string msg);
+        public delegate void GetDebugEvent(string msg, ProtocolReply reply);
+        public event GetReplyEvent ToReply;
+        public event GetDebugEvent ToDebug;
+
         public CommandsOutput(object sender) { GetTypeDevice(sender); }
         public virtual void Dispose()
         {
@@ -26,6 +32,7 @@ namespace RMDebugger
         protected virtual void Dispose(bool disposing)
         {
         }
+
 
         protected SerialPort Port;
         protected Socket Sock;
@@ -102,7 +109,8 @@ namespace RMDebugger
         }
         protected ProtocolReply GetDataReply(byte[] bufferIn, byte[] bufferOut)
         {
-            if (!DataEqual(bufferIn, bufferOut)) return ProtocolReply.WData;
+            if (bufferIn.Length != bufferOut.Length 
+                || !DataEqual(bufferIn, bufferOut)) return ProtocolReply.WData;
             return ProtocolReply.Ok;
         }
         protected bool SignatureEqual(byte[] bufferIn, byte[] rmSign)
@@ -134,22 +142,17 @@ namespace RMDebugger
         {
             try
             {
-                return cmdMain == (CmdInput)((bufferIn[6] << 8) | bufferIn[7])
-                    && cmdThrough == (CmdInput)((bufferIn[2] << 8) | bufferIn[3]);
+                return cmdMain ==       (CmdInput)((bufferIn[6] << 8) | bufferIn[7])
+                    && cmdThrough ==    (CmdInput)((bufferIn[2] << 8) | bufferIn[3]);
             }
             catch { return false; }
         }
         protected bool DataEqual(byte[] bufferIn, byte[] bufferOut)
         {
+            int start = through ? 8 : 4;
+            int crap = through ? 12 : 6;
             try
             {
-                int start = 4;
-                int crap = 6;
-                if (Options.through)
-                {
-                    start += 8;
-                    crap += 12;
-                }
                 byte[] data_out = new byte[bufferOut.Length - crap];
                 byte[] data_in = new byte[bufferOut.Length - crap];
                 Array.Copy(bufferOut, start, data_out, 0, data_out.Length);
@@ -158,6 +161,7 @@ namespace RMDebugger
             }
             catch { return false; }
         }
+
         public RmResult CheckResult(byte[] bufferIn)
         {
             try { return (RmResult)bufferIn[bufferIn.Length - 3]; }
@@ -233,67 +237,43 @@ namespace RMDebugger
         async public Task<Tuple<RmResult, ProtocolReply>> GetResult(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");
-
             sendData(cmdOut);
             string message = $"{DateTime.Now:dd.HH:mm:ss:fff} : {"send",-6}-> {cmdOut.GetStringOfBytes()}\n";
-
             Task<byte[]> receiveTask = receiveData(size, Options.through ? ms * 2 : ms);
-
             PraseCmd(cmdOut, out CmdInput cmdMain, out CmdInput cmdThrough);
-
             await Task.WhenAll(receiveTask);
-
             byte[] cmdIn = receiveTask.Result;
-
             ProtocolReply reply = through
                 ? GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
                                           new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
                 : GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
-
+            ToReply?.Invoke(reply.ToString());
             message += $"{DateTime.Now:dd.HH:mm:ss:fff} : {reply,-6}<- {cmdIn.GetStringOfBytes()}\n";
-            ToLogger(message, reply);
-
+            ToDebug?.Invoke(message, reply);
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
-
             return new Tuple<RmResult, ProtocolReply>(CheckResult(cmdIn), reply);
         }
-        async public Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 50)
+        async public virtual Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");
-
             sendData(cmdOut);
             string message = $"{DateTime.Now:dd.HH:mm:ss:fff} : {"send",-6}-> {cmdOut.GetStringOfBytes()}\n";
-
             Task<byte[]> receiveTask = receiveData(size, Options.through ? ms * 2 : ms);
-
             PraseCmd(cmdOut, out CmdInput cmdMain, out CmdInput cmdThrough);
-
             await Task.WhenAll(receiveTask);
-
             byte[] cmdIn = receiveTask.Result;
-
             ProtocolReply reply = through
-                ? GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
-                                          new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
-                : GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
-
+                ? GetReply(cmdIn,   new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
+                                    new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
+                : GetReply(cmdIn,   new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
             reply = (reply == ProtocolReply.Ok && cmdMain == CmdInput.LOAD_DATA_PAGE)
                     ? GetDataReply(cmdIn, cmdOut)
                     : reply;
-
+            ToReply?.Invoke(reply.ToString());
             message += $"{DateTime.Now:dd.HH:mm:ss:fff} : {reply,-6}<- {cmdIn.GetStringOfBytes()}\n";
-            ToLogger(message, reply);
-
+            ToDebug?.Invoke(message, reply);
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
-
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
-        }
-        protected void ToLogger(string message, ProtocolReply reply)
-        {
-            if (Options.debugForm is null) return;
-            if ((Options.logState == LogState.ERRORState && reply != ProtocolReply.Ok)
-                || Options.logState == LogState.DEBUGState)
-                Options.debugForm?.AddToQueue(message);
         }
     }
 }

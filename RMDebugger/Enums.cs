@@ -8,6 +8,7 @@
         MCS = 0x24, TABLET_OR_MRIS = 0x25, BCOM = 0x31, NAP = 0x32,
         SERVER = 0x41, DI8 = 0x50, DI7C = 0x51, NAMUR = 0x52,
         DO8 = 0x53, DO7R = 0x54, AI4 = 0x55, AI4T = 0x56, LTL9 = 0x57,
+        _ = 0x00
     }
     enum ProtocolReply : int
     {

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
 
 using ProtocolEnums;
 using RMDebugger;
@@ -20,15 +20,11 @@ namespace StaticSettings
         public static bool through { get; set; } = false;
         public static bool showMessages {  get; set; }
 
-        //DistTof
-        public static bool autoDistTof { get; set; }
-        public static int timeoutDistTof { get; set; }
+        //Search
+        public static bool autoSearch { get; set; } = false;
+        public static int timeoutSearch { get; set; } = 200;
+        public static List<DevType> devTypesSearch = new List<DevType>();
 
-        //GetNear
-        public static bool autoGetNear { get; set; }
-
-        public static int timeoutGetNear { get; set; }
-        public static string typeOfGetNear { get; set; } = "<Any>";
 
         //Hex uploader
         public static string hexPath { get; set; }
@@ -39,10 +35,6 @@ namespace StaticSettings
         //Config
         public static bool ConfigUploadState { get; set; } = false;
         public static bool ConfigLoadState { get; set; } = false;
-        public static bool RMLRRed { get; set; } = true;
-        public static bool RMLRGreen { get; set; } = true;
-        public static bool RMLRBlue { get; set; } = true;
-        public static bool RMLRBuzzer { get; set; } = true;
 
         //RS485Test
         public static bool RS485TestState { get; set; } = false;
