@@ -8,7 +8,6 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Threading;
 using Microsoft.Win32;
 using System.IO.Ports;
 using System.Drawing;
