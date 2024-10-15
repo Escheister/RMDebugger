@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Threading;
 using Microsoft.Win32;
 using System.IO.Ports;
 using System.Drawing;
@@ -83,7 +84,6 @@ namespace RMDebugger
                 SetBootloaderStopButton.Visible =
                 SetBootloaderStartButton.Visible = extendedButtonsToolStrip.Checked;
             };
-
 
             comPort.SelectedIndexChanged += (s, e) => mainPort.PortName = comPort.SelectedItem.ToString();
             BaudRate.SelectedIndexChanged += (s, e) => BaudRateSelectedIndexChanged(s, e);
@@ -198,7 +198,8 @@ namespace RMDebugger
             SetBootloaderStartButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.START_BOOTLOADER);
             SetBootloaderStopButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.STOP_BOOTLOADER);
         }
-        
+
+
         //********************
         private void MainFormLoad(object sender, EventArgs e)
         {
@@ -564,11 +565,10 @@ namespace RMDebugger
         {
             Options.pingOk =
                 Connect.Enabled = false;
-            bool ipCorrect = IPAddress.TryParse(IPaddressBox.Text, out IPAddress ipAddr);
+            bool ipCorrect = IPAddress.TryParse(IPaddressBox.Text, out IPAddress ipAddr) && IPaddressBox.Text.Split('.').Length == 4;
             PingButton.Enabled = ipCorrect;
             if (ipCorrect) ErrorMessage.Clear();
             else ErrorMessage.SetError(label13, $"Неверно задан параметр IP Address");
-            Connect.Text = "Connect";
         }
         private void PingSettings(bool sw)
         {
@@ -578,22 +578,26 @@ namespace RMDebugger
         }
         async private Task check_ip()
         {
-            int timeout = 500;
             using Ping ping = new Ping();
             byte[] buffer = new byte[32];
             PingOptions pingOptions = new PingOptions(buffer.Length, true);
             if (!IPAddress.TryParse(IPaddressBox.Text, out IPAddress ip)) return;
-            PingReply reply = await ping.SendPingAsync(ip, timeout, buffer, pingOptions);
+            PingReply reply = await ping.SendPingAsync(ip, 255, buffer, pingOptions);
             PingSettings(reply.Status == IPStatus.Success);
             if (reply.Status != IPStatus.Success) return;
             try
             {
-                for (int reconnect = 0; reconnect <= 10 && Options.pingOk;)
+                for (int reconnect = 0; reconnect <= 5 && Options.pingOk;)
                 {
-                    reply = await ping.SendPingAsync(ip, timeout, buffer, pingOptions);
-                    if (reply.Status != IPStatus.Success) reconnect++;
+                    reply = await ping.SendPingAsync(ip, 1000, buffer, pingOptions);
+
+                    if (reply.Status != IPStatus.Success)
+                    {
+                        reconnect++;
+                        continue;
+                    }
                     else if (reconnect > 0) reconnect = 0;
-                    await Task.Delay(100);
+                    await Task.Delay(250);
                 }
             }
             catch (Exception ex) { ToMessageStatus(ex.Message.ToString()); }
@@ -814,7 +818,8 @@ namespace RMDebugger
         async private Task<bool> ThisDeviceInOneBus(CommandsOutput search, DeviceData device)
         {
             try {
-                await search.GetData(search.FormatCmdOut(device.devSign.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 35);
+                await Task.Delay(1);
+                await search.GetData(search.FormatCmdOut(device.devSign.GetBytes(), CmdOutput.STATUS, 0xff), (int)CmdMaxSize.STATUS, 50);
                 return true;
             }
             catch { return false; }
@@ -857,22 +862,27 @@ namespace RMDebugger
                 SignaturePanel.Enabled = !sw;
             HexUploadButton.Text = sw ? "Stop" : "Upload";
             HexUploadButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
-            UpdateBar.Value = 0; 
+            UpdateBar.Value = 0;
             BytesStart.Text = "0";
+        }
+        private void SetHexUploadProgress(int progress = 0)
+        {
+            UpdateBar.Value = progress;
+            BytesStart.Text = progress.ToString();
         }
         async private Task HexUploadAsyncNew()
         {
-            using (BootloaderNew boot = NeedThrough.Checked
-                ? new BootloaderNew(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
-                : new BootloaderNew(Options.mainInterface, TargetSignID.GetBytes()))
+            using (Bootloader boot = NeedThrough.Checked
+                ? new Bootloader(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
+                : new Bootloader(Options.mainInterface, TargetSignID.GetBytes()))
             {
                 boot.ToReply += ToReplyStatus;
                 boot.ToDebug += ToDebuggerWindow;
+                boot.SetProgress += SetHexUploadProgress;
                 try { boot.SetQueueFromHex(Options.hexPath); }
                 catch (Exception ex) { ToMessageStatus(ex.Message); return; }
-
-                //async method
-                async Task<bool> GetReplyFromDevice(byte[] cmdOut, int receiveDelay = 50, bool taskDelay = false, int delayMs = 25)
+                //async method2
+                async Task<bool> GetReplyFromDevice(byte[] cmdOut, int receiveDelay = 50, bool taskDelay = false, int delayMs = 10)
                 {
                     DateTime t0 = DateTime.Now;
                     TimeSpan tstop = DateTime.Now - t0;
@@ -907,21 +917,14 @@ namespace RMDebugger
                 ToMessageStatus("Bootload OK");
 
                 boot.PageSize = (int)HexPageSize.Value;
-                int startFrom = boot.HexQueue.Count();
 
-                Stopwatch stopwatchQueue = new Stopwatch();
-                stopwatchQueue.Start();
+                Stopwatch stopwatchQueue = Stopwatch.StartNew();
 
                 while (boot.HexQueue.Count() > 0)
                 {
                     boot.GetDataForUpload(out byte[] dataOutput); 
                     if (!await GetReplyFromDevice(boot.buildDataCmdDelegate(dataOutput), receiveDelay: 250)) return;
                     if (!await GetReplyFromDevice(cmdConfirmData, taskDelay: true, delayMs: 10)) return;
-                    BeginInvoke((MethodInvoker)(() =>
-                    {
-                        UpdateBar.Value = boot.HexQueue.Count() > 0 ? Convert.ToInt32(100.000 - (100.000 * boot.HexQueue.Count() / startFrom)) : 0;
-                        BytesStart.Text = (startFrom - boot.HexQueue.Count()).ToString();
-                    }));
                 }
                 await GetReplyFromDevice(cmdBootStop, taskDelay: true);
                 stopwatchQueue.Stop();
@@ -973,6 +976,7 @@ namespace RMDebugger
                 Options.hexPath = HexPathBox.Text;
                 int linesCount = File.ReadLines(HexPathBox.Text).Count();
                 BytesEnd.Text = linesCount.ToString();
+                UpdateBar.Maximum = linesCount;
             }
             HexUploadButton.Enabled = exists;
             HexUploadFilename.Text = exists ? $"Filename: {Path.GetFileName(HexPathBox.Text)}" : string.Empty;
@@ -1036,7 +1040,7 @@ namespace RMDebugger
                 data.Add(RMLRGreen.Checked ? count : (byte)0);
                 data.Add(RMLRBlue.Checked ? count : (byte)0);
                 data.Add(RMLRBuzzer.Checked ? count : (byte)0);
-                return new CRC16_CCITT_FALSE().CRC_calc(data.ToArray());
+                return new CRC16_CCITT_FALSE().CrcCalc(data.ToArray());
             }
 
             Tuple<byte[], ProtocolReply> reply;
@@ -1075,17 +1079,20 @@ namespace RMDebugger
             Configuration config = NeedThrough.Checked
                 ? new Configuration(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
                 : new Configuration(Options.mainInterface, TargetSignID.GetBytes());
+            config.ToReply += ToReplyStatus;
+            config.ToDebug += ToDebuggerWindow;
 
 
             if (RMLRModeCheck.Checked && !NeedThrough.Checked)
             {
                 if (await RMLRMode(config))
+                {
                     config = new Configuration(Options.mainInterface, config._targetSign, TargetSignID.GetBytes());
+                    config.ToReply += ToReplyStatus;
+                    config.ToDebug += ToDebuggerWindow;
+                }
                 else return;
             }
-
-            config.ToReply += ToReplyStatus;
-            config.ToDebug += ToDebuggerWindow;
 
             foreach (FieldConfiguration field in fieldsData)
             {
@@ -1474,7 +1481,7 @@ namespace RMDebugger
                 foreach (string key in devices.Keys)
                 {
                     if (key == connectedInterface)
-                        tasks.Add(StartTestNew(new ForTests(Options.mainInterface, devices[key])));
+                        tasks.Add(StartTest(new ForTests(Options.mainInterface, devices[key])));
                     else tasks.Add(ConnectInterfaceAndStartTest(key.Split(':'), devices[key]));
                 }
                 await Task.WhenAll(tasks.ToArray());
@@ -1517,7 +1524,7 @@ namespace RMDebugger
                 using (Socket sockTest = new Socket(SocketType.Dgram, ProtocolType.Udp))
                 {
                     sockTest.Connect(ipAddr, Convert.ToUInt16(interfaceSettings[1]));
-                    await StartTestNew(new ForTests(sockTest, devices));
+                    await StartTest(new ForTests(sockTest, devices));
                 }
             }   
             else
@@ -1525,52 +1532,39 @@ namespace RMDebugger
                 using (SerialPort serialTest = new SerialPort(interfaceSettings[0], Convert.ToInt32(interfaceSettings[1])))
                 {
                     serialTest.Open();
-                    await StartTestNew(new ForTests(serialTest, devices));
+                    await StartTest(new ForTests(serialTest, devices));
                 };
             }
         }
-
-        async private Task StartTestNew(ForTests forTests)
+        async private Task StartTest(ForTests forTests)
         {
             forTests.TestDebug += ToDebuggerWindow;
-            do {
-                for (int i = 0; i < 4 && Options.RS485TestState && Options.mainIsAvailable; i++)
+            forTests.clearAfterError = ClearBufferSettingsTestBox.Checked;
+            Random random = new Random();
+            do
+            {
+                int getTest = random.Next(0, 101);
+                foreach (DeviceClass device in forTests.ListDeviceClass)
                 {
-                    foreach (DeviceClass device in forTests.ListDeviceClass)
-                    {
-                        if (!Options.RS485TestState || !Options.mainIsAvailable) break;
-                        if (ClearBufferSettingsTestBox.Checked) forTests.clearBuffer();
-                        switch (i)
-                        {
-                            case 0:
-                                await forTests.GetDataFromDevice(device, CmdOutput.GRAPH_WHO_ARE_YOU);
-                                break;
-                            case 1:
-                                if (RadioSettingsTestBox.Checked)
-                                    await forTests.GetRadioDataFromDevice(device, CmdOutput.GRAPH_GET_NEAR);
-                                else continue;
-                                break;
-                            case 2:
-                                await forTests.GetDataFromDevice(device, CmdOutput.STATUS);
-                                break;
-                            case 3:
-                                if (RadioSettingsTestBox.Checked)
-                                    await forTests.GetRadioDataFromDevice(device, CmdOutput.ONLINE_DIST_TOF);
-                                else continue;
-                                break;
-                        }
-                        await Task.Delay(1);
-                    }
+                    if (!Options.RS485TestState || !Options.mainIsAvailable) break;
+                    if      (getTest == 0 && RadioSettingsTestBox.Checked) 
+                            await forTests.GetRadioDataFromDevice(device, CmdOutput.GRAPH_GET_NEAR);
+                    else if (getTest == 100) 
+                            await forTests.GetRadioDataFromDevice(device, CmdOutput.ONLINE_DIST_TOF);
+                    else if (getTest == 99 && RadioSettingsTestBox.Checked) 
+                            await forTests.GetDataFromDevice(device, CmdOutput.GRAPH_WHO_ARE_YOU);
+                    else if (getTest >= 75) 
+                            await forTests.GetDataFromDevice(device, CmdOutput.STATUS);
+                    else    await forTests.GetDataFromDevice(device, CmdOutput.ROUTING_GET);
                 }
             }
             while (Options.RS485TestState && Options.mainIsAvailable);
         }
-
         async Task<DeviceClass> GetDeviceInfo(Searching search, ushort sign)
         {
             Tuple<byte[], ProtocolReply> replyes =
                     await search.GetData(search.FormatCmdOut(sign.GetBytes(), CmdOutput.STATUS, 0xff),
-                        (int)CmdMaxSize.STATUS, 25);
+                        (int)CmdMaxSize.STATUS, 35);
             return new DeviceClass()
             {
                 devSign = sign,
@@ -1614,7 +1608,7 @@ namespace RMDebugger
             StatusRS485GridView.AllowUserToDeleteRows =
                 minSigToScan.Enabled = 
                 maxSigToScan.Enabled =
-                StartTestRSButton.Enabled =  // <----------
+                StartTestRSButton.Enabled =
                 SignaturePanel.Enabled =
                 AutoScanToTest.Enabled =
                 settingsGroupBox.Enabled =

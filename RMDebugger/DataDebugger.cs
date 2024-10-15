@@ -24,10 +24,6 @@ namespace RMDebugger
         private void AddEvents()
         {
             this.FormClosed += (s, e) => { AppendTimer.Stop(); Options.debugForm = null; };
-            LogBox.TextChanged += (s, e) => {
-                if (LogBox.Lines.Length > (int)Options.logSize)
-                    LogBox.Lines = LogBox.Lines.Skip(Options.linesRemove).ToArray();
-            };
             SaveLogger.Click += (s, e) => {
                 saveFileDialog.RestoreDirectory = true;
                 if (saveFileDialog.ShowDialog() != DialogResult.Cancel)
@@ -77,15 +73,18 @@ namespace RMDebugger
                     Options.logSize = LogSize.largeBuffer;
                     break;
             }
-            Enum.TryParse(Enum.GetName(typeof(LogSize), Options.logSize), out LogLinesRemove result);
-            Options.linesRemove = (int)result;
             bufSize.CheckState = CheckState.Checked;
             bufferLabel.Text = bufSize.Text;
         }
         private void AppendTimer_Tick(object sender, EventArgs e)
         {
+            if (LogBox.Lines.Length > (int)Options.logSize)
+                LogBox.Lines = LogBox.Lines.Skip(
+                    LogBox.Lines.Length + linesQueue.Count - (int)Options.logSize)
+                    .ToArray();
             while (linesQueue.Count > 0 && linesQueue.TryDequeue(out string line))
-                LogBox.AppendText(line);
+                    LogBox.AppendText(line);
+            
         }
     }
 }

@@ -364,6 +364,11 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "Signature ID:";
             // 
+            // mainPort
+            // 
+            this.mainPort.ReadBufferSize = 512;
+            this.mainPort.WriteBufferSize = 512;
+            // 
             // RMData
             // 
             this.RMData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1818,13 +1823,15 @@
             // ClearBufferSettingsTestBox
             // 
             this.ClearBufferSettingsTestBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ClearBufferSettingsTestBox.Checked = true;
+            this.ClearBufferSettingsTestBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ClearBufferSettingsTestBox.Location = new System.Drawing.Point(3, 13);
             this.ClearBufferSettingsTestBox.Margin = new System.Windows.Forms.Padding(0);
             this.ClearBufferSettingsTestBox.Name = "ClearBufferSettingsTestBox";
             this.ClearBufferSettingsTestBox.Size = new System.Drawing.Size(80, 17);
             this.ClearBufferSettingsTestBox.TabIndex = 29;
             this.ClearBufferSettingsTestBox.Text = "Clear buffer";
-            this.ToolTipHelper.SetToolTip(this.ClearBufferSettingsTestBox, "Очистка входного и выходного буфера перед отправкой новой команды");
+            this.ToolTipHelper.SetToolTip(this.ClearBufferSettingsTestBox, "Очистка входного буфера после ошибки");
             this.ClearBufferSettingsTestBox.UseVisualStyleBackColor = true;
             // 
             // TimerSettingsTestBox
@@ -1844,13 +1851,16 @@
             // 
             this.RadioSettingsTestBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.RadioSettingsTestBox.AutoSize = true;
+            this.RadioSettingsTestBox.Checked = true;
+            this.RadioSettingsTestBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.RadioSettingsTestBox.Location = new System.Drawing.Point(3, 29);
             this.RadioSettingsTestBox.Margin = new System.Windows.Forms.Padding(0);
             this.RadioSettingsTestBox.Name = "RadioSettingsTestBox";
             this.RadioSettingsTestBox.Size = new System.Drawing.Size(54, 17);
             this.RadioSettingsTestBox.TabIndex = 27;
             this.RadioSettingsTestBox.Text = "Radio";
-            this.ToolTipHelper.SetToolTip(this.RadioSettingsTestBox, resources.GetString("RadioSettingsTestBox.ToolTip"));
+            this.ToolTipHelper.SetToolTip(this.RadioSettingsTestBox, "Включение в тестирование таких команд как Get Near и Dist Tof\r\nПри отправке коман" +
+        "ды Get Near, если кол-во устройств меньше 0, то засчитывается BadRadio");
             this.RadioSettingsTestBox.UseVisualStyleBackColor = true;
             // 
             // scanGroupBox
@@ -2063,7 +2073,6 @@
             this.RadioNearbyStatusRM,
             this.WorkTimeStatusRM,
             this.VerStatusRM});
-            this.StatusRS485GridView.ContextMenuStrip = this.RS485SortMenuStrip;
             dataGridViewCellStyle35.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle35.BackColor = System.Drawing.Color.White;
             dataGridViewCellStyle35.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
@@ -2616,7 +2625,7 @@
             this.saveToRegToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("saveToRegToolStripMenuItem.Image")));
             this.saveToRegToolStripMenuItem.Name = "saveToRegToolStripMenuItem";
             this.saveToRegToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.saveToRegToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.saveToRegToolStripMenuItem.Size = new System.Drawing.Size(184, 26);
             this.saveToRegToolStripMenuItem.Text = "Save in PC";
             this.saveToRegToolStripMenuItem.ToolTipText = "Выполняет сохранение настройки пользователя в реестр";
             this.saveToRegToolStripMenuItem.Click += new System.EventHandler(this.saveToRegToolStripMenuItem_Click);
@@ -2626,7 +2635,7 @@
             this.loadFromPCToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("loadFromPCToolStripMenuItem.Image")));
             this.loadFromPCToolStripMenuItem.Name = "loadFromPCToolStripMenuItem";
             this.loadFromPCToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.loadFromPCToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.loadFromPCToolStripMenuItem.Size = new System.Drawing.Size(184, 26);
             this.loadFromPCToolStripMenuItem.Text = "Load from PC";
             this.loadFromPCToolStripMenuItem.ToolTipText = "Выполняет загрузку настройки пользователя из реестра";
             // 
@@ -2635,14 +2644,14 @@
             this.deleteSaveFromPCToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("deleteSaveFromPCToolStripMenuItem.Image")));
             this.deleteSaveFromPCToolStripMenuItem.Name = "deleteSaveFromPCToolStripMenuItem";
             this.deleteSaveFromPCToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.deleteSaveFromPCToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.deleteSaveFromPCToolStripMenuItem.Size = new System.Drawing.Size(184, 26);
             this.deleteSaveFromPCToolStripMenuItem.Text = "Delete from PC";
             this.deleteSaveFromPCToolStripMenuItem.ToolTipText = "Выполняет удаление настройки пользователя из реестра\r\n";
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(151, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(181, 6);
             // 
             // toolStripMenuItem1
             // 
@@ -2653,7 +2662,7 @@
             this.extendedButtonsToolStrip});
             this.toolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem1.Image")));
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(154, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(184, 26);
             this.toolStripMenuItem1.Text = "Settings";
             // 
             // transparentToolStrip
@@ -2664,7 +2673,7 @@
             this.transparentToolStrip.CheckOnClick = true;
             this.transparentToolStrip.CheckState = System.Windows.Forms.CheckState.Checked;
             this.transparentToolStrip.Name = "transparentToolStrip";
-            this.transparentToolStrip.Size = new System.Drawing.Size(167, 22);
+            this.transparentToolStrip.Size = new System.Drawing.Size(180, 22);
             this.transparentToolStrip.Text = "Transparent";
             this.transparentToolStrip.ToolTipText = "Прозрачность основного окна";
             // 
@@ -2676,7 +2685,7 @@
             this.messagesToolStrip.CheckOnClick = true;
             this.messagesToolStrip.CheckState = System.Windows.Forms.CheckState.Checked;
             this.messagesToolStrip.Name = "messagesToolStrip";
-            this.messagesToolStrip.Size = new System.Drawing.Size(167, 22);
+            this.messagesToolStrip.Size = new System.Drawing.Size(180, 22);
             this.messagesToolStrip.Text = "Messages";
             this.messagesToolStrip.ToolTipText = "Всплывающие сообщения";
             // 
@@ -2685,7 +2694,7 @@
             this.windowPinToolStrip.BackColor = System.Drawing.Color.White;
             this.windowPinToolStrip.CheckOnClick = true;
             this.windowPinToolStrip.Name = "windowPinToolStrip";
-            this.windowPinToolStrip.Size = new System.Drawing.Size(167, 22);
+            this.windowPinToolStrip.Size = new System.Drawing.Size(180, 22);
             this.windowPinToolStrip.Text = "Window pin";
             this.windowPinToolStrip.ToolTipText = "Обычное состояние окна";
             // 
@@ -2693,20 +2702,20 @@
             // 
             this.extendedButtonsToolStrip.CheckOnClick = true;
             this.extendedButtonsToolStrip.Name = "extendedButtonsToolStrip";
-            this.extendedButtonsToolStrip.Size = new System.Drawing.Size(167, 22);
+            this.extendedButtonsToolStrip.Size = new System.Drawing.Size(180, 22);
             this.extendedButtonsToolStrip.Text = "Extended buttons";
             this.extendedButtonsToolStrip.ToolTipText = "Дополнительные кнопки";
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(151, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(181, 6);
             // 
             // clearSettingsToolStrip
             // 
             this.clearSettingsToolStrip.Image = ((System.Drawing.Image)(resources.GetObject("clearSettingsToolStrip.Image")));
             this.clearSettingsToolStrip.Name = "clearSettingsToolStrip";
-            this.clearSettingsToolStrip.Size = new System.Drawing.Size(154, 22);
+            this.clearSettingsToolStrip.Size = new System.Drawing.Size(184, 26);
             this.clearSettingsToolStrip.Text = "Clear settings";
             this.clearSettingsToolStrip.ToolTipText = "Выполняет сброс всех настроек, которые были сохранены пользователем ранее";
             this.clearSettingsToolStrip.Click += new System.EventHandler(this.clearSettingsToolStripMenuItem_Click);

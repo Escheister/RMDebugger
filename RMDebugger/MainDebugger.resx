@@ -343,10 +343,6 @@
         SuzDZzMM4zMAbAM2m2GYKAMI4SHgAkKYpgasAEkSgSFJmTLAwAAAvNajeAJQm+sAAAAASUVORK5CYII=
 </value>
   </data>
-  <data name="RadioSettingsTestBox.ToolTip" xml:space="preserve">
-    <value>Включение в тестирование таких команд как Get Near и Dist Tof
-При отправке команды Get Near, при наличии больше 1 устройства в таблице, включается условие, при котором, если соседние устройства не обнаруживаются по радио, засчитывается ошибка всех пакетов, отправленных этой командой.</value>
-  </data>
   <data name="ManualScanToTest.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6

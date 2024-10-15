@@ -49,7 +49,7 @@ namespace ConfigurationProtocol
             _targetSign.CopyTo(loadField, 0);
             ((ushort)CmdOutput.GET_CONFIG).GetReverseBytes().CopyTo(loadField, 2);
             field.CopyTo(loadField, 4);
-            return new CRC16_CCITT_FALSE().CRC_calc(loadField);
+            return new CRC16_CCITT_FALSE().CrcCalc(loadField);
         }
         private byte[] FormationUploadConfig(byte[] field, byte[] value)
         {
@@ -58,7 +58,7 @@ namespace ConfigurationProtocol
             ((ushort)CmdOutput.SET_CONFIG).GetReverseBytes().CopyTo(loadField, 2);
             field.CopyTo(loadField, 4);
             value.CopyTo(loadField, 4 + field.Length);
-            return new CRC16_CCITT_FALSE().CRC_calc(loadField);
+            return new CRC16_CCITT_FALSE().CrcCalc(loadField);
         }
 
         public byte[] ConfigLoad(string field)

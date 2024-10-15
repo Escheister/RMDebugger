@@ -6,6 +6,7 @@ using System;
 using StaticSettings;
 using ProtocolEnums;
 using RMDebugger;
+using System.Collections;
 
 namespace SearchProtocol
 {
@@ -29,12 +30,13 @@ namespace SearchProtocol
                     byte[] cmdOut = Options.through
                         ? CmdThroughRm(FormatCmdOut(rmSign, cmdOutput, ix), rmThrough, CmdOutput.ROUTING_THROUGH)
                         : FormatCmdOut(rmSign, cmdOutput, ix);
-                    Tuple<byte[], ProtocolReply> requestData = await GetData(cmdOut, cmdInSize, 50);
+                    Tuple<byte[], ProtocolReply> requestData = await GetData(cmdOut, cmdInSize, 100);
                     requestData = new Tuple<byte[], ProtocolReply>(ReturnWithoutThrough(requestData.Item1), requestData.Item2);
 
                     IEnumerable<DeviceData> _List = GetDataDevices(cmdOutput, requestData.Item1, out ix);
                     deviceDataList.AddRange(_List);
                     iteration++;
+                    await Task.Delay(1);
                 }
                 while (ix != 0x00 && iteration <= 5);
             }
@@ -58,10 +60,10 @@ namespace SearchProtocol
              * 2 - type */
             List<DeviceData> data = new List<DeviceData>();
             if (cmdIn.Count() >= 3 && cmdIn.Count() % 3 == 0)
-                foreach (IEnumerable<byte> IArray in cmdIn.Split(3)) 
+                foreach (IEnumerable<byte> IArray in cmdIn.Split(3))
                     data.Add(new DeviceData((ushort)((IArray.ElementAt(1) << 8) | IArray.ElementAt(0)))
                     {
-                        devType = (DevType)IArray.ElementAt(2)
+                        devType = Enum.IsDefined(typeof(DevType), IArray.ElementAt(2)) ? (DevType)IArray.ElementAt(2) : DevType.NuLL
                     });
             return data;
         }

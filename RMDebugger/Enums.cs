@@ -8,7 +8,7 @@
         MCS = 0x24, TABLET_OR_MRIS = 0x25, BCOM = 0x31, NAP = 0x32,
         SERVER = 0x41, DI8 = 0x50, DI7C = 0x51, NAMUR = 0x52,
         DO8 = 0x53, DO7R = 0x54, AI4 = 0x55, AI4T = 0x56, LTL9 = 0x57,
-        _ = 0x00
+        NuLL = 0x00
     }
     enum ProtocolReply : int
     {
@@ -62,8 +62,6 @@
         RMLR_REGISTRATION = 0xB002,
         RMLR_RGB = 0xB004,
     }
-    enum dataSize : int { ONLINE_DIST_TOF = 5, GRAPH_GET_NEAR = 3, }
-    enum cmdSize : int { ONLINE_DIST_TOF = 9, GRAPH_GET_NEAR = 7, }
     enum CmdMaxSize : int
     {
         GRAPH_WHO_ARE_YOU = 30,
@@ -144,6 +142,5 @@
     }
 
     enum LogState { DEBUGState, ERRORState }
-    enum LogSize   { lowestBuffer = 256, smallBuffer=512, normalBuffer=1024, mediumBuffer=2048, largeBuffer=4096}
-    enum LogLinesRemove { lowestBuffer = 32, smallBuffer = 64, normalBuffer = 128, mediumBuffer = 256, largeBuffer = 512}
+    enum LogSize  { lowestBuffer = 256, smallBuffer=512, normalBuffer=1024, mediumBuffer=2048, largeBuffer=4096}
 }

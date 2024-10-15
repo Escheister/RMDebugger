@@ -10,12 +10,15 @@ using CRC16;
 
 namespace BootloaderProtocol
 {
-    internal class BootloaderNew : CommandsOutput
+    internal class Bootloader : CommandsOutput
     {
         public delegate byte[] BuildCmdDelegate(CmdOutput cmdOutput);
         public delegate byte[] BuildDataCmdDelegate(byte[] data);
 
-        public BootloaderNew(object sender, byte[] targetSign) : base(sender)
+        public delegate void SetProgressEvent(int data);
+        public event SetProgressEvent SetProgress;
+
+        public Bootloader(object sender, byte[] targetSign) : base(sender)
         {
             _addrHex = new byte[2];
             _addrElar = new byte[2];
@@ -23,7 +26,7 @@ namespace BootloaderProtocol
             buildCmdDelegate += BuildCmd;
             buildDataCmdDelegate += BuildDataCmd;
         }
-        public BootloaderNew(object sender, byte[] targetSign, byte[] throughSign) : base(sender)
+        public Bootloader(object sender, byte[] targetSign, byte[] throughSign) : base(sender)
         {
             _addrHex = new byte[2];
             _addrElar = new byte[2];
@@ -54,6 +57,7 @@ namespace BootloaderProtocol
 
         private Queue<byte[]> hexQueue;
         public Queue<byte[]> HexQueue { get { return hexQueue; } }
+        public int hexLinesCount = 0;
 
         private int pageSize;
         public int PageSize
@@ -64,6 +68,7 @@ namespace BootloaderProtocol
 
         public BuildCmdDelegate buildCmdDelegate;
         public BuildDataCmdDelegate buildDataCmdDelegate;
+
 
         private byte[] BuildCmd(CmdOutput cmdOutput) => FormatCmdOut(_targetSign, cmdOutput, 0xff);
         private byte[] BuildCmdThrough(CmdOutput cmdOutput) => CmdThroughRm(BuildCmd(cmdOutput), _throughSign, CmdOutput.ROUTING_PROG);
@@ -77,7 +82,7 @@ namespace BootloaderProtocol
             _targetSign.CopyTo(loadField, 0);
             ((ushort)CmdOutput.LOAD_DATA_PAGE).GetReverseBytes().CopyTo(loadField, 2);
             data.CopyTo(loadField, 4);
-            return new CRC16_CCITT_FALSE().CRC_calc(loadField);
+            return new CRC16_CCITT_FALSE().CrcCalc(loadField);
         }
         private void GetStringsFromFile(string path, out string[] fileStrings)
         {
@@ -116,6 +121,7 @@ namespace BootloaderProtocol
                 }
                 hexQueue.Enqueue(byteString);
             }
+            hexLinesCount = hexQueue.Count;
         }
         public void GetDataForUpload(out byte[] dataOutput)
         {
@@ -143,6 +149,7 @@ namespace BootloaderProtocol
             cmd.AddRange(_addrHex);
             cmd.AddRange(_addrElar);
             cmd.AddRange(data);
+            SetProgress?.BeginInvoke(hexLinesCount - hexQueue.Count, null, null);
             dataOutput = cmd.ToArray();
         }
     }

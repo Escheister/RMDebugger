@@ -9,6 +9,7 @@ namespace StaticSettings
     {
         public static DataDebuggerForm debugForm = null;
         public static MainDebugger debugger = null;
+        public static bool oldHandler { get; set; } = false;
 
         //Socket
         public static bool pingOk { get; set; } = false;
@@ -43,6 +44,5 @@ namespace StaticSettings
         //Logger
         public static LogState logState { get; set; } = LogState.ERRORState;
         public static LogSize logSize { get; set; } = LogSize.smallBuffer;
-        public static int linesRemove { get; set; } = (int)LogLinesRemove.smallBuffer;
     }
 }

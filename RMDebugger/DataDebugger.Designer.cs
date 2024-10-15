@@ -220,7 +220,7 @@
             // 
             // AppendTimer
             // 
-            this.AppendTimer.Interval = 200;
+            this.AppendTimer.Interval = 250;
             this.AppendTimer.Tick += new System.EventHandler(this.AppendTimer_Tick);
             // 
             // DataDebuggerForm
