@@ -252,6 +252,7 @@ namespace RMDebugger
         async public Task<Tuple<RmResult, ProtocolReply>> GetResult(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");
+            Options.activeToken.Token.ThrowIfCancellationRequested();
             clearBuffer();
             sendData(cmdOut);
             string message = $"{DateTime.Now:dd.HH:mm:ss:fff} : {"send",-6}-> {cmdOut.GetStringOfBytes()}\n";
@@ -272,6 +273,7 @@ namespace RMDebugger
         async public virtual Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 50)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");
+            Options.activeToken.Token.ThrowIfCancellationRequested();
             clearBuffer();
             sendData(cmdOut);
             string message = $"{DateTime.Now:dd.HH:mm:ss:fff} : {"send",-6}-> {cmdOut.GetStringOfBytes()}\n";

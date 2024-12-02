@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reflection;
-using System.Linq;
 using System;
 
 using System.Drawing;
@@ -26,6 +25,7 @@ namespace RMDebugger
         async public override Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 250)
         {
             if (!Options.mainIsAvailable) throw new Exception("No interface");
+            Options.activeToken.Token.ThrowIfCancellationRequested();
             sendData(cmdOut);
             string message = $"{DateTime.Now:dd.HH:mm:ss:fff} : {"send",-6}-> {cmdOut.GetStringOfBytes()}\n";
             Enum.TryParse(Enum.GetName(typeof(CmdOutput), (CmdOutput)((cmdOut[2] << 8) | cmdOut[3])), out CmdInput cmdMain);
@@ -82,7 +82,6 @@ namespace RMDebugger
                 case ProtocolReply.WData:
                     device.devBadReply++;
                     break;
-
             }
             if (clearAfterError) clearBuffer();
             return false;
@@ -136,6 +135,7 @@ namespace RMDebugger
                     iteration++;
                     device.devRx++;
                 }
+                catch (OperationCanceledException) { return; }
                 catch
                 {
                     AddValueToDevice(device, ProtocolReply.WData);
@@ -151,8 +151,6 @@ namespace RMDebugger
                     device.devRx--;
                 }
             }
-
-
         }
     }
 

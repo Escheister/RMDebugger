@@ -64,14 +64,16 @@
     }
     enum CmdMaxSize : int
     {
-        GRAPH_WHO_ARE_YOU = 30,
-        GRAPH_GET_NEAR = 43,
-        ROUTING_GET = 6,
-        STATUS = 32,
         ONLINE_DIST_TOF = 69,
-        RESET = 6,
-        ONLINE = 7,
+        GRAPH_GET_NEAR = 43,
+        STATUS = 36,
+        GRAPH_WHO_ARE_YOU = 30,
         RMLR_REGISTRATION = 10,
+        ONLINE = 7,
+        ROUTING_GET = 6,
+        RESET = 6,
+        STOP_BOOTLOADER = 6,
+        START_BOOTLOADER = 6,
         RMLR_RGB = 6,
     }
     enum UID : byte { GRAPH_WHO_ARE_YOU = 0x01, STATUS = 0x02, }
@@ -130,7 +132,7 @@
         ROUTING_GET = 6,
     }
 
-    enum InfoGrid { Signature, Type, Version, Radio, Location, Fio, Date }
+    enum infoEnum { Type, Signature, Version, Radio, Location, Fio, Date }
 
     enum ConfigRule { NoRule, uInt16=5, len4=4, len16=16 }
     enum ConfigColumns { ConfigColumn, enabled, ConfigLoad, ConfigUpload }

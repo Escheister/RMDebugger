@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Threading;
 using Microsoft.Win32;
 using System.IO.Ports;
 using System.Drawing;
@@ -38,6 +39,8 @@ namespace RMDebugger
         BindingList<DeviceClass> testerData = new BindingList<DeviceClass>();
         BindingList<DeviceData> deviceData = new BindingList<DeviceData>();
 
+        CancellationTokenSource pingToken;
+
         private int setTimerTest;
         private int realTimeWorkingTest = 0;
 
@@ -54,6 +57,7 @@ namespace RMDebugger
         {
             Load += MainFormLoad;
             FormClosed += MainFormClosed;
+            DinoRunningProcessOk.Click += (s, e) => Options.activeToken?.Cancel();
 
             KeyDown += (s, e) =>
             {
@@ -64,6 +68,7 @@ namespace RMDebugger
                     else
                         this.WindowState = FormWindowState.Normal;
                 }
+                else if (e.KeyValue == (char)Keys.Escape) Options.activeToken?.Cancel();
             };
             StatusRS485GridView.DoubleBuffered(true);
             ConfigDataGrid.DoubleBuffered(true);
@@ -92,7 +97,7 @@ namespace RMDebugger
             foreach (ToolStripDropDownItem item in stopBits.DropDownItems) item.Click += StopBitsForSerial;
             OpenCom.Click += OpenComClick;
             PingButton.Click += PingButtonClick;
-            numericPort.ValueChanged += (s, e) => { if (Options.pingOk) Options.pingOk = !Options.pingOk; };
+            numericPort.ValueChanged += (s, e) => { if (Options.pingOk) pingToken?.Cancel(); };
             Connect.Click += ConnectClick;
             NeedThrough.CheckedChanged += NeedThroughCheckedChanged;
             TargetSignID.ValueChanged += (s, e) => NeedThrough.Enabled = TargetSignID.Value != 0;
@@ -171,10 +176,13 @@ namespace RMDebugger
                         fieldName = ConfigFieldTextBox.Text
                     });
             };
-
             RMLRModeCheck.CheckedChanged += (s, e) => RMLRRepeatCount.Visible = RMLRModeCheck.Checked;
 
             InfoTree.NodeMouseClick += InfoTreeNodeClick;
+            buttonInfoStop.Click += (s, e) => Options.activeToken?.Cancel();
+            saveToCsvInfoMenuStrip.Click += InfoSaveToCSVButtonClick;
+            clearInfoMenuStrip.Click += InfoClearGridClick;
+
 
             StartTestRSButton.Click += StartTestRSButtonClick;
             AddSignatureIDToTest.Click += AddTargetSignID;
@@ -206,7 +214,6 @@ namespace RMDebugger
             ComDefault();
             AddPorts(comPort);
             CheckReg();
-            DefaultInfoGrid();
             DefaultConfigGrid();
             SetProperties();
         }
@@ -557,13 +564,17 @@ namespace RMDebugger
         //UDP config
         async private void PingButtonClick(object sender, EventArgs e)
         {
-            if (Options.pingOk) PingSettings(!Options.pingOk);
-            else await check_ip();
+            if (Options.pingOk) { pingToken?.Cancel(); return; }
+            pingToken = new CancellationTokenSource();
+            await check_ip(pingToken);
         }
         private void IPaddressBox_TextChanged(object sender, EventArgs e)
         {
-            Options.pingOk =
+            if (Options.pingOk) 
+            { 
+                pingToken?.Cancel();
                 Connect.Enabled = false;
+            }
             bool ipCorrect = IPAddress.TryParse(IPaddressBox.Text, out IPAddress ipAddr) && IPaddressBox.Text.Split('.').Length == 4;
             PingButton.Enabled = ipCorrect;
             if (ipCorrect) ErrorMessage.Clear();
@@ -575,7 +586,7 @@ namespace RMDebugger
                 Connect.Enabled = sw;
             PingButton.BackColor = sw ? Color.Green : Color.Red;
         }
-        async private Task check_ip()
+        async private Task check_ip(CancellationTokenSource cts)
         {
             using Ping ping = new Ping();
             byte[] buffer = new byte[32];
@@ -586,7 +597,7 @@ namespace RMDebugger
             if (reply.Status != IPStatus.Success) return;
             try
             {
-                for (int reconnect = 0; reconnect <= 5 && Options.pingOk;)
+                for (int reconnect = 0; reconnect <= 5 && Options.pingOk && !cts.IsCancellationRequested;)
                 {
                     reply = await ping.SendPingAsync(ip, 1000, buffer, pingOptions);
 
@@ -596,12 +607,14 @@ namespace RMDebugger
                         continue;
                     }
                     else if (reconnect > 0) reconnect = 0;
-                    await Task.Delay(250);
+                    await Task.Delay(1000, cts.Token);
                 }
             }
+            catch (OperationCanceledException) { }
             catch (Exception ex) { ToMessageStatus(ex.Message.ToString()); }
             finally {
                 if (udpGate.Connected) ConnectClick(null, null);
+                Options.activeToken?.Cancel();
                 PingSettings(udpGate.Connected);
             }
         }
@@ -686,6 +699,19 @@ namespace RMDebugger
             if (InvokeRequired) BeginInvoke(action);
             else action();
         }
+        //Any events
+        private void AfterAnyAutoEvent(bool sw)
+        {
+            SerUdpPages.Enabled =
+                ExtraButtonsGroup.Enabled = 
+                BaudRate.Enabled = 
+                dataBits.Enabled = 
+                Parity.Enabled = 
+                stopBits.Enabled = !sw;
+            DinoRunningProcessOk.Enabled = 
+                Options.activeProgress = 
+                DinoRunningProcessOk.Visible = sw;
+        }
 
         //Search
         private void SearchFilterClick(object sender, EventArgs e)
@@ -704,23 +730,17 @@ namespace RMDebugger
         }
         async private void SearchButtonClick(object sender, EventArgs e)
         {
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
             Button btn = (Button)sender;
-            bool manual = btn == SearchManualButton;
-            if (btn == SearchAutoButton)
-            {
-                if (Options.autoSearch)
-                {
-                    Options.autoSearch = false;
-                    SearchAutoButton.Enabled = false;
-                    return;
-                }
-                else Options.autoSearch = true;
-            }
+            bool manual = btn == SearchManualButton; 
+            Options.activeToken = new CancellationTokenSource();
+            Options.activeTask = Task.Run(() => StartSearchAsync(!manual));
             AfterSearchEvent(true, manual);
             offTabsExcept(RMData, SearchPage);
-            await Task.Run(() => StartSearchAsync());
-            AfterSearchEvent(false, manual);
+            try { await Options.activeTask; } catch { }
             onTabPages(RMData);
+            AfterSearchEvent(false, manual);
+            Options.activeTask = null;
         }
         private void AfterSearchEvent(bool sw, bool manual)
         {
@@ -735,7 +755,7 @@ namespace RMDebugger
             SearchManualButton.Enabled = !sw;
         }
         
-        async private Task StartSearchAsync()
+        async private Task StartSearchAsync(bool auto)
         {
             using (Searching search = new Searching(Options.mainInterface))
             {
@@ -804,14 +824,13 @@ namespace RMDebugger
 
                     if (SearchKnockMode.Checked && data.Count > 0)
                     {
-                        Options.autoSearch = false;
+                        Options.activeToken?.Cancel();
                         if (Options.showMessages)
                             NotifyMessage.ShowBalloonTip(5, "Тук-тук!", $"Ответ получен!", ToolTipIcon.Info);
                     }
-                    await Task.Delay(Options.autoSearch ? Options.timeoutSearch : 50);
+                    await Task.Delay(auto ? Options.timeoutSearch : 50, Options.activeToken.Token);
                 }
-                while (Options.autoSearch);
-                Options.autoSearch = false;
+                while (auto && Options.activeProgress && !Options.activeToken.IsCancellationRequested);
             }
         }
         async private Task<bool> ThisDeviceInOneBus(CommandsOutput search, DeviceData device)
@@ -824,32 +843,17 @@ namespace RMDebugger
             catch { return false; }
         }
 
-        //Any events
-        private void AfterAnyAutoEvent(bool sw)
-        {
-            SerUdpPages.Enabled =
-                ExtraButtonsGroup.Enabled = 
-                BaudRate.Enabled = 
-                dataBits.Enabled = 
-                Parity.Enabled = 
-                stopBits.Enabled = !sw;
-            DinoRunningProcessOk.Enabled =
-                DinoRunningProcessOk.Visible = sw;
-        }
 
         //Hex uploader
         async private void HexUploadButtonClick(object sender, EventArgs e)
         {
-            Options.HexUploadState = !Options.HexUploadState;
-            if (Options.HexUploadState)
-            {
-                AfterHexUploadEvent(true);
-                offTabsExcept(RMData, HexUpdatePage);
-                await Task.Run(() => HexUploadAsyncNew());
-                Options.HexUploadState = false;
-                AfterHexUploadEvent(false);
-                onTabPages(RMData);
-            }
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
+            Options.activeToken = new CancellationTokenSource();
+            AfterHexUploadEvent(true);
+            offTabsExcept(RMData, HexUpdatePage);
+            try { await Task.Run(() => HexUploadAsync()); } catch { }
+            AfterHexUploadEvent(false);
+            onTabPages(RMData);
         }
         private void AfterHexUploadEvent(bool sw)
         {
@@ -869,7 +873,7 @@ namespace RMDebugger
             UpdateBar.Value = progress;
             BytesStart.Text = progress.ToString();
         }
-        async private Task HexUploadAsyncNew()
+        async private Task HexUploadAsync()
         {
             using (Bootloader boot = NeedThrough.Checked
                 ? new Bootloader(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
@@ -880,28 +884,29 @@ namespace RMDebugger
                 boot.SetProgress += SetHexUploadProgress;
                 try { boot.SetQueueFromHex(Options.hexPath); }
                 catch (Exception ex) { ToMessageStatus(ex.Message); return; }
-                //async method2
+                //async method
                 async Task<bool> GetReplyFromDevice(byte[] cmdOut, int receiveDelay = 50, bool taskDelay = false, int delayMs = 10)
                 {
                     DateTime t0 = DateTime.Now;
                     TimeSpan tstop = DateTime.Now - t0;
-                    while (tstop.Seconds < Options.hexTimeout && Options.HexUploadState)
+                    while (tstop.Seconds < Options.hexTimeout)
                     {
                         try
                         {
                             Tuple<byte[], ProtocolReply> replyes = await boot.GetData(cmdOut, cmdOut.Length, receiveDelay);
                             return true;
                         }
+                        catch (OperationCanceledException) { return false; }
                         catch (Exception ex)
                         {
                             if (ex.Message == "devNull") return false;
                             if ((DateTime.Now - t0).Seconds >= Options.hexTimeout)
                             {
                                 DialogResult message = MessageBox.Show(this, "Timeout", "Something wrong...", MessageBoxButtons.RetryCancel);
-                                if (message == DialogResult.Cancel) break;
+                                if (message == DialogResult.Cancel) return false;
                                 else t0 = DateTime.Now;
                             }
-                            if (taskDelay) await Task.Delay(delayMs);
+                            if (taskDelay) await Task.Delay(delayMs, Options.activeToken.Token);
                         }
                     }
                     return false;
@@ -928,7 +933,7 @@ namespace RMDebugger
                 await GetReplyFromDevice(cmdBootStop, taskDelay: true);
                 stopwatchQueue.Stop();
                 string timeUplod = $"{stopwatchQueue.Elapsed.Minutes:00}:{stopwatchQueue.Elapsed.Seconds:00}:{stopwatchQueue.Elapsed.Milliseconds:000}";
-                if (Options.HexUploadState)
+                if (!Options.activeToken.IsCancellationRequested)
                 {
                     ToMessageStatus($"Firmware OK | Uploaded for " + timeUplod);
                     if (Options.showMessages)
@@ -1002,13 +1007,14 @@ namespace RMDebugger
                     if (field.fieldActive) return true;
                 return false;
             }
-            Options.ConfigLoadState = !Options.ConfigLoadState;
-            if ((Options.ConfigLoadState && CheckFields()) || RMLRModeCheck.Checked)
+
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
+            if (CheckFields() || RMLRModeCheck.Checked)
             {
+                Options.activeToken = new CancellationTokenSource();
                 AfterLoadConfigEvent(true);
                 offTabsExcept(RMData, ConfigPage);
-                await Task.Run(() => LoadField());
-                Options.ConfigLoadState = false;
+                try { await Task.Run(() => LoadField()); } catch { }
                 AfterLoadConfigEvent(false);
                 onTabPages(RMData);
             }
@@ -1045,9 +1051,9 @@ namespace RMDebugger
             Tuple<byte[], ProtocolReply> reply;
             byte[] cmdOut = config.FormatCmdOut(config._targetSign, CmdOutput.RMLR_REGISTRATION, 0xff);
             byte[] rgbBuzz = RMLRRgbFormat(config._targetSign, (byte)RMLRRepeatCount.Value, CmdOutput.RMLR_RGB);
-            while (true)
+            while (!Options.activeToken.IsCancellationRequested)
             {
-                if (!Options.ConfigLoadState && !Options.ConfigUploadState) return false;
+                if (Options.activeToken.IsCancellationRequested) return false;
                 try
                 {
                     reply = await config.GetData(cmdOut, (int)CmdMaxSize.RMLR_REGISTRATION);
@@ -1064,12 +1070,13 @@ namespace RMDebugger
                         break;
                     }
                 }
+                catch (OperationCanceledException) { return false; }
                 catch (Exception ex)
                 {
                     ToReplyStatus(ex.Message);
                     if (ex.Message == "devNull") return false;
                 }
-                await Task.Delay(50);
+                await Task.Delay(50, Options.activeToken.Token);
             }
             return true;
         }
@@ -1095,7 +1102,7 @@ namespace RMDebugger
 
             foreach (FieldConfiguration field in fieldsData)
             {
-                if (field.fieldActive && Options.ConfigLoadState)
+                if (field.fieldActive && !Options.activeToken.IsCancellationRequested)
                 {
                     byte[] cmdOut = config.buildCmdLoadDelegate(field.fieldName);
                     int fieldLen = fieldsFounded.Contains(field.fieldName) ? (int)field.rule + 1 : 17;
@@ -1104,7 +1111,7 @@ namespace RMDebugger
 
                     Tuple<byte[], ProtocolReply> reply;
                     byte[] cmdIn = new byte[0];
-                    while (Options.ConfigLoadState)
+                    while (!Options.activeToken.IsCancellationRequested)
                     {
                         try
                         {
@@ -1117,7 +1124,7 @@ namespace RMDebugger
                         {
                             if (ex.Message == "devNull") return;
                         }
-                        await Task.Delay(50);
+                        await Task.Delay(50, Options.activeToken.Token);
                     }
                     try
                     {
@@ -1140,19 +1147,20 @@ namespace RMDebugger
         {
             bool CheckFields() {
                 foreach (FieldConfiguration field in fieldsData)
-                    if (field.fieldActive && Options.ConfigUploadState)
+                    if (field.fieldActive)
                         if (!string.IsNullOrEmpty(field.uploadValue) || ConfigFactoryCheck.Checked) return true;
                 return false;
             }
-            Options.ConfigUploadState = !Options.ConfigUploadState;
-            if ((Options.ConfigUploadState && CheckFields()) || RMLRModeCheck.Checked)
+
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
+            if (CheckFields() || RMLRModeCheck.Checked)
             {
+                Options.activeToken = new CancellationTokenSource();
                 AfterUploadConfigEvent(true);
                 offTabsExcept(RMData, ConfigPage);
-                await Task.Run(() => UploadField());
-                Options.ConfigUploadState = false;
-                AfterUploadConfigEvent(false);
+                try { await Task.Run(() => UploadField()); } catch { }
                 onTabPages(RMData);
+                AfterUploadConfigEvent(false);
             }
         }
         private void AfterUploadConfigEvent(bool sw)
@@ -1192,7 +1200,7 @@ namespace RMDebugger
 
             foreach (FieldConfiguration field in fieldsData)
             {
-                if (field.fieldActive && Options.ConfigUploadState)
+                if (field.fieldActive && !Options.activeToken.IsCancellationRequested)
                     if (!string.IsNullOrEmpty(field.uploadValue) || config.factory)
                     {
                         if (config.factory && field.fieldName == "addr") continue;
@@ -1201,7 +1209,7 @@ namespace RMDebugger
                                             field.fieldName, 
                                             field.uploadValue, 
                                             fieldsFounded.Contains(field.fieldName) ? (int)field.rule + 1 : 17);
-                        while (Options.ConfigUploadState)
+                        while (!Options.activeToken.IsCancellationRequested)
                         {
                             try
                             {
@@ -1218,44 +1226,142 @@ namespace RMDebugger
                             {
                                 if (ex.Message == "devNull") return;
                             }
-                            await Task.Delay(50);
+                            await Task.Delay(50, Options.activeToken.Token);
                         }
                     }
             }
         }
 
         //Get info
-        private void DefaultInfoGrid()
-        {
-            InfoFieldsGrid.Rows.Clear();
-            foreach (string data in Enum.GetNames(typeof(InfoGrid))) InfoFieldsGrid.Rows.Add(data);
-            foreach (TreeNode node in InfoTree.Nodes) node.Nodes.Clear();
-        }
+
         async private void InfoTreeNodeClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            if (UInt16.TryParse(e.Node.Text, out ushort newSignTarget))
-            {
-                TargetSignID.Value = newSignTarget;
-                return;
-            }
+            if (UInt16.TryParse(e.Node.Text, out ushort newSignTarget)) { TargetSignID.Value = newSignTarget; return; }
             switch (e.Node.Name)
             {
                 case "GetNearInfo":
-                    using (Searching search = new Searching(Options.mainInterface))
+                    Options.activeTask = Task.Run(() => GetInfoNearFromDevice(e.Node));
+                    break;
+                case "WhoAreYouInfo":
+                    Options.activeTask = Task.Run(() => GetInfoAboutDevice(CmdOutput.GRAPH_WHO_ARE_YOU, e.Node));
+                    break;
+                case "StatusInfo":
+                    Options.activeTask = Task.Run(() => GetInfoAboutDevice(CmdOutput.STATUS, e.Node));
+                    break;
+                default:
+                    return;
+            }
+            AfterInfoEvent(true);
+            offTabsExcept(RMData, InfoPage);
+            try { await Options.activeTask; } catch { }
+            AfterInfoEvent(false);
+            onTabPages(RMData);
+            Options.activeTask = null;
+        }
+        private void AfterInfoEvent(bool sw)
+        {
+            AfterAnyAutoEvent(sw);
+            SignaturePanel.Enabled =
+                numericInfoSeconds.Enabled =
+                InfoTree.Enabled = !sw;
+            buttonInfoStop.Visible = sw;
+        }
+        async private Task GetInfoAboutDevice(CmdOutput cmdOutput, TreeNode treeNode)
+        {
+            Options.activeToken = numericInfoSeconds.Value > 0
+                ? new CancellationTokenSource((int)numericInfoSeconds.Value * 1000)
+                : new CancellationTokenSource();
+            using (Information info = NeedThrough.Checked
+                ? new Information(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
+                : new Information(Options.mainInterface, TargetSignID.GetBytes()))
+            {
+                info.ToReply += ToReplyStatus;
+                info.ToDebug += ToDebuggerWindow;
+                byte[] cmdOut = info.buildCmdDelegate(cmdOutput);
+                int size = !NeedThrough.Checked ? (int)cmdOutput : (int)cmdOutput + 4;
+                async Task _GetInfoCycle()
+                {
+                    do
                     {
-                        search.ToReply += ToReplyStatus;
-                        search.ToDebug += ToDebuggerWindow;
-                        List<DeviceData> data = await search.GetDataFromDevice(CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes(), ThroughSignID.GetBytes());
-                        string radio = data.Count > 0 ? "Ok" : "Null";
-                        e.Node.Nodes.Clear();
-                        TreeNode getnear = new TreeNode($"Radio: {radio}");
-                        e.Node.Nodes.Add(getnear);
-                        InfoFieldsGrid.Rows[(int)InfoGrid.Radio].Cells[1].Value = radio;
+                        try
+                        {
+                            Tuple<byte[], ProtocolReply> reply = await info.GetData(cmdOut, size);
+                            byte[] cmdIn = info.ReturnWithoutThrough(reply.Item1);
+                            Dictionary<string, string> data = info.CmdInParse(cmdIn);
+                            data.Add($"{infoEnum.Date}", DateTime.Now.ToString("dd-MM-yy HH:mm"));
+
+                            foreach (PropertyInfo info in Options.infoData.GetType().GetProperties())
+                                if (data.ContainsKey(info.Name)) info.SetValue(Options.infoData, data[info.Name], null);
+
+
+                            List<TreeNode> typeNodesList = new List<TreeNode>();
+                            Invoke((MethodInvoker)(() =>
+                            {
+                                foreach (string str in data.Keys)
+                                {
+                                    bool csvInfo = Enum.IsDefined(typeof(infoEnum), str);
+                                    typeNodesList.Add(
+                                        new TreeNode($"{str}: {data[str]}")
+                                        {
+                                            ToolTipText = csvInfo ? "Данные для csv" : "",
+                                            ForeColor = csvInfo ? Color.ForestGreen : Color.Black,
+                                        });
+                                }
+                                treeNode.Nodes.Clear();
+                                treeNode.Nodes.AddRange(typeNodesList.ToArray());
+                                treeNode.Expand();
+                            }));
+                            return;
+                        }
+                        catch { }
+                        await Task.Delay(25, Options.activeToken.Token);
+                    }
+                    while (!Options.activeToken.IsCancellationRequested);
+                }
+                treeNode.Nodes.Clear();
+                do
+                {
+                    await _GetInfoCycle();
+                    if (numericInfoSeconds.Value > 0) return;
+                    await Task.Delay(250, Options.activeToken.Token);
+                }
+                while (!Options.activeToken.IsCancellationRequested);
+            };
+        }
+        async private Task GetInfoNearFromDevice(TreeNode treeNode)
+        {
+            Options.activeToken = numericInfoSeconds.Value > 0
+                ? new CancellationTokenSource((int)numericInfoSeconds.Value * 1000)
+                : new CancellationTokenSource();
+            using (Searching search = new Searching(Options.mainInterface))
+            {
+                search.ToReply += ToReplyStatus;
+                search.ToDebug += ToDebuggerWindow;
+                List<DeviceData> data;
+                async Task _GetGetNear()
+                {
+                    do
+                    {
+                        data = await search.GetDataFromDevice(CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes(), ThroughSignID.GetBytes());
+                        await Task.Delay(25, Options.activeToken.Token);
+                        Options.activeToken.Token.ThrowIfCancellationRequested();
+                    }
+                    while (!Options.activeToken.IsCancellationRequested && data.Count == 0);
+
+                    Invoke((MethodInvoker)(() =>
+                    {
+                        Options.infoData.Radio = "Ok";
+                        TreeNode getnear = new TreeNode($"{(infoEnum)3}: Ok")
+                        {
+                            ToolTipText = "Данные для csv",
+                            ForeColor = Color.ForestGreen
+                        };
+
                         if (data.Count > 0)
                         {
-                            e.Node.Expand();
+                            treeNode.Expand();
                             Dictionary<string, List<int>> typeNodesData = new Dictionary<string, List<int>>();
-                            foreach(DeviceData device in data)
+                            foreach (DeviceData device in data)
                             {
                                 string type = $"{device.devType}";
                                 if (!typeNodesData.ContainsKey(type)) typeNodesData[type] = new List<int>();
@@ -1275,74 +1381,45 @@ namespace RMDebugger
                                         });
                                 typeNodesList.Add(typeNode);
                             }
+                            treeNode.Nodes.Clear();
                             getnear.Nodes.AddRange(typeNodesList.ToArray());
+                            treeNode.Nodes.Add(getnear);
                             getnear.Expand();
                         }
-                        e.Node.Expand();
-                    };
-                    return;
-                case "WhoAreYouInfo":
-                    GetInfoAboutDevice(CmdOutput.GRAPH_WHO_ARE_YOU, e.Node);
-                    break;
-                case "StatusInfo":
-                    GetInfoAboutDevice(CmdOutput.STATUS, e.Node);
-                    break;
-                default: return;
-            }
-        }
-        async private void GetInfoAboutDevice(CmdOutput cmdOutput, TreeNode treeNode)
-        {
-            using (Information info = NeedThrough.Checked
-                ? new Information(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
-                : new Information(Options.mainInterface, TargetSignID.GetBytes()))
-            {
-                info.ToReply += ToReplyStatus;
-                info.ToDebug += ToDebuggerWindow;
-                byte[] cmdOut = info.buildCmdDelegate(cmdOutput);
-                int size = !NeedThrough.Checked ? (int)cmdOutput : (int)cmdOutput + 4;
-                treeNode.Nodes.Clear();
-                try
-                {
-                    Tuple<byte[], ProtocolReply> reply = await info.GetData(cmdOut, size);
-                    byte[] cmdIn = info.ReturnWithoutThrough(reply.Item1);
-                    Dictionary<string, string> data = info.CmdInParse(cmdIn);
-                    data.Add("Date", DateTime.Now.ToString("dd-MM-yy HH:mm"));
-                    foreach (string str in data.Keys)
-                    {
-                        treeNode.Nodes.Add($"{str}: {data[str]}");
-                        if (Enum.GetNames(typeof(InfoGrid)).Contains(str))
-                            InfoFieldsGrid.Rows[(int)Enum.Parse(typeof(InfoGrid), str)].Cells[1].Value = data[str];
-                    }
-                    treeNode.Expand();
+                        treeNode.Expand();
+                    }));
                 }
-                catch { }
+                treeNode.Nodes.Clear();
+                Options.infoData.Radio = "None";
+                do
+                {
+                    await _GetGetNear();
+                    if (numericInfoSeconds.Value > 0) return;
+                    await Task.Delay(250, Options.activeToken.Token);
+                }
+                while (!Options.activeToken.IsCancellationRequested);
             };
         }
-        private void OpenCloseMenuInfoTree_Click(object sender, EventArgs e)
+        private void InfoClearGridClick(object sender, EventArgs e) 
         {
-            InfoTreePanel.Location = OpenCloseMenuInfoTree.Text == "<"
-                ? new Point(InfoTreePanel.Location.X - 162, InfoTreePanel.Location.Y)
-                : new Point(InfoTreePanel.Location.X + 162, InfoTreePanel.Location.Y);
-            OpenCloseMenuInfoTree.Text = OpenCloseMenuInfoTree.Text == "<" ? ">" : "<";
-        }
-        private void InfoClearGrid_Click(object sender, EventArgs e) => DefaultInfoGrid();
-        private void InfoSaveToCSVButton_Click(object sender, EventArgs e)
+            foreach (TreeNode node in InfoTree.Nodes) node.Nodes.Clear();
+            Options.infoData = new InformationData();
+        } 
+        private void InfoSaveToCSVButtonClick(object sender, EventArgs e)
         {
-            if ((string)InfoFieldsGrid.Rows[0].Cells[1].Value == string.Empty) return;
-            string path = Environment.CurrentDirectory + $"\\InformationAboutDevice.csv";
-            CSVLib csv = new CSVLib(path);
-            string columns = "";
-            string[] columnsEnum = Enum.GetNames(typeof(InfoGrid));
-            foreach (string column in columnsEnum)
-                columns += column != "Date" ? $"{column};" : column;
-            csv.AddFields(columns);
-            csv.MainIndexes = new int[] { 0, 1, columnsEnum.Length - 1 };
-            List<string> list = new List<string>();
-            for (int i = 0; i < InfoFieldsGrid.Rows.Count; i++)
-                list.Add((string)InfoFieldsGrid.Rows[i].Cells[1].Value);
-            csv.WriteCsv(string.Join(";", list));
+            if (Options.infoData.haveDataForCSV)
+            {
+                string path = Environment.CurrentDirectory + $"\\InfoAbout_{Options.infoData.Type}.csv"; 
+                CSVLib csv = new CSVLib(path);
+                string columns = "";
+                string[] columnsEnum = Enum.GetNames(typeof(infoEnum));
+                foreach (string column in columnsEnum)
+                    columns += column != "Date" ? $"{column};" : column;
+                csv.AddFields(columns);
+                csv.MainIndexes = new int[] { 0, 1, columnsEnum.Length - 1 };
+                csv.WriteCsv(string.Join(";", Options.infoData.GetFieldsValue()));
+            }
         }
-
 
         //RS485 test
         private void StatusGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e) => TaskForChangedRows();
@@ -1424,24 +1501,21 @@ namespace RMDebugger
             ToMessageStatus($"Device count: {StatusRS485GridView.RowCount}");
         }
 
-
         async private void StartTestRSButtonClick(object sender, EventArgs e)
         {
-            Options.RS485TestState = !Options.RS485TestState;
-            if (Options.RS485TestState && StatusRS485GridView.Rows.Count > 0)
-            {
-                AfterStartTestRSEvent(true);
-                offTabsExcept(RMData, TestPage);
-                offTabsExcept(TestPages, RS485Page);
-                ToMessageStatus($"Device count: {StatusRS485GridView.RowCount}");
-                await Task.Run(() => StartTaskRS485Test());
-                AfterStartTestRSEvent(false);
-                Options.RS485TestState = false;
-                WorkTestTimer.Stop();
-                onTabPages(RMData);
-                onTabPages(TestPages);
-            }
-            else StartTestRSButton.Enabled = false;
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
+            Options.activeToken = new CancellationTokenSource();
+            Options.activeTask = Task.Run(() => StartTaskRS485Test()); 
+            AfterStartTestRSEvent(true);
+            offTabsExcept(RMData, TestPage);
+            offTabsExcept(TestPages, RS485Page);
+            ToMessageStatus($"Device count: {testerData.Count}");
+            try { await Options.activeTask; } catch { }
+            WorkTestTimer.Stop();
+            onTabPages(RMData);
+            onTabPages(TestPages);
+            AfterStartTestRSEvent(false);
+            Options.activeTask = null;
         }
         private void AfterStartTestRSEvent(bool sw)
         {
@@ -1456,7 +1530,6 @@ namespace RMDebugger
             StatusRS485GridView.Cursor = sw ? Cursors.AppStarting : Cursors.Default;
             StartTestRSButton.Text = sw ? "&Stop" : "&Start Test";
             StartTestRSButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
-            if (!sw) StartTestRSButton.Enabled = true;
         }
 
         async private Task StartTaskRS485Test()
@@ -1472,7 +1545,6 @@ namespace RMDebugger
                                (int)numericHoursTest.Value,
                                (int)numericMinutesTest.Value,
                                (int)numericSecondsTest.Value).TotalSeconds;
-
             Invoke((MethodInvoker)(() => WorkTestTimer.Start()));
 
             try
@@ -1485,10 +1557,11 @@ namespace RMDebugger
                 }
                 await Task.WhenAll(tasks.ToArray());
             }
+            catch (OperationCanceledException) { MessageBox.Show("Задача остановлена"); }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             finally {
                 RefreshGridTask();
-                ToMessageStatus($"Device count: {StatusRS485GridView.RowCount} | Завершено");
+                ToMessageStatus($"Device count: {testerData.Count} | Завершено");
             }
         }
         private void RefreshGridTask()
@@ -1506,16 +1579,14 @@ namespace RMDebugger
             ChangeWorkTestTime(realTimeWorkingTest);
             if (TimerSettingsTestBox.Checked && setTimerTest == 0)
             {
-                Options.RS485TestState = false;
+                Options.activeToken?.Cancel();
                 if (Options.showMessages)
                     NotifyMessage.ShowBalloonTip(5,
                         "Время истекло!",
                         "Время истекло, тест завершен",
                         ToolTipIcon.Info);
             }
-            
         }
-
         async private Task ConnectInterfaceAndStartTest(string[] interfaceSettings, List<DeviceClass> devices)
         {
             if (IPAddress.TryParse(interfaceSettings[0], out IPAddress ipAddr))
@@ -1545,7 +1616,7 @@ namespace RMDebugger
                 int getTest = random.Next(0, 101);
                 foreach (DeviceClass device in forTests.ListDeviceClass)
                 {
-                    if (!Options.RS485TestState || !Options.mainIsAvailable) break;
+                    if (Options.activeToken.IsCancellationRequested || !Options.mainIsAvailable) return;
                     if      (getTest == 0 && RadioSettingsTestBox.Checked) 
                             await forTests.GetRadioDataFromDevice(device, CmdOutput.GRAPH_GET_NEAR);
                     else if (getTest == 100) 
@@ -1557,7 +1628,7 @@ namespace RMDebugger
                     else    await forTests.GetDataFromDevice(device, CmdOutput.ROUTING_GET);
                 }
             }
-            while (Options.RS485TestState && Options.mainIsAvailable);
+            while (Options.activeProgress && !Options.activeToken.IsCancellationRequested);
         }
         async Task<DeviceClass> GetDeviceInfo(Searching search, ushort sign)
         {
@@ -1575,8 +1646,11 @@ namespace RMDebugger
         // //Add signature from Target numeric
         async private void AddTargetSignID(object sender, EventArgs e)
         {
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
+            Options.activeToken = new CancellationTokenSource();
             using (Searching search = new Searching(Options.mainInterface))
             {
+                Options.activeToken = new CancellationTokenSource();
                 search.ToReply += ToReplyStatus;                                                                                                                                                        
                 search.ToDebug += ToDebuggerWindow;
                 try { AddToGridDevice(await GetDeviceInfo(search, (ushort)TargetSignID.Value)); }
@@ -1587,18 +1661,16 @@ namespace RMDebugger
         // //Manual scan
         async private void ManualScanToTestClick(object sender, EventArgs e)
         {
-            Options.RS485ManualScanState = !Options.RS485ManualScanState;
-            if (Options.RS485ManualScanState)
-            {
-                AfterRS485ManualScanEvent(true);
-                offTabsExcept(RMData, TestPage);
-                offTabsExcept(TestPages, RS485Page);
-                await ManualScanRange();
-                Options.RS485ManualScanState = false;
-                AfterRS485ManualScanEvent(false);
-                onTabPages(RMData);
-                onTabPages(TestPages);
-            }
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
+            Options.activeToken = new CancellationTokenSource();
+            AfterRS485ManualScanEvent(true);
+            offTabsExcept(RMData, TestPage);
+            offTabsExcept(TestPages, RS485Page);
+            await ManualScanRange();
+            Options.RS485ManualScanState = false;
+            onTabPages(RMData);
+            onTabPages(TestPages);
+            AfterRS485ManualScanEvent(false);
         }
         private void AfterRS485ManualScanEvent(bool sw)
         {
@@ -1626,15 +1698,14 @@ namespace RMDebugger
                     search.ToReply += ToReplyStatus;
                     search.ToDebug += ToDebuggerWindow;
                     List<DeviceClass> devices = new List<DeviceClass>();
-                    int newDevices = 0;
-                    for (int i = (int)minSigToScan.Value; i <= maxSigToScan.Value && Options.RS485ManualScanState; i++)
+                    for (int i = (int)minSigToScan.Value, devs = 0; i <= maxSigToScan.Value && !Options.activeToken.IsCancellationRequested; i++)
                     {
-                        string deviceCount = newDevices > 0 ? $" (Catched: {newDevices})" : "";
+                        string deviceCount = devs > 0 ? $" (Catched: {devs})" : "";
                         try
                         {
                             ToMessageStatus($"Signature: {i} {deviceCount}");
                             devices.Add(await GetDeviceInfo(search, (ushort)i));
-                            newDevices++;
+                            devs++;
                         }
                         catch { }
                     }
@@ -1647,18 +1718,16 @@ namespace RMDebugger
         // //Auto scan
         async private void AutoScanToTestClick(object sender, EventArgs e)
         {
-            Options.RS485ManualScanState = !Options.RS485ManualScanState;
-            if (Options.RS485ManualScanState)
-            {
-                AfterRS485AutoScanEvent(true);
-                offTabsExcept(RMData, TestPage);
-                offTabsExcept(TestPages, RS485Page);
-                await AutoScanAdd();
-                Options.RS485ManualScanState = false;
-                AfterRS485AutoScanEvent(false);
-                onTabPages(RMData);
-                onTabPages(TestPages);
-            }
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
+            Options.activeToken = new CancellationTokenSource();
+            AfterRS485AutoScanEvent(true);
+            offTabsExcept(RMData, TestPage);
+            offTabsExcept(TestPages, RS485Page);
+            await AutoScanAdd();
+            Options.RS485ManualScanState = false;
+            onTabPages(RMData);
+            onTabPages(TestPages);
+            AfterRS485AutoScanEvent(false);
         }
         private void AfterRS485AutoScanEvent(bool sw)
         {
@@ -1700,7 +1769,7 @@ namespace RMDebugger
         private void minSigToScan_ValueChanged(object sender, EventArgs e)
         {
             maxSigToScan.Minimum = minSigToScan.Value;
-            if (minSigToScan.Value >= maxSigToScan.Value)
+            if (minSigToScan.Value > maxSigToScan.Value)
                 maxSigToScan.Value = minSigToScan.Value;
         }
 
@@ -1885,13 +1954,14 @@ namespace RMDebugger
         async private void SendCommandFromExtraButton(CmdOutput cmdOutput)
         {
             AfterSendExtraButtonEvent(true);
-            await Task.Run(() => SendCommandFromButtonTask(cmdOutput));
+            try { await Task.Run(() => SendCommandFromButtonTask(cmdOutput)); } catch { }
             AfterSendExtraButtonEvent(false);
         }
         async private Task SendCommandFromButtonTask(CmdOutput cmdOutput)
         {
             using (CommandsOutput cOutput = new CommandsOutput(Options.mainInterface))
             {
+                Options.activeToken = new CancellationTokenSource();
                 cOutput.ToReply += ToReplyStatus;
                 cOutput.ToDebug += ToDebuggerWindow;
                 byte[] cmdOut;
@@ -1934,12 +2004,12 @@ namespace RMDebugger
                                 "Кнопка отработана",
                                 $"Успешно отправлена команда {cmdOutput}",
                                 ToolTipIcon.Info);
-                        break;
+                        return;
                     }
                     catch { }
-                    finally { await Task.Delay((int)AutoExtraButtonsTimeout.Value); }
+                    await Task.Delay((int)AutoExtraButtonsTimeout.Value, Options.activeToken.Token);
                 }
-                while (AutoExtraButtons.Checked);
+                while (AutoExtraButtons.Checked && !Options.activeToken.IsCancellationRequested);
             };
         }
     }

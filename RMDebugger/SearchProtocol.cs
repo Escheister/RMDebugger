@@ -6,7 +6,6 @@ using System;
 using StaticSettings;
 using ProtocolEnums;
 using RMDebugger;
-using System.Collections;
 
 namespace SearchProtocol
 {
@@ -40,6 +39,7 @@ namespace SearchProtocol
                 }
                 while (ix != 0x00 && iteration <= 5);
             }
+            catch (OperationCanceledException) { Options.activeToken.Token.ThrowIfCancellationRequested(); }
             catch { }
             return deviceDataList;
         }
@@ -85,7 +85,6 @@ namespace SearchProtocol
                         devRSSI = rssi > 0 ? $"{rssi}" : ""
                     });
                 }
-                    
             return data;
         }
         public int GetVersion(byte[] bufferIn)  => bufferIn[bufferIn.Length - 3] << 8

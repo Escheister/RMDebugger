@@ -79,9 +79,14 @@ namespace RMDebugger
         private void AppendTimer_Tick(object sender, EventArgs e)
         {
             if (LogBox.Lines.Length > (int)Options.logSize)
+            {
                 LogBox.Lines = LogBox.Lines.Skip(
                     LogBox.Lines.Length + linesQueue.Count - (int)Options.logSize)
                     .ToArray();
+
+                LogBox.SelectionStart = LogBox.Text.Length;
+                LogBox.ScrollToCaret();
+            }
             while (linesQueue.Count > 0 && linesQueue.TryDequeue(out string line))
                     LogBox.AppendText(line);
             

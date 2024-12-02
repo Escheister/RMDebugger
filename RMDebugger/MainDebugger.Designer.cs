@@ -39,22 +39,20 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Who are you");
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Status");
             System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Get Near");
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle31 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle32 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle33 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle35 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle36 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle37 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -66,10 +64,8 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle28 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle29 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle30 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle31 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle32 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle33 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle34 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
             this.TargetSignID = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.mainPort = new System.IO.Ports.SerialPort(this.components);
@@ -128,10 +124,6 @@
             this.RMLRRepeat = new System.Windows.Forms.ToolStripMenuItem();
             this.ConfigFactoryCheck = new System.Windows.Forms.CheckBox();
             this.ConfigDataGrid = new System.Windows.Forms.DataGridView();
-            this.FieldsColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.EnabledColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.LoadFieldColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.UploadFieldColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ConfigClearMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ConfigEnableAllMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ConfigClearMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -141,14 +133,14 @@
             this.UploadConfigButton = new System.Windows.Forms.Button();
             this.LoadConfigButton = new System.Windows.Forms.Button();
             this.InfoPage = new System.Windows.Forms.TabPage();
-            this.InfoTreePanel = new System.Windows.Forms.Panel();
-            this.InfoClearGrid = new System.Windows.Forms.Button();
-            this.InfoSaveToCSVButton = new System.Windows.Forms.Button();
-            this.InfoFieldsGrid = new System.Windows.Forms.DataGridView();
-            this.InfoFieldRow = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.InfoValueRow = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.OpenCloseMenuInfoTree = new System.Windows.Forms.Button();
+            this.numericInfoSeconds = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            this.buttonInfoStop = new System.Windows.Forms.Button();
             this.InfoTree = new System.Windows.Forms.TreeView();
+            this.infoMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.clearInfoMenuStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
+            this.saveToCsvInfoMenuStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.TestPage = new System.Windows.Forms.TabPage();
             this.TestPages = new System.Windows.Forms.TabControl();
             this.RS485Page = new System.Windows.Forms.TabPage();
@@ -286,6 +278,10 @@
             this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FieldsColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.EnabledColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.LoadFieldColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.UploadFieldColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.TargetSignID)).BeginInit();
             this.RMData.SuspendLayout();
             this.SearchPage.SuspendLayout();
@@ -304,8 +300,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.ConfigDataGrid)).BeginInit();
             this.ConfigClearMenuStrip.SuspendLayout();
             this.InfoPage.SuspendLayout();
-            this.InfoTreePanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.InfoFieldsGrid)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericInfoSeconds)).BeginInit();
+            this.infoMenuStrip.SuspendLayout();
             this.TestPage.SuspendLayout();
             this.TestPages.SuspendLayout();
             this.RS485Page.SuspendLayout();
@@ -581,11 +577,6 @@
             this.SearchTimeout.Margin = new System.Windows.Forms.Padding(1);
             this.SearchTimeout.Maximum = new decimal(new int[] {
             10000,
-            0,
-            0,
-            0});
-            this.SearchTimeout.Minimum = new decimal(new int[] {
-            10,
             0,
             0,
             0});
@@ -1148,6 +1139,7 @@
             // 
             this.ConfigDataGrid.AllowUserToAddRows = false;
             this.ConfigDataGrid.AllowUserToOrderColumns = true;
+            this.ConfigDataGrid.AllowUserToResizeRows = false;
             this.ConfigDataGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -1162,88 +1154,41 @@
             dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.ConfigDataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
-            this.ConfigDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ConfigDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.ConfigDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.FieldsColumn,
             this.EnabledColumn,
             this.LoadFieldColumn,
             this.UploadFieldColumn});
             this.ConfigDataGrid.ContextMenuStrip = this.ConfigClearMenuStrip;
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ConfigDataGrid.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ConfigDataGrid.DefaultCellStyle = dataGridViewCellStyle12;
             this.ConfigDataGrid.EnableHeadersVisualStyles = false;
             this.ConfigDataGrid.GridColor = System.Drawing.Color.DarkGray;
             this.ConfigDataGrid.Location = new System.Drawing.Point(0, 0);
             this.ConfigDataGrid.Margin = new System.Windows.Forms.Padding(0);
             this.ConfigDataGrid.Name = "ConfigDataGrid";
             this.ConfigDataGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle11.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ConfigDataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle13.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ConfigDataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle13;
             this.ConfigDataGrid.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
             this.ConfigDataGrid.ShowEditingIcon = false;
             this.ConfigDataGrid.Size = new System.Drawing.Size(319, 201);
             this.ConfigDataGrid.TabIndex = 0;
             this.ConfigDataGrid.TabStop = false;
             this.ConfigDataGrid.VirtualMode = true;
-            // 
-            // FieldsColumn
-            // 
-            this.FieldsColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.FieldsColumn.DataPropertyName = "fieldName";
-            this.FieldsColumn.Frozen = true;
-            this.FieldsColumn.HeaderText = "Field";
-            this.FieldsColumn.MaxInputLength = 16;
-            this.FieldsColumn.Name = "FieldsColumn";
-            this.FieldsColumn.ReadOnly = true;
-            this.FieldsColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.FieldsColumn.Width = 35;
-            // 
-            // EnabledColumn
-            // 
-            this.EnabledColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.EnabledColumn.DataPropertyName = "fieldActive";
-            this.EnabledColumn.FillWeight = 20F;
-            this.EnabledColumn.Frozen = true;
-            this.EnabledColumn.HeaderText = "";
-            this.EnabledColumn.MinimumWidth = 20;
-            this.EnabledColumn.Name = "EnabledColumn";
-            this.EnabledColumn.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.EnabledColumn.Width = 20;
-            // 
-            // LoadFieldColumn
-            // 
-            this.LoadFieldColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.LoadFieldColumn.DataPropertyName = "loadValue";
-            this.LoadFieldColumn.FillWeight = 140F;
-            this.LoadFieldColumn.HeaderText = "Load Value";
-            this.LoadFieldColumn.MaxInputLength = 16;
-            this.LoadFieldColumn.MinimumWidth = 100;
-            this.LoadFieldColumn.Name = "LoadFieldColumn";
-            this.LoadFieldColumn.ReadOnly = true;
-            this.LoadFieldColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // UploadFieldColumn
-            // 
-            this.UploadFieldColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.UploadFieldColumn.DataPropertyName = "uploadValue";
-            this.UploadFieldColumn.FillWeight = 140F;
-            this.UploadFieldColumn.HeaderText = "Upload Value";
-            this.UploadFieldColumn.MaxInputLength = 16;
-            this.UploadFieldColumn.MinimumWidth = 100;
-            this.UploadFieldColumn.Name = "UploadFieldColumn";
-            this.UploadFieldColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // ConfigClearMenuStrip
             // 
@@ -1324,7 +1269,9 @@
             // InfoPage
             // 
             this.InfoPage.BackColor = System.Drawing.Color.White;
-            this.InfoPage.Controls.Add(this.InfoTreePanel);
+            this.InfoPage.Controls.Add(this.numericInfoSeconds);
+            this.InfoPage.Controls.Add(this.label3);
+            this.InfoPage.Controls.Add(this.buttonInfoStop);
             this.InfoPage.Controls.Add(this.InfoTree);
             this.InfoPage.Location = new System.Drawing.Point(4, 22);
             this.InfoPage.Name = "InfoPage";
@@ -1333,154 +1280,52 @@
             this.InfoPage.TabIndex = 7;
             this.InfoPage.Text = "Info";
             // 
-            // InfoTreePanel
+            // numericInfoSeconds
             // 
-            this.InfoTreePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.InfoTreePanel.BackColor = System.Drawing.Color.White;
-            this.InfoTreePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.InfoTreePanel.Controls.Add(this.InfoClearGrid);
-            this.InfoTreePanel.Controls.Add(this.InfoSaveToCSVButton);
-            this.InfoTreePanel.Controls.Add(this.InfoFieldsGrid);
-            this.InfoTreePanel.Controls.Add(this.OpenCloseMenuInfoTree);
-            this.InfoTreePanel.Location = new System.Drawing.Point(142, 0);
-            this.InfoTreePanel.Margin = new System.Windows.Forms.Padding(0);
-            this.InfoTreePanel.Name = "InfoTreePanel";
-            this.InfoTreePanel.Size = new System.Drawing.Size(177, 266);
-            this.InfoTreePanel.TabIndex = 2;
+            this.numericInfoSeconds.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numericInfoSeconds.Location = new System.Drawing.Point(44, 246);
+            this.numericInfoSeconds.Margin = new System.Windows.Forms.Padding(1);
+            this.numericInfoSeconds.Maximum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
+            this.numericInfoSeconds.Name = "numericInfoSeconds";
+            this.numericInfoSeconds.Size = new System.Drawing.Size(34, 20);
+            this.numericInfoSeconds.TabIndex = 5;
+            this.numericInfoSeconds.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.ToolTipHelper.SetToolTip(this.numericInfoSeconds, "Время ожидания ответа, в секундах");
+            this.numericInfoSeconds.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
             // 
-            // InfoClearGrid
+            // label3
             // 
-            this.InfoClearGrid.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.InfoClearGrid.Location = new System.Drawing.Point(95, 241);
-            this.InfoClearGrid.Margin = new System.Windows.Forms.Padding(0);
-            this.InfoClearGrid.Name = "InfoClearGrid";
-            this.InfoClearGrid.Size = new System.Drawing.Size(80, 23);
-            this.InfoClearGrid.TabIndex = 6;
-            this.InfoClearGrid.Text = "Clear";
-            this.InfoClearGrid.UseVisualStyleBackColor = true;
-            this.InfoClearGrid.Click += new System.EventHandler(this.InfoClearGrid_Click);
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(0, 249);
+            this.label3.Margin = new System.Windows.Forms.Padding(1);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(45, 13);
+            this.label3.TabIndex = 45;
+            this.label3.Text = "Timeout";
             // 
-            // InfoSaveToCSVButton
+            // buttonInfoStop
             // 
-            this.InfoSaveToCSVButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.InfoSaveToCSVButton.Location = new System.Drawing.Point(14, 241);
-            this.InfoSaveToCSVButton.Margin = new System.Windows.Forms.Padding(0);
-            this.InfoSaveToCSVButton.Name = "InfoSaveToCSVButton";
-            this.InfoSaveToCSVButton.Size = new System.Drawing.Size(80, 23);
-            this.InfoSaveToCSVButton.TabIndex = 5;
-            this.InfoSaveToCSVButton.Text = "To CSV";
-            this.InfoSaveToCSVButton.UseVisualStyleBackColor = true;
-            this.InfoSaveToCSVButton.Click += new System.EventHandler(this.InfoSaveToCSVButton_Click);
-            // 
-            // InfoFieldsGrid
-            // 
-            this.InfoFieldsGrid.AllowUserToAddRows = false;
-            this.InfoFieldsGrid.AllowUserToDeleteRows = false;
-            this.InfoFieldsGrid.AllowUserToResizeColumns = false;
-            this.InfoFieldsGrid.AllowUserToResizeRows = false;
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.InfoFieldsGrid.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle12;
-            this.InfoFieldsGrid.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.InfoFieldsGrid.BackgroundColor = System.Drawing.Color.White;
-            this.InfoFieldsGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.InfoFieldsGrid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.InfoFieldsGrid.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
-            this.InfoFieldsGrid.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle13.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle13.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle13.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.InfoFieldsGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
-            this.InfoFieldsGrid.ColumnHeadersHeight = 18;
-            this.InfoFieldsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            this.InfoFieldsGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.InfoFieldRow,
-            this.InfoValueRow});
-            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle16.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle16.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle16.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.InfoFieldsGrid.DefaultCellStyle = dataGridViewCellStyle16;
-            this.InfoFieldsGrid.GridColor = System.Drawing.Color.White;
-            this.InfoFieldsGrid.Location = new System.Drawing.Point(17, -1);
-            this.InfoFieldsGrid.MultiSelect = false;
-            this.InfoFieldsGrid.Name = "InfoFieldsGrid";
-            this.InfoFieldsGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.InfoFieldsGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle17;
-            this.InfoFieldsGrid.RowHeadersVisible = false;
-            this.InfoFieldsGrid.RowHeadersWidth = 25;
-            this.InfoFieldsGrid.RowTemplate.DefaultCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.InfoFieldsGrid.RowTemplate.Height = 18;
-            this.InfoFieldsGrid.RowTemplate.ReadOnly = true;
-            this.InfoFieldsGrid.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.InfoFieldsGrid.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.InfoFieldsGrid.Size = new System.Drawing.Size(160, 239);
-            this.InfoFieldsGrid.TabIndex = 4;
-            // 
-            // InfoFieldRow
-            // 
-            this.InfoFieldRow.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle14.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.Color.Black;
-            this.InfoFieldRow.DefaultCellStyle = dataGridViewCellStyle14;
-            this.InfoFieldRow.HeaderText = "Field";
-            this.InfoFieldRow.MaxInputLength = 5;
-            this.InfoFieldRow.MinimumWidth = 60;
-            this.InfoFieldRow.Name = "InfoFieldRow";
-            this.InfoFieldRow.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.InfoFieldRow.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // InfoValueRow
-            // 
-            this.InfoValueRow.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle15.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle15.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.Color.Black;
-            this.InfoValueRow.DefaultCellStyle = dataGridViewCellStyle15;
-            this.InfoValueRow.HeaderText = "Value";
-            this.InfoValueRow.MaxInputLength = 6;
-            this.InfoValueRow.MinimumWidth = 60;
-            this.InfoValueRow.Name = "InfoValueRow";
-            this.InfoValueRow.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.InfoValueRow.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.InfoValueRow.Width = 60;
-            // 
-            // OpenCloseMenuInfoTree
-            // 
-            this.OpenCloseMenuInfoTree.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.OpenCloseMenuInfoTree.FlatAppearance.BorderSize = 0;
-            this.OpenCloseMenuInfoTree.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.OpenCloseMenuInfoTree.Location = new System.Drawing.Point(-1, -1);
-            this.OpenCloseMenuInfoTree.Margin = new System.Windows.Forms.Padding(0);
-            this.OpenCloseMenuInfoTree.Name = "OpenCloseMenuInfoTree";
-            this.OpenCloseMenuInfoTree.Size = new System.Drawing.Size(15, 266);
-            this.OpenCloseMenuInfoTree.TabIndex = 0;
-            this.OpenCloseMenuInfoTree.Text = ">";
-            this.OpenCloseMenuInfoTree.UseVisualStyleBackColor = true;
-            this.OpenCloseMenuInfoTree.Click += new System.EventHandler(this.OpenCloseMenuInfoTree_Click);
+            this.buttonInfoStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonInfoStop.BackColor = System.Drawing.Color.White;
+            this.buttonInfoStop.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.buttonInfoStop.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.buttonInfoStop.Location = new System.Drawing.Point(80, 245);
+            this.buttonInfoStop.Margin = new System.Windows.Forms.Padding(1);
+            this.buttonInfoStop.Name = "buttonInfoStop";
+            this.buttonInfoStop.Size = new System.Drawing.Size(37, 22);
+            this.buttonInfoStop.TabIndex = 44;
+            this.buttonInfoStop.Text = "Stop";
+            this.buttonInfoStop.UseVisualStyleBackColor = false;
+            this.buttonInfoStop.Visible = false;
             // 
             // InfoTree
             // 
@@ -1488,9 +1333,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.InfoTree.BackColor = System.Drawing.Color.White;
-            this.InfoTree.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.InfoTree.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.InfoTree.ContextMenuStrip = this.infoMenuStrip;
             this.InfoTree.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.InfoTree.HotTracking = true;
             this.InfoTree.Indent = 15;
             this.InfoTree.ItemHeight = 17;
             this.InfoTree.Location = new System.Drawing.Point(0, 0);
@@ -1518,9 +1363,38 @@
             treeNode1,
             treeNode2,
             treeNode3});
+            this.InfoTree.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.InfoTree.ShowNodeToolTips = true;
-            this.InfoTree.Size = new System.Drawing.Size(302, 262);
+            this.InfoTree.ShowRootLines = false;
+            this.InfoTree.Size = new System.Drawing.Size(319, 244);
             this.InfoTree.TabIndex = 1;
+            this.ToolTipHelper.SetToolTip(this.InfoTree, "Нажмите правую кнопку мыши для дополнительного меню");
+            // 
+            // infoMenuStrip
+            // 
+            this.infoMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.clearInfoMenuStrip,
+            this.toolStripSeparator8,
+            this.saveToCsvInfoMenuStrip});
+            this.infoMenuStrip.Name = "infoMenuStrip";
+            this.infoMenuStrip.Size = new System.Drawing.Size(156, 54);
+            // 
+            // clearInfoMenuStrip
+            // 
+            this.clearInfoMenuStrip.Name = "clearInfoMenuStrip";
+            this.clearInfoMenuStrip.Size = new System.Drawing.Size(155, 22);
+            this.clearInfoMenuStrip.Text = "Clear";
+            // 
+            // toolStripSeparator8
+            // 
+            this.toolStripSeparator8.Name = "toolStripSeparator8";
+            this.toolStripSeparator8.Size = new System.Drawing.Size(152, 6);
+            // 
+            // saveToCsvInfoMenuStrip
+            // 
+            this.saveToCsvInfoMenuStrip.Name = "saveToCsvInfoMenuStrip";
+            this.saveToCsvInfoMenuStrip.Size = new System.Drawing.Size(155, 22);
+            this.saveToCsvInfoMenuStrip.Text = "Save to CSV file";
             // 
             // TestPage
             // 
@@ -1975,6 +1849,7 @@
             this.minSigToScan.TabIndex = 28;
             this.minSigToScan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.ToolTipHelper.SetToolTip(this.minSigToScan, "Minimum addr");
+            this.minSigToScan.UpDownAlign = System.Windows.Forms.LeftRightAlignment.Left;
             this.minSigToScan.Value = new decimal(new int[] {
             1,
             0,
@@ -2036,8 +1911,8 @@
             this.StatusRS485GridView.AllowUserToAddRows = false;
             this.StatusRS485GridView.AllowUserToOrderColumns = true;
             this.StatusRS485GridView.AllowUserToResizeRows = false;
-            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.StatusRS485GridView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.StatusRS485GridView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle14;
             this.StatusRS485GridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -2047,14 +1922,14 @@
             this.StatusRS485GridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.StatusRS485GridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
             this.StatusRS485GridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle19.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle19.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle19.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle19.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle19.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle19.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.StatusRS485GridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle19;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle15.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle15.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle15.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.StatusRS485GridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle15;
             this.StatusRS485GridView.ColumnHeadersHeight = 18;
             this.StatusRS485GridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.StatusRS485GridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -2073,33 +1948,33 @@
             this.RadioNearbyStatusRM,
             this.WorkTimeStatusRM,
             this.VerStatusRM});
-            dataGridViewCellStyle35.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle35.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle35.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle35.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle35.SelectionBackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            dataGridViewCellStyle35.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle35.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.StatusRS485GridView.DefaultCellStyle = dataGridViewCellStyle35;
+            dataGridViewCellStyle31.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle31.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle31.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle31.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle31.SelectionBackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            dataGridViewCellStyle31.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle31.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.StatusRS485GridView.DefaultCellStyle = dataGridViewCellStyle31;
             this.StatusRS485GridView.GridColor = System.Drawing.Color.White;
             this.StatusRS485GridView.Location = new System.Drawing.Point(2, 2);
             this.StatusRS485GridView.Margin = new System.Windows.Forms.Padding(1);
             this.StatusRS485GridView.Name = "StatusRS485GridView";
             this.StatusRS485GridView.ReadOnly = true;
             this.StatusRS485GridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle36.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle36.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle36.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle36.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle36.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle36.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle36.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.StatusRS485GridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle36;
+            dataGridViewCellStyle32.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle32.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle32.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle32.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle32.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle32.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle32.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.StatusRS485GridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle32;
             this.StatusRS485GridView.RowHeadersVisible = false;
             this.StatusRS485GridView.RowHeadersWidth = 25;
             this.StatusRS485GridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle37.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.StatusRS485GridView.RowsDefaultCellStyle = dataGridViewCellStyle37;
+            dataGridViewCellStyle33.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.StatusRS485GridView.RowsDefaultCellStyle = dataGridViewCellStyle33;
             this.StatusRS485GridView.RowTemplate.DefaultCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.StatusRS485GridView.RowTemplate.ErrorText = "???";
             this.StatusRS485GridView.RowTemplate.Height = 12;
@@ -2118,8 +1993,8 @@
             // 
             this.InterfaceStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.InterfaceStatusRM.DataPropertyName = "devInterface";
-            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            this.InterfaceStatusRM.DefaultCellStyle = dataGridViewCellStyle20;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            this.InterfaceStatusRM.DefaultCellStyle = dataGridViewCellStyle16;
             this.InterfaceStatusRM.HeaderText = "Interface";
             this.InterfaceStatusRM.MaxInputLength = 5;
             this.InterfaceStatusRM.MinimumWidth = 50;
@@ -2132,8 +2007,8 @@
             // 
             this.SignStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.SignStatusRM.DataPropertyName = "devSign";
-            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.SignStatusRM.DefaultCellStyle = dataGridViewCellStyle21;
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.SignStatusRM.DefaultCellStyle = dataGridViewCellStyle17;
             this.SignStatusRM.FillWeight = 50F;
             this.SignStatusRM.HeaderText = "Sign";
             this.SignStatusRM.MaxInputLength = 5;
@@ -2147,8 +2022,8 @@
             // 
             this.TypeStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.TypeStatusRM.DataPropertyName = "devType";
-            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.TypeStatusRM.DefaultCellStyle = dataGridViewCellStyle22;
+            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.TypeStatusRM.DefaultCellStyle = dataGridViewCellStyle18;
             this.TypeStatusRM.FillWeight = 45F;
             this.TypeStatusRM.HeaderText = "Type";
             this.TypeStatusRM.MaxInputLength = 5;
@@ -2162,8 +2037,8 @@
             // 
             this.StatusStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.StatusStatusRM.DataPropertyName = "devStatus";
-            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.StatusStatusRM.DefaultCellStyle = dataGridViewCellStyle23;
+            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.StatusStatusRM.DefaultCellStyle = dataGridViewCellStyle19;
             this.StatusStatusRM.FillWeight = 45F;
             this.StatusStatusRM.HeaderText = "Status";
             this.StatusStatusRM.MaxInputLength = 4;
@@ -2177,8 +2052,8 @@
             // 
             this.TxStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.TxStatusRM.DataPropertyName = "devTx";
-            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.TxStatusRM.DefaultCellStyle = dataGridViewCellStyle24;
+            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.TxStatusRM.DefaultCellStyle = dataGridViewCellStyle20;
             this.TxStatusRM.FillWeight = 75F;
             this.TxStatusRM.HeaderText = "Tx";
             this.TxStatusRM.MaxInputLength = 7;
@@ -2192,8 +2067,8 @@
             // 
             this.RxStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.RxStatusRM.DataPropertyName = "devRx";
-            dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.RxStatusRM.DefaultCellStyle = dataGridViewCellStyle25;
+            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.RxStatusRM.DefaultCellStyle = dataGridViewCellStyle21;
             this.RxStatusRM.FillWeight = 75F;
             this.RxStatusRM.HeaderText = "Rx";
             this.RxStatusRM.MaxInputLength = 7;
@@ -2207,8 +2082,8 @@
             // 
             this.ErrorStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.ErrorStatusRM.DataPropertyName = "devErrors";
-            dataGridViewCellStyle26.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.ErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle26;
+            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle22;
             this.ErrorStatusRM.FillWeight = 75F;
             this.ErrorStatusRM.HeaderText = "Error";
             this.ErrorStatusRM.MaxInputLength = 7;
@@ -2222,10 +2097,10 @@
             // 
             this.PercentErrorStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.PercentErrorStatusRM.DataPropertyName = "devPercentErrors";
-            dataGridViewCellStyle27.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle27.Format = "N3";
-            dataGridViewCellStyle27.NullValue = null;
-            this.PercentErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle27;
+            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle23.Format = "N3";
+            dataGridViewCellStyle23.NullValue = null;
+            this.PercentErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle23;
             this.PercentErrorStatusRM.FillWeight = 75F;
             this.PercentErrorStatusRM.HeaderText = "%Error";
             this.PercentErrorStatusRM.MaxInputLength = 7;
@@ -2239,8 +2114,8 @@
             // 
             this.DisconnectedStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.DisconnectedStatusRM.DataPropertyName = "devNoReply";
-            dataGridViewCellStyle28.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.DisconnectedStatusRM.DefaultCellStyle = dataGridViewCellStyle28;
+            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.DisconnectedStatusRM.DefaultCellStyle = dataGridViewCellStyle24;
             this.DisconnectedStatusRM.FillWeight = 75F;
             this.DisconnectedStatusRM.HeaderText = "No Reply";
             this.DisconnectedStatusRM.MaxInputLength = 7;
@@ -2255,8 +2130,8 @@
             // 
             this.BadReplyStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.BadReplyStatusRM.DataPropertyName = "devBadReply";
-            dataGridViewCellStyle29.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.BadReplyStatusRM.DefaultCellStyle = dataGridViewCellStyle29;
+            dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.BadReplyStatusRM.DefaultCellStyle = dataGridViewCellStyle25;
             this.BadReplyStatusRM.FillWeight = 75F;
             this.BadReplyStatusRM.HeaderText = "Bad Reply";
             this.BadReplyStatusRM.MaxInputLength = 7;
@@ -2271,8 +2146,8 @@
             // 
             this.BadCrcStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.BadCrcStatusRM.DataPropertyName = "devBadCRC";
-            dataGridViewCellStyle30.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.BadCrcStatusRM.DefaultCellStyle = dataGridViewCellStyle30;
+            dataGridViewCellStyle26.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.BadCrcStatusRM.DefaultCellStyle = dataGridViewCellStyle26;
             this.BadCrcStatusRM.FillWeight = 75F;
             this.BadCrcStatusRM.HeaderText = "Bad CRC";
             this.BadCrcStatusRM.MaxInputLength = 7;
@@ -2287,8 +2162,8 @@
             // 
             this.RadioErrorStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.RadioErrorStatusRM.DataPropertyName = "devBadRadio";
-            dataGridViewCellStyle31.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.RadioErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle31;
+            dataGridViewCellStyle27.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.RadioErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle27;
             this.RadioErrorStatusRM.FillWeight = 75F;
             this.RadioErrorStatusRM.HeaderText = "Bad Radio";
             this.RadioErrorStatusRM.MaxInputLength = 7;
@@ -2303,8 +2178,8 @@
             // 
             this.RadioNearbyStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.RadioNearbyStatusRM.DataPropertyName = "devNearbyDevs";
-            dataGridViewCellStyle32.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.RadioNearbyStatusRM.DefaultCellStyle = dataGridViewCellStyle32;
+            dataGridViewCellStyle28.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.RadioNearbyStatusRM.DefaultCellStyle = dataGridViewCellStyle28;
             this.RadioNearbyStatusRM.HeaderText = "Nearby";
             this.RadioNearbyStatusRM.MaxInputLength = 2;
             this.RadioNearbyStatusRM.Name = "RadioNearbyStatusRM";
@@ -2317,9 +2192,9 @@
             // 
             this.WorkTimeStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.WorkTimeStatusRM.DataPropertyName = "devWorkTime";
-            dataGridViewCellStyle33.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle33.NullValue = null;
-            this.WorkTimeStatusRM.DefaultCellStyle = dataGridViewCellStyle33;
+            dataGridViewCellStyle29.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle29.NullValue = null;
+            this.WorkTimeStatusRM.DefaultCellStyle = dataGridViewCellStyle29;
             this.WorkTimeStatusRM.HeaderText = "Work Time";
             this.WorkTimeStatusRM.MaxInputLength = 32;
             this.WorkTimeStatusRM.MinimumWidth = 70;
@@ -2332,8 +2207,8 @@
             // 
             this.VerStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.VerStatusRM.DataPropertyName = "devVer";
-            dataGridViewCellStyle34.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.VerStatusRM.DefaultCellStyle = dataGridViewCellStyle34;
+            dataGridViewCellStyle30.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.VerStatusRM.DefaultCellStyle = dataGridViewCellStyle30;
             this.VerStatusRM.FillWeight = 35F;
             this.VerStatusRM.HeaderText = "Ver";
             this.VerStatusRM.MaxInputLength = 4;
@@ -2625,7 +2500,7 @@
             this.saveToRegToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("saveToRegToolStripMenuItem.Image")));
             this.saveToRegToolStripMenuItem.Name = "saveToRegToolStripMenuItem";
             this.saveToRegToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.saveToRegToolStripMenuItem.Size = new System.Drawing.Size(184, 26);
+            this.saveToRegToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.saveToRegToolStripMenuItem.Text = "Save in PC";
             this.saveToRegToolStripMenuItem.ToolTipText = "Выполняет сохранение настройки пользователя в реестр";
             this.saveToRegToolStripMenuItem.Click += new System.EventHandler(this.saveToRegToolStripMenuItem_Click);
@@ -2635,7 +2510,7 @@
             this.loadFromPCToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("loadFromPCToolStripMenuItem.Image")));
             this.loadFromPCToolStripMenuItem.Name = "loadFromPCToolStripMenuItem";
             this.loadFromPCToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.loadFromPCToolStripMenuItem.Size = new System.Drawing.Size(184, 26);
+            this.loadFromPCToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.loadFromPCToolStripMenuItem.Text = "Load from PC";
             this.loadFromPCToolStripMenuItem.ToolTipText = "Выполняет загрузку настройки пользователя из реестра";
             // 
@@ -2644,14 +2519,14 @@
             this.deleteSaveFromPCToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("deleteSaveFromPCToolStripMenuItem.Image")));
             this.deleteSaveFromPCToolStripMenuItem.Name = "deleteSaveFromPCToolStripMenuItem";
             this.deleteSaveFromPCToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.deleteSaveFromPCToolStripMenuItem.Size = new System.Drawing.Size(184, 26);
+            this.deleteSaveFromPCToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.deleteSaveFromPCToolStripMenuItem.Text = "Delete from PC";
             this.deleteSaveFromPCToolStripMenuItem.ToolTipText = "Выполняет удаление настройки пользователя из реестра\r\n";
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(181, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(151, 6);
             // 
             // toolStripMenuItem1
             // 
@@ -2662,7 +2537,7 @@
             this.extendedButtonsToolStrip});
             this.toolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem1.Image")));
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(184, 26);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(154, 22);
             this.toolStripMenuItem1.Text = "Settings";
             // 
             // transparentToolStrip
@@ -2673,7 +2548,7 @@
             this.transparentToolStrip.CheckOnClick = true;
             this.transparentToolStrip.CheckState = System.Windows.Forms.CheckState.Checked;
             this.transparentToolStrip.Name = "transparentToolStrip";
-            this.transparentToolStrip.Size = new System.Drawing.Size(180, 22);
+            this.transparentToolStrip.Size = new System.Drawing.Size(167, 22);
             this.transparentToolStrip.Text = "Transparent";
             this.transparentToolStrip.ToolTipText = "Прозрачность основного окна";
             // 
@@ -2685,7 +2560,7 @@
             this.messagesToolStrip.CheckOnClick = true;
             this.messagesToolStrip.CheckState = System.Windows.Forms.CheckState.Checked;
             this.messagesToolStrip.Name = "messagesToolStrip";
-            this.messagesToolStrip.Size = new System.Drawing.Size(180, 22);
+            this.messagesToolStrip.Size = new System.Drawing.Size(167, 22);
             this.messagesToolStrip.Text = "Messages";
             this.messagesToolStrip.ToolTipText = "Всплывающие сообщения";
             // 
@@ -2694,7 +2569,7 @@
             this.windowPinToolStrip.BackColor = System.Drawing.Color.White;
             this.windowPinToolStrip.CheckOnClick = true;
             this.windowPinToolStrip.Name = "windowPinToolStrip";
-            this.windowPinToolStrip.Size = new System.Drawing.Size(180, 22);
+            this.windowPinToolStrip.Size = new System.Drawing.Size(167, 22);
             this.windowPinToolStrip.Text = "Window pin";
             this.windowPinToolStrip.ToolTipText = "Обычное состояние окна";
             // 
@@ -2702,20 +2577,20 @@
             // 
             this.extendedButtonsToolStrip.CheckOnClick = true;
             this.extendedButtonsToolStrip.Name = "extendedButtonsToolStrip";
-            this.extendedButtonsToolStrip.Size = new System.Drawing.Size(180, 22);
+            this.extendedButtonsToolStrip.Size = new System.Drawing.Size(167, 22);
             this.extendedButtonsToolStrip.Text = "Extended buttons";
             this.extendedButtonsToolStrip.ToolTipText = "Дополнительные кнопки";
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(181, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(151, 6);
             // 
             // clearSettingsToolStrip
             // 
             this.clearSettingsToolStrip.Image = ((System.Drawing.Image)(resources.GetObject("clearSettingsToolStrip.Image")));
             this.clearSettingsToolStrip.Name = "clearSettingsToolStrip";
-            this.clearSettingsToolStrip.Size = new System.Drawing.Size(184, 26);
+            this.clearSettingsToolStrip.Size = new System.Drawing.Size(154, 22);
             this.clearSettingsToolStrip.Text = "Clear settings";
             this.clearSettingsToolStrip.ToolTipText = "Выполняет сброс всех настроек, которые были сохранены пользователем ранее";
             this.clearSettingsToolStrip.Click += new System.EventHandler(this.clearSettingsToolStripMenuItem_Click);
@@ -2898,7 +2773,7 @@
             this.DinoRunningProcessOk.Margin = new System.Windows.Forms.Padding(0);
             this.DinoRunningProcessOk.Name = "DinoRunningProcessOk";
             this.DinoRunningProcessOk.Size = new System.Drawing.Size(25, 25);
-            this.DinoRunningProcessOk.ToolTipText = "Dino goes ROAR";
+            this.DinoRunningProcessOk.ToolTipText = "Dino goes ROAR\r\nAnd he can stop any task!";
             this.DinoRunningProcessOk.Visible = false;
             // 
             // SignaturePanel
@@ -3235,6 +3110,60 @@
             this.dataGridViewTextBoxColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.dataGridViewTextBoxColumn1.Width = 60;
             // 
+            // FieldsColumn
+            // 
+            this.FieldsColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.FieldsColumn.DataPropertyName = "fieldName";
+            this.FieldsColumn.FillWeight = 200F;
+            this.FieldsColumn.Frozen = true;
+            this.FieldsColumn.HeaderText = "Field";
+            this.FieldsColumn.MaxInputLength = 16;
+            this.FieldsColumn.Name = "FieldsColumn";
+            this.FieldsColumn.ReadOnly = true;
+            this.FieldsColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.FieldsColumn.Width = 35;
+            // 
+            // EnabledColumn
+            // 
+            this.EnabledColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.EnabledColumn.DataPropertyName = "fieldActive";
+            this.EnabledColumn.FillWeight = 20F;
+            this.EnabledColumn.Frozen = true;
+            this.EnabledColumn.HeaderText = "";
+            this.EnabledColumn.MinimumWidth = 20;
+            this.EnabledColumn.Name = "EnabledColumn";
+            this.EnabledColumn.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.EnabledColumn.Width = 20;
+            // 
+            // LoadFieldColumn
+            // 
+            this.LoadFieldColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.LoadFieldColumn.DataPropertyName = "loadValue";
+            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.LoadFieldColumn.DefaultCellStyle = dataGridViewCellStyle10;
+            this.LoadFieldColumn.FillWeight = 200F;
+            this.LoadFieldColumn.HeaderText = "Load Value";
+            this.LoadFieldColumn.MaxInputLength = 16;
+            this.LoadFieldColumn.MinimumWidth = 80;
+            this.LoadFieldColumn.Name = "LoadFieldColumn";
+            this.LoadFieldColumn.ReadOnly = true;
+            this.LoadFieldColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.LoadFieldColumn.Width = 80;
+            // 
+            // UploadFieldColumn
+            // 
+            this.UploadFieldColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.UploadFieldColumn.DataPropertyName = "uploadValue";
+            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.UploadFieldColumn.DefaultCellStyle = dataGridViewCellStyle11;
+            this.UploadFieldColumn.FillWeight = 200F;
+            this.UploadFieldColumn.HeaderText = "Upload Value";
+            this.UploadFieldColumn.MaxInputLength = 16;
+            this.UploadFieldColumn.MinimumWidth = 80;
+            this.UploadFieldColumn.Name = "UploadFieldColumn";
+            this.UploadFieldColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.UploadFieldColumn.Width = 80;
+            // 
             // MainDebugger
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -3277,8 +3206,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.ConfigDataGrid)).EndInit();
             this.ConfigClearMenuStrip.ResumeLayout(false);
             this.InfoPage.ResumeLayout(false);
-            this.InfoTreePanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.InfoFieldsGrid)).EndInit();
+            this.InfoPage.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericInfoSeconds)).EndInit();
+            this.infoMenuStrip.ResumeLayout(false);
             this.TestPage.ResumeLayout(false);
             this.TestPages.ResumeLayout(false);
             this.RS485Page.ResumeLayout(false);
@@ -3396,8 +3326,6 @@
         private System.Windows.Forms.NotifyIcon NotifyMessage;
         private System.Windows.Forms.TabPage InfoPage;
         private System.Windows.Forms.TreeView InfoTree;
-        private System.Windows.Forms.Panel InfoTreePanel;
-        private System.Windows.Forms.Button OpenCloseMenuInfoTree;
         private System.Windows.Forms.GroupBox ExtraButtonsGroup;
         private System.Windows.Forms.Button ResetButton;
         private System.Windows.Forms.Button SetOnlineButton;
@@ -3409,9 +3337,6 @@
         private System.Windows.Forms.Button SetBootloaderStartButton;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.NumericUpDown SetOnlineFreqNumeric;
-        private System.Windows.Forms.Button InfoClearGrid;
-        private System.Windows.Forms.Button InfoSaveToCSVButton;
-        private System.Windows.Forms.DataGridView InfoFieldsGrid;
         private System.Windows.Forms.CheckBox RadioSettingsTestBox;
         public System.Windows.Forms.NumericUpDown maxSigToScan;
         public System.Windows.Forms.NumericUpDown minSigToScan;
@@ -3460,8 +3385,6 @@
         private System.Windows.Forms.CheckBox HexCheckCrc;
         public System.Windows.Forms.NumericUpDown HexTimeout;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.DataGridViewTextBoxColumn InfoFieldRow;
-        private System.Windows.Forms.DataGridViewTextBoxColumn InfoValueRow;
         private System.Windows.Forms.CheckBox ClearBufferSettingsTestBox;
         private System.Windows.Forms.ToolStripMenuItem extendedButtonsToolStrip;
         private System.Windows.Forms.Label HexUploadFilename;
@@ -3485,10 +3408,6 @@
         private System.Windows.Forms.TextBox ConfigFieldTextBox;
         private System.Windows.Forms.Button ConfigAddField;
         private System.Windows.Forms.ToolStripMenuItem ConfigEnableAllMenuItem;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FieldsColumn;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn EnabledColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn LoadFieldColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn UploadFieldColumn;
         private System.Windows.Forms.ContextMenuStrip SearchFindSignatureColorMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem SearchChangeColorMenuItem;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
@@ -3538,5 +3457,16 @@
         private System.Windows.Forms.ToolStripMenuItem rMGToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rMHToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rMTAToolStripMenuItem;
+        private System.Windows.Forms.Button buttonInfoStop;
+        public System.Windows.Forms.NumericUpDown numericInfoSeconds;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ContextMenuStrip infoMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem clearInfoMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem saveToCsvInfoMenuStrip;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FieldsColumn;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn EnabledColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn LoadFieldColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn UploadFieldColumn;
     }
 }
