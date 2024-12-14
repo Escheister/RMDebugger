@@ -36,10 +36,6 @@ namespace StaticSettings
         public static int hexTimeout { get; set; } = 20;
         public static bool checkCrc { get; set; }
 
-        //Config
-        public static bool ConfigUploadState { get; set; } = false;
-        public static bool ConfigLoadState { get; set; } = false;
-
         //Info
         public static InformationData infoData = new InformationData();
 

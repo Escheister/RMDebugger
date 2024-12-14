@@ -24,6 +24,8 @@ using File_Verifier;
 using ProtocolEnums;
 using CRC16;
 using CSV;
+using System.DirectoryServices;
+using System.Runtime.CompilerServices;
 
 namespace RMDebugger
 {
@@ -36,6 +38,7 @@ namespace RMDebugger
         private string[] fieldsFounded = new string[5] { "addr", "fio", "lamp", "puid", "rmb" };
 
         BindingList<FieldConfiguration> fieldsData = new BindingList<FieldConfiguration>();
+        BindingList<FieldConfiguration> settingsRMLRData = new BindingList<FieldConfiguration>();
         BindingList<DeviceClass> testerData = new BindingList<DeviceClass>();
         BindingList<DeviceData> deviceData = new BindingList<DeviceData>();
 
@@ -73,6 +76,8 @@ namespace RMDebugger
             StatusRS485GridView.DoubleBuffered(true);
             ConfigDataGrid.DoubleBuffered(true);
             SearchGrid.DoubleBuffered(true);
+            SettingsRMLRGrid.AutoGenerateColumns = false;
+            SettingsRMLRGrid.DoubleBuffered(true);
 
             windowPinToolStrip.CheckedChanged += (s, e) =>
             {
@@ -82,11 +87,12 @@ namespace RMDebugger
             transparentToolStrip.CheckedChanged += (s, e) => this.Opacity = transparentToolStrip.Checked ? 0.95 : 1;
             messagesToolStrip.CheckedChanged += (s, e) => Options.showMessages = messagesToolStrip.Checked;
             HexTimeout.ValueChanged += (s, e) => Options.hexTimeout = (int)HexTimeout.Value;
-            extendedButtonsToolStrip.CheckedChanged += (s, e) =>
+            extendedSettingsToolStrip.CheckedChanged += (s, e) =>
             {
                 ResetButton.Visible =
                 SetBootloaderStopButton.Visible =
-                SetBootloaderStartButton.Visible = extendedButtonsToolStrip.Checked;
+                SetBootloaderStartButton.Visible =
+                HexExtendedPanel.Visible = extendedSettingsToolStrip.Checked;
             };
 
             comPort.SelectedIndexChanged += (s, e) => mainPort.PortName = comPort.SelectedItem.ToString();
@@ -120,7 +126,11 @@ namespace RMDebugger
             };
             foreach (ToolStripMenuItem item in SearchFilterMenuStrip.Items) item.Click += SearchFilterClick;
             SearchGrid.DataSource = deviceData;
-            SearchGrid.CellContentClick += (s, e) => TargetSignID.Value = Convert.ToDecimal(SearchGrid[0, e.RowIndex].Value);
+            SearchGrid.CellContentClick += (s, e) =>
+            {
+                if (e.RowIndex > -1)
+                    TargetSignID.Value = Convert.ToDecimal(SearchGrid[0, e.RowIndex].Value);
+            };
 
 
             HexCheckCrc.CheckedChanged += (s, e) => Options.checkCrc = HexCheckCrc.Checked;
@@ -143,7 +153,7 @@ namespace RMDebugger
             ConfigDataGrid.CellToolTipTextNeeded += (s, e) =>
             {
                 if (e.RowIndex > -1 && e.ColumnIndex == (int)ConfigColumns.ConfigUpload)
-                    e.ToolTipText = ((FieldConfiguration)ConfigDataGrid.Rows[e.RowIndex].DataBoundItem).toolTip;
+                    e.ToolTipText = ((FieldConfiguration)ConfigDataGrid.Rows[e.RowIndex].DataBoundItem).uploadToolTip;
             };
 
 
@@ -168,20 +178,53 @@ namespace RMDebugger
                     fc.fieldActive = ConfigEnableAllMenuItem.Checked; 
                 ConfigDataGrid.Refresh(); 
             };
-
-            ConfigAddField.Click += (s, e) =>
+            clearAllFieldsMenuItem.Click += (s, e) => fieldsData.Clear();
+            LoadFieldsConfigButton.Click += LoadFieldsConfigButtonClick;
+            HideConfigPanel.Click += (s, e) => HideConfigPanelClick((string)HideConfigPanel.Tag == "Hided");
+            minIxScanConfig.ValueChanged += (s, e) =>
             {
-                if (ConfigFieldTextBox.TextLength > 0)
-                    fieldsData.Add(new FieldConfiguration() {
-                        fieldName = ConfigFieldTextBox.Text
-                    });
+                maxIxScanConfig.Minimum = minIxScanConfig.Value;
+                if (minIxScanConfig.Value > maxIxScanConfig.Value)
+                    maxIxScanConfig.Value = minIxScanConfig.Value;
             };
-            RMLRModeCheck.CheckedChanged += (s, e) => RMLRRepeatCount.Visible = RMLRModeCheck.Checked;
 
             InfoTree.NodeMouseClick += InfoTreeNodeClick;
             buttonInfoStop.Click += (s, e) => Options.activeToken?.Cancel();
             saveToCsvInfoMenuStrip.Click += InfoSaveToCSVButtonClick;
             clearInfoMenuStrip.Click += InfoClearGridClick;
+
+
+
+
+
+            
+            SettingsRMLRGrid.DataSource = settingsRMLRData;
+            SettingsRMLRGrid.CellToolTipTextNeeded += (s, e) =>
+            {
+                if (e.RowIndex > -1)
+                {
+                    if (e.ColumnIndex == (int)SettingsRmlrColumns.RmlrField)
+                        e.ToolTipText = ((FieldConfiguration)SettingsRMLRGrid.Rows[e.RowIndex].DataBoundItem).GetFieldToolTip();
+                    else if (e.ColumnIndex == (int)SettingsRmlrColumns.RmlrUpload)
+                        e.ToolTipText = ((FieldConfiguration)SettingsRMLRGrid.Rows[e.RowIndex].DataBoundItem).uploadToolTip;
+                }
+
+            };
+            resetSettingsRmlrToolStrip.CheckedChanged += (s, e) 
+                => UploadSettingRMLRButton.Image = resetSettingsRmlrToolStrip.Checked 
+                                                    ? Resources.CloudError 
+                                                    : Resources.CloudUpload;
+
+            LoadSettingRMLRButton.Click += SettingRMLRButtonClick;
+            UploadSettingRMLRButton.Click += SettingRMLRButtonClick;
+            TestSettingRMLRButton.Click += SettingRMLRTestClick;
+
+
+            linkSettingsRMLR_RMP_Signature.Click += (s, e) =>
+            {
+                if (ushort.TryParse(linkSettingsRMLR_RMP_Signature.Text.Split(':')[0], out ushort value))
+                    TargetSignID.Value = value;
+            };
 
 
             StartTestRSButton.Click += StartTestRSButtonClick;
@@ -191,6 +234,17 @@ namespace RMDebugger
 
             ClearInfoTestRS485.Click += ClearInfoTestRS485Click;
             MoreInfoTestRS485.Click += MoreInfoTestRS485Click;
+            ShowExtendedMenu.Click += (s, e) =>
+            {
+                bool hideMenu = ShowExtendedMenu.Text == "Show &menu";
+                StatusRS485GridView.Columns[0].Visible = hideMenu;
+                extendedMenuPanel.Location = hideMenu
+                    ? new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y - 147)
+                    : new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y + 147);
+                ShowExtendedMenu.Image = hideMenu ? Resources.Unhide : Resources.Hide;
+                ToolTipHelper.SetToolTip(ShowExtendedMenu, hideMenu ? "Скрыть расширенное меню" : "Показать расширенное меню");
+                ShowExtendedMenu.Text = hideMenu ? "Hide &menu" : "Show &menu";
+            };
 
             TimerSettingsTestBox.CheckedChanged += (s, e) => timerPanelTest.Visible = TimerSettingsTestBox.Checked;
             StatusRS485GridView.DataSource = testerData;
@@ -204,6 +258,15 @@ namespace RMDebugger
             ResetButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.RESET);
             SetBootloaderStartButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.START_BOOTLOADER);
             SetBootloaderStopButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.STOP_BOOTLOADER);
+            AutoExtraButtons.CheckedChanged += (s, e)
+                => AutoExtraButtonsTimeout.Visible = label15.Visible = AutoExtraButtons.Checked;
+        }
+
+        private void HideConfigPanelClick(bool sw)
+        {
+            HideConfigPanel.Tag = sw ? "Unhided" : "Hided";
+            HideConfigPanel.Image = sw ? Resources.Unhide : Resources.Hide;
+            ConfigPanel.Location = new Point(0, sw ? ConfigPanel.Location.Y - 113 : ConfigPanel.Location.Y + 113);
         }
 
 
@@ -214,8 +277,9 @@ namespace RMDebugger
             ComDefault();
             AddPorts(comPort);
             CheckReg();
-            DefaultConfigGrid();
             SetProperties();
+            HideConfigPanelClick((string)HideConfigPanel.Tag == "Hided");
+            SettingsRmlrGridDefault();
         }
         private void SetProperties()
         {
@@ -660,8 +724,7 @@ namespace RMDebugger
         {
             Options.through = NeedThrough.Checked;
             RS485Page.Enabled =
-                RMLRModeCheck.Enabled =
-                RMLRRepeatCount.Enabled = !Options.through;
+                rmlrPage.Enabled = !Options.through;
             SearchFindSignatireMode.Enabled =
                 SearchExtendedFindMode.Enabled = !Options.through && SearchGetNear.Checked;
             ThroughSignID.Enabled = Options.through;
@@ -672,11 +735,13 @@ namespace RMDebugger
         {
             Action action = () =>
             {
+                ToMessageStatus("");
+                ToReplyStatus("");
                 foreach (TabPage t in tab.TabPages)
                 {
                     if (t == exc)
                     {
-                        t.Text = $"↓{t.Text}↓";
+                        t.Text = $"▶ {t.Text}";
                         continue;
                     }
                     t.Enabled = false;
@@ -693,7 +758,7 @@ namespace RMDebugger
                 {
                     if (page.Enabled == false)
                         page.Enabled = true;
-                    page.Text = page.Text.Replace("↓", "");
+                    page.Text = page.Text.Replace("▶ ", "");
                 }
             };
             if (InvokeRequired) BeginInvoke(action);
@@ -885,15 +950,15 @@ namespace RMDebugger
                 try { boot.SetQueueFromHex(Options.hexPath); }
                 catch (Exception ex) { ToMessageStatus(ex.Message); return; }
                 //async method
-                async Task<bool> GetReplyFromDevice(byte[] cmdOut, int receiveDelay = 50, bool taskDelay = false, int delayMs = 10)
+                async Task<bool> GetReplyFromDevice(byte[] cmdOut)
                 {
                     DateTime t0 = DateTime.Now;
                     TimeSpan tstop = DateTime.Now - t0;
-                    while (tstop.Seconds < Options.hexTimeout)
+                    while (tstop.Seconds < Options.hexTimeout && !Options.activeToken.IsCancellationRequested)
                     {
                         try
                         {
-                            Tuple<byte[], ProtocolReply> replyes = await boot.GetData(cmdOut, cmdOut.Length, receiveDelay);
+                            Tuple<byte[], ProtocolReply> replyes = await boot.GetData(cmdOut, cmdOut.Length, (int)HexTimeoutCmdAwait.Value);
                             return true;
                         }
                         catch (OperationCanceledException) { return false; }
@@ -906,7 +971,7 @@ namespace RMDebugger
                                 if (message == DialogResult.Cancel) return false;
                                 else t0 = DateTime.Now;
                             }
-                            if (taskDelay) await Task.Delay(delayMs, Options.activeToken.Token);
+                            await Task.Delay((int)HexTimeoutCmdRepeat.Value, Options.activeToken.Token);
                         }
                     }
                     return false;
@@ -916,7 +981,7 @@ namespace RMDebugger
                 byte[] cmdBootStop = boot.buildCmdDelegate(CmdOutput.STOP_BOOTLOADER);
                 byte[] cmdConfirmData = boot.buildCmdDelegate(CmdOutput.UPDATE_DATA_PAGE);
 
-                if (!await GetReplyFromDevice(cmdBootStart, taskDelay: true)) return;
+                if (!await GetReplyFromDevice(cmdBootStart)) return;
 
                 ToMessageStatus("Bootload OK");
 
@@ -927,10 +992,10 @@ namespace RMDebugger
                 while (boot.HexQueue.Count() > 0)
                 {
                     boot.GetDataForUpload(out byte[] dataOutput); 
-                    if (!await GetReplyFromDevice(boot.buildDataCmdDelegate(dataOutput), receiveDelay: 250)) return;
-                    if (!await GetReplyFromDevice(cmdConfirmData, taskDelay: true, delayMs: 10)) return;
+                    if (!await GetReplyFromDevice(boot.buildDataCmdDelegate(dataOutput))) return;
+                    if (!await GetReplyFromDevice(cmdConfirmData)) return;
                 }
-                await GetReplyFromDevice(cmdBootStop, taskDelay: true);
+                await GetReplyFromDevice(cmdBootStop);
                 stopwatchQueue.Stop();
                 string timeUplod = $"{stopwatchQueue.Elapsed.Minutes:00}:{stopwatchQueue.Elapsed.Seconds:00}:{stopwatchQueue.Elapsed.Milliseconds:000}";
                 if (!Options.activeToken.IsCancellationRequested)
@@ -988,14 +1053,10 @@ namespace RMDebugger
 
 
         //Config
-        private void DefaultConfigGrid() {
-            foreach (string key in fieldsFounded)
-                fieldsData.Add(new FieldConfiguration() { fieldName = key });
-        }
         private void ColoredRow(int index, DataGridView dgv, Color color)
                 => Invoke((MethodInvoker)(async () => {
                     dgv.Rows[index].DefaultCellStyle.BackColor = color;
-                    await Task.Delay(500);
+                    await Task.Delay(1000);
                     dgv.Rows[index].DefaultCellStyle.BackColor = Color.White;
                 }));
 
@@ -1009,7 +1070,7 @@ namespace RMDebugger
             }
 
             if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
-            if (CheckFields() || RMLRModeCheck.Checked)
+            if (CheckFields())
             {
                 Options.activeToken = new CancellationTokenSource();
                 AfterLoadConfigEvent(true);
@@ -1024,62 +1085,13 @@ namespace RMDebugger
             AfterAnyAutoEvent(sw);
             ConfigDataGrid.Enabled =
                 SignaturePanel.Enabled =
+                LoadFieldsConfigButton.Enabled =
                 UploadConfigButton.Enabled =
-                RMLRModeCheck.Enabled =
-                RMLRRepeatCount.Enabled =
-                ConfigAddField.Enabled =
-                ConfigFieldTextBox.Enabled =
-                ConfigFactoryCheck.Enabled = !sw;
-            LoadConfigButton.Text = sw ? "Stop" : "Load from device";
+                settingsBoxConfig.Enabled = !sw;
+            LoadConfigButton.Text = sw ? "Stop" : "Load from fields";
             LoadConfigButton.Image = sw ? Resources.StatusStopped : Resources.CloudDownload;
         }
 
-        async private Task<bool> RMLRMode(Configuration config)
-        {
-            byte[] RMLRRgbFormat(byte[] rmSign, byte count, CmdOutput cmd)
-            {
-                List<byte> data = new List<byte>();
-                data.AddRange(rmSign);
-                data.AddRange(BitConverter.GetBytes((ushort)cmd).Reverse());
-                data.Add(RMLRRed.Checked ? count : (byte)0);
-                data.Add(RMLRGreen.Checked ? count : (byte)0);
-                data.Add(RMLRBlue.Checked ? count : (byte)0);
-                data.Add(RMLRBuzzer.Checked ? count : (byte)0);
-                return new CRC16_CCITT_FALSE().CrcCalc(data.ToArray());
-            }
-
-            Tuple<byte[], ProtocolReply> reply;
-            byte[] cmdOut = config.FormatCmdOut(config._targetSign, CmdOutput.RMLR_REGISTRATION, 0xff);
-            byte[] rgbBuzz = RMLRRgbFormat(config._targetSign, (byte)RMLRRepeatCount.Value, CmdOutput.RMLR_RGB);
-            while (!Options.activeToken.IsCancellationRequested)
-            {
-                if (Options.activeToken.IsCancellationRequested) return false;
-                try
-                {
-                    reply = await config.GetData(cmdOut, (int)CmdMaxSize.RMLR_REGISTRATION);
-                    ToReplyStatus(reply.Item2.ToString());
-                    if (reply.Item1.Length == 10)
-                    {
-                        await config.GetData(rgbBuzz, (int)CmdMaxSize.RMLR_RGB);
-                        config._targetSign = new byte[2] { reply.Item1[4], reply.Item1[5] };
-                        if (Options.showMessages)
-                            NotifyMessage.ShowBalloonTip(
-                                5, "Найдена метка RMP", 
-                                $"Найдена метка RMP с сигнатурой: {reply.Item1[5] << 8 | reply.Item1[4]}", 
-                                ToolTipIcon.Info);
-                        break;
-                    }
-                }
-                catch (OperationCanceledException) { return false; }
-                catch (Exception ex)
-                {
-                    ToReplyStatus(ex.Message);
-                    if (ex.Message == "devNull") return false;
-                }
-                await Task.Delay(50, Options.activeToken.Token);
-            }
-            return true;
-        }
         async private Task LoadField()
         {
             Configuration config = NeedThrough.Checked
@@ -1087,18 +1099,6 @@ namespace RMDebugger
                 : new Configuration(Options.mainInterface, TargetSignID.GetBytes());
             config.ToReply += ToReplyStatus;
             config.ToDebug += ToDebuggerWindow;
-
-
-            if (RMLRModeCheck.Checked && !NeedThrough.Checked)
-            {
-                if (await RMLRMode(config))
-                {
-                    config = new Configuration(Options.mainInterface, config._targetSign, TargetSignID.GetBytes());
-                    config.ToReply += ToReplyStatus;
-                    config.ToDebug += ToDebuggerWindow;
-                }
-                else return;
-            }
 
             foreach (FieldConfiguration field in fieldsData)
             {
@@ -1124,7 +1124,7 @@ namespace RMDebugger
                         {
                             if (ex.Message == "devNull") return;
                         }
-                        await Task.Delay(50, Options.activeToken.Token);
+                        await Task.Delay((int)ConfigButtonsTimeout.Value, Options.activeToken.Token);
                     }
                     try
                     {
@@ -1148,12 +1148,12 @@ namespace RMDebugger
             bool CheckFields() {
                 foreach (FieldConfiguration field in fieldsData)
                     if (field.fieldActive)
-                        if (!string.IsNullOrEmpty(field.uploadValue) || ConfigFactoryCheck.Checked) return true;
+                        if (!string.IsNullOrEmpty(field.uploadValue)) return true;
                 return false;
             }
 
             if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
-            if (CheckFields() || RMLRModeCheck.Checked)
+            if (CheckFields())
             {
                 Options.activeToken = new CancellationTokenSource();
                 AfterUploadConfigEvent(true);
@@ -1169,12 +1169,9 @@ namespace RMDebugger
             ConfigDataGrid.Enabled =
                 SignaturePanel.Enabled =
                 LoadConfigButton.Enabled =
-                RMLRModeCheck.Enabled =
-                RMLRRepeatCount.Enabled =
-                ConfigAddField.Enabled =
-                ConfigFieldTextBox.Enabled =
-                ConfigFactoryCheck.Enabled = !sw;
-            UploadConfigButton.Text = sw ? "Stop" : "Upload to device";
+                LoadFieldsConfigButton.Enabled =
+                settingsBoxConfig.Enabled = !sw;
+            UploadConfigButton.Text = sw ? "Stop" : "Upload to fields";
             UploadConfigButton.Image = sw ? Resources.StatusStopped : Resources.CloudUpload;
         }
         async private Task UploadField()
@@ -1183,17 +1180,8 @@ namespace RMDebugger
                 ? new Configuration(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
                 : new Configuration(Options.mainInterface, TargetSignID.GetBytes());
 
-            if (RMLRModeCheck.Checked && !NeedThrough.Checked)
-            {
-                if (await RMLRMode(config))
-                    config = new Configuration(Options.mainInterface, config._targetSign, TargetSignID.GetBytes());
-                else return;
-            }
-
             config.ToReply += ToReplyStatus;
             config.ToDebug += ToDebuggerWindow;
-
-            config.factory = ConfigFactoryCheck.Checked;
 
             int sizeData = (int)CmdMaxSize.ONLINE;
             if (config.through) sizeData += 4; // +2 addr, +2 cmd
@@ -1217,8 +1205,13 @@ namespace RMDebugger
                                 ToMessageStatus($"{field.fieldName} : {reply.Item1}");
                                 if (reply.Item1 == RmResult.Ok)
                                 {
-                                    if (field.fieldName == "addr" && !RMLRModeCheck.Checked) TargetSignID.Value = Convert.ToInt32(field.uploadValue);
+                                    if (field.fieldName == "addr") TargetSignID.Value = Convert.ToInt32(field.uploadValue);
                                     ColoredRow(fieldsData.IndexOf(field), ConfigDataGrid, Color.GreenYellow);
+                                    break;
+                                }
+                                else
+                                {
+                                    ColoredRow(fieldsData.IndexOf(field), ConfigDataGrid, Color.Red);
                                     break;
                                 }
                             }
@@ -1226,14 +1219,87 @@ namespace RMDebugger
                             {
                                 if (ex.Message == "devNull") return;
                             }
-                            await Task.Delay(50, Options.activeToken.Token);
+                            await Task.Delay((int)ConfigButtonsTimeout.Value, Options.activeToken.Token);
                         }
                     }
             }
         }
 
-        //Get info
+        async private void LoadFieldsConfigButtonClick(object sender, EventArgs e)
+        {
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
+            Options.activeToken = new CancellationTokenSource();
+            AfterLoadFieldsEvent(true);
+            offTabsExcept(RMData, ConfigPage);
+            try { await Task.Run(() => LoadFields()); } catch { }
+            AfterLoadFieldsEvent(false);
+            onTabPages(RMData);
+        }
+        private void AfterLoadFieldsEvent(bool sw)
+        {
+            AfterAnyAutoEvent(sw);
+            ConfigDataGrid.Enabled =
+                SignaturePanel.Enabled =
+                LoadConfigButton.Enabled =
+                UploadConfigButton.Enabled =
+                settingsBoxConfig.Enabled = !sw;
+            LoadFieldsConfigButton.Text = sw ? "Stop" : "Scan fields";
+            LoadFieldsConfigButton.Image = sw ? Resources.StatusStopped : Resources.DatabaseSource;
+        }
 
+        async private Task LoadFields()
+        {
+            using (Configuration config = NeedThrough.Checked
+                ? new Configuration(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
+                : new Configuration(Options.mainInterface, TargetSignID.GetBytes()))
+            {
+                config.ToReply += ToReplyStatus;
+                config.ToDebug += ToDebuggerWindow;
+                List<FieldConfiguration> newFields = new List<FieldConfiguration>();
+                for(byte i = (byte)minIxScanConfig.Value; i <= (byte)maxIxScanConfig.Value && !Options.activeToken.IsCancellationRequested; i++)
+                {
+                    byte[] cmdOut = config.buildCmdGetFieldsDelegate(i);
+                    Tuple<byte[], ProtocolReply> reply;
+                    byte[] cmdIn;
+                    do
+                    {
+                        try
+                        {
+                            await Task.Delay((int)ConfigButtonsTimeout.Value, Options.activeToken.Token);
+                            reply = await config.GetData(cmdOut, 50);
+                            cmdIn = config.ReturnWithoutThrough(reply.Item1);
+                            byte[] data = new byte[cmdIn.Length - 6];
+                            Array.Copy(cmdIn, 4, data, 0, data.Length);
+                            if (data.Length > 0)
+                            {
+                                List<byte[]> splited = data.SplitBytteArrayBy(0x00);
+                                ToMessageStatus($"Field added: {config.GetSymbols(splited[0])} | ID: {i}");
+                                newFields.Add(new FieldConfiguration()
+                                {
+                                    fieldName = config.GetSymbols(splited[0]),
+                                    loadValue = splited.Count > 1 ? config.GetSymbols(splited[1]) : "",
+                                    fieldActive = true,
+                                });
+                            }
+                            break;
+                        }
+                        catch { }
+                    }
+                    while (!Options.activeToken.IsCancellationRequested);
+                }
+                if (newFields.Count == 0) return;
+                Action action = () =>
+                {
+                    if (clearAfterScanCheckBox.Checked) fieldsData.Clear();
+                    foreach (FieldConfiguration field in newFields)
+                        fieldsData.Add(field);
+                };
+                if (InvokeRequired) Invoke(action);
+                else action();
+            }
+        }
+
+        //Get info
         async private void InfoTreeNodeClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (UInt16.TryParse(e.Node.Text, out ushort newSignTarget)) { TargetSignID.Value = newSignTarget; return; }
@@ -1421,6 +1487,174 @@ namespace RMDebugger
             }
         }
 
+        //Settings
+        // //RMLR
+        private void SettingsRmlrGridDefault()
+        {
+            settingsRMLRData.Add(new FieldConfiguration("tag_min_pwr"));
+            settingsRMLRData.Add(new FieldConfiguration("tag_pack_cnt"));
+            settingsRMLRData.Add(new FieldConfiguration("tag_ttl"));
+            settingsRMLRData.Add(new FieldConfiguration("ps_als_avg_cnt"));
+            settingsRMLRData.Add(new FieldConfiguration("ps_rise_threshold"));
+            settingsRMLRData.Add(new FieldConfiguration("als_drop_threshold"));
+            settingsRMLRData.Add(new FieldConfiguration("als_ps_delay"));
+        }
+        private async void SettingRMLRButtonClick(object sender, EventArgs e)
+        {
+            bool GetUploadDataFromSettingsRmlrTable(out List<byte> data)
+            {
+                data = new List<byte>();
+                foreach (FieldConfiguration rmlrData in settingsRMLRData)
+                {
+                    if (string.IsNullOrEmpty(rmlrData.uploadValue)) return false;
+                    switch (rmlrData.rule)
+                    {
+                        case ConfigRule.uInt8:
+                            if (Byte.TryParse(rmlrData.uploadValue, out byte vByte))
+                                data.Add(vByte);
+                            break;
+                        case ConfigRule.uInt16:
+                            if (UInt16.TryParse(rmlrData.uploadValue, out ushort vUshort))
+                                data.AddRange(vUshort.GetBytes());
+                            break;
+                    }
+                }
+                return true;
+            }
+            void SetLoadDataToSettingsRmlrTable(byte[] data)
+            {
+                for(int i = 0, d = 0; i < settingsRMLRData.Count; i++)
+                {
+                    string value = "";
+                    switch (settingsRMLRData[i].rule)
+                    {
+                        case ConfigRule.uInt8:
+                            value = data[d].ToString();
+                            d++;
+                            break;
+                        case ConfigRule.uInt16:
+                            value = (data[d+1] << 8 | data[d]).ToString();
+                            d += 2;
+                            break;
+                    }
+                    settingsRMLRData[i].loadValue = settingsRMLRData[i].uploadValue = value;
+                }
+                
+                Invoke((MethodInvoker)(() => {
+                    settingsRMLRData.ResetBindings();
+                    SettingsRMLRGrid.Refresh();
+                }));
+            }
+            using (RMLR cOutput = new RMLR(Options.mainInterface, TargetSignID.GetBytes()))
+            {
+                Options.activeToken = new CancellationTokenSource(500);
+                cOutput.ToReply += ToReplyStatus;
+                cOutput.ToDebug += ToDebuggerWindow;
+
+                Button btn = (Button)sender;
+                byte[] cmdOut;
+                bool buzzer = false;
+                if (btn == LoadSettingRMLRButton)
+                    cmdOut = cOutput.GetCmdLoad();
+                else
+                {
+                    buzzer = resetSettingsRmlrToolStrip.Checked;
+                    if (resetSettingsRmlrToolStrip.Checked) 
+                        cmdOut = cOutput.GetCmdReset();
+                    else
+                    {
+                        if (GetUploadDataFromSettingsRmlrTable(out List<byte> data))
+                            cmdOut = cOutput.GetCmdUpload(data.ToArray());
+                        else
+                        {
+                            MessageBox.Show(this, "Введены не все данные в столбце Upload");
+                            return;
+                        }
+                    }
+                }
+                try
+                {
+                    Tuple<byte[], ProtocolReply> reply = await cOutput.GetData(cmdOut, 15);
+                    byte[] data = new byte[8];
+                    Array.Copy(reply.Item1, 5, data, 0, data.Length);
+                    SetLoadDataToSettingsRmlrTable(data);
+                    if (buzzer)
+                    {
+                        await Task.Delay(25);
+                        await cOutput.GetData(cOutput.GetCmdRGBB(false, false, false, true, 4), 6);
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private async void SettingRMLRTestClick(object sender, EventArgs e)
+        {
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
+            Options.activeToken = new CancellationTokenSource();
+            Options.activeTask = Task.Run(() => StartTestSettingsRMLR());
+            AfterStartRMLRTest(true);
+            offTabsExcept(RMData, SettingsPages);
+            offTabsExcept(ModeDeviceTabs, rmlrPage);
+            try { await Options.activeTask; } catch { }
+            onTabPages(RMData);
+            onTabPages(ModeDeviceTabs);
+            AfterStartRMLRTest(false);
+            Options.activeTask = null;
+        }
+        private void AfterStartRMLRTest(bool sw)
+        {
+            AfterAnyAutoEvent(sw);
+            SignaturePanel.Enabled =
+                LoadSettingRMLRButton.Enabled = 
+                UploadSettingRMLRButton.Enabled =
+                SettingsRMLRGrid.Enabled = !sw;
+            TestSettingRMLRButton.Text = sw ? "Stop" : "Test";
+            TestSettingRMLRButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
+
+        }
+        private async Task StartTestSettingsRMLR()
+        {
+            using (RMLR cOutput = new RMLR(Options.mainInterface, TargetSignID.GetBytes()))
+            {
+                cOutput.ToReply += ToReplyStatus;
+                cOutput.ToDebug += ToDebuggerWindow;
+                byte[] cmdOut = cOutput.GetCmdRegistration();
+                Tuple<byte[], ProtocolReply> reply;
+                do
+                {
+                    try
+                    {
+                        reply = await cOutput.GetData(cmdOut, (int)CmdMaxSize.RMLR_REGISTRATION);
+                        if (reply.Item1.Length > 6)
+                        {
+                            if (SettingsRMLRCounter.Value > 0)
+                                await cOutput.GetData(cOutput.GetCmdRGBB(
+                                    RedSettingsRMLR.Enabled,
+                                    GreenSettingsRMLR.Enabled,
+                                    BlueSettingsRMLR.Enabled,
+                                    BuzzerSettingsRMLR.Enabled,
+                                    (byte)SettingsRMLRCounter.Value), 6);
+                            byte[] data = new byte[4];
+                            Array.Copy(reply.Item1, 4, data, 0, data.Length);
+                            linkSettingsRMLR_RMP_Signature.Text = $"{data[1] << 8 | data[0]}:{data[3] << 8 | data[2]} hz"; 
+                            if (Options.showMessages)
+                                NotifyMessage.ShowBalloonTip(
+                                    5, "Найдена метка RMP",
+                                    $"Найдена метка RMP с сигнатурой: {data[1] << 8 | data[0]}",
+                                    ToolTipIcon.Info);
+                            await Task.Delay(1000, Options.activeToken.Token);
+                        }
+                        else linkSettingsRMLR_RMP_Signature.Text = "0:0 hz";
+                    }
+                    catch (OperationCanceledException) { return; }
+                    catch { }
+                    await Task.Delay(25, Options.activeToken.Token);
+                }
+                while (!Options.activeToken.IsCancellationRequested);
+            }
+        }
+
         //RS485 test
         private void StatusGridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e) => TaskForChangedRows();
         private void StatusGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e) => TaskForChangedRows();
@@ -1526,7 +1760,8 @@ namespace RMDebugger
                 scanGroupBox.Enabled = 
                 settingsGroupBox.Enabled = 
                 ClearDataTestRS485.Enabled =
-                timerPanelTest.Enabled = !sw;
+                timerPanelTest.Enabled =
+                SortByButton.Enabled = !sw;
             StatusRS485GridView.Cursor = sw ? Cursors.AppStarting : Cursors.Default;
             StartTestRSButton.Text = sw ? "&Stop" : "&Start Test";
             StartTestRSButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
@@ -1774,17 +2009,6 @@ namespace RMDebugger
         }
 
         // //ExtendedMenu
-        private void ShowExtendedMenu_Click(object sender, EventArgs e)
-        {
-            bool hideMenu = ShowExtendedMenu.Text == "Show &menu";
-            StatusRS485GridView.Columns[0].Visible = hideMenu;
-            extendedMenuPanel.Location = hideMenu
-                ? new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y - 147)
-                : new Point(extendedMenuPanel.Location.X, extendedMenuPanel.Location.Y + 147);
-            ShowExtendedMenu.Image = hideMenu ? Resources.Unhide : Resources.Hide;
-            ToolTipHelper.SetToolTip(ShowExtendedMenu, hideMenu ? "Скрыть расширенное меню" : "Показать расширенное меню");
-            ShowExtendedMenu.Text = hideMenu ? "Hide &menu" : "Show &menu";
-        }
         private void ClearDataStatusRM_Click(object sender, EventArgs e) => testerData.Clear();
         private void ClearInfoTestRS485Click(object sender, EventArgs e)
         {
@@ -2012,5 +2236,6 @@ namespace RMDebugger
                 while (AutoExtraButtons.Checked && !Options.activeToken.IsCancellationRequested);
             };
         }
+
     }
 }

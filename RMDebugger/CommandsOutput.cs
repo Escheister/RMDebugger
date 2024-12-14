@@ -205,7 +205,7 @@ namespace RMDebugger
                     crc = CRC16_CCITT_FALSE.CrcCalcRT(tBuffer.Array, crc);
                 }
             }
-            while (sw.Elapsed.Milliseconds < ms && crc != 0 && buffer.Count() < length);
+            while (sw.ElapsedMilliseconds < ms && crc != 0 && buffer.Count() < length);
             sw.Stop();
             return buffer.ToArray();
         }
@@ -225,7 +225,7 @@ namespace RMDebugger
                     crc = CRC16_CCITT_FALSE.CrcCalcRT(tBuffer, crc);
                 }
             }
-            while (sw.Elapsed.Milliseconds < ms && crc != 0 && buffer.Count() < length);
+            while (sw.ElapsedMilliseconds < ms && crc != 0 && buffer.Count() < length);
             sw.Stop();
             return buffer.ToArray();
         }
@@ -249,7 +249,7 @@ namespace RMDebugger
                     break;
             }
         }
-        async public Task<Tuple<RmResult, ProtocolReply>> GetResult(byte[] cmdOut, int size, int ms = 50)
+        async public Task<Tuple<RmResult, ProtocolReply>> GetResult(byte[] cmdOut, int size, int ms = 100)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");
             Options.activeToken.Token.ThrowIfCancellationRequested();
@@ -270,7 +270,7 @@ namespace RMDebugger
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
             return new Tuple<RmResult, ProtocolReply>(CheckResult(cmdIn), reply);
         }
-        async public virtual Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 50)
+        async public virtual Task<Tuple<byte[], ProtocolReply>> GetData(byte[] cmdOut, int size, int ms = 100)
         {
             if (!Options.mainIsAvailable) throw new Exception("devNull");
             Options.activeToken.Token.ThrowIfCancellationRequested();
