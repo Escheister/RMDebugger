@@ -1630,19 +1630,19 @@ namespace RMDebugger
                         {
                             if (SettingsRMLRCounter.Value > 0)
                                 await cOutput.GetData(cOutput.GetCmdRGBB(
-                                    RedSettingsRMLR.Enabled,
-                                    GreenSettingsRMLR.Enabled,
-                                    BlueSettingsRMLR.Enabled,
-                                    BuzzerSettingsRMLR.Enabled,
+                                    RedSettingsRMLR.Checked,
+                                    GreenSettingsRMLR.Checked,
+                                    BlueSettingsRMLR.Checked,
+                                    BuzzerSettingsRMLR.Checked,
                                     (byte)SettingsRMLRCounter.Value), 6);
                             byte[] data = new byte[4];
                             Array.Copy(reply.Item1, 4, data, 0, data.Length);
                             linkSettingsRMLR_RMP_Signature.Text = $"{data[1] << 8 | data[0]}:{data[3] << 8 | data[2]} hz"; 
                             if (Options.showMessages)
-                                NotifyMessage.ShowBalloonTip(
-                                    5, "Найдена метка RMP",
+                                NotifyMessage.ShowBalloonTip(5, "Найдена метка RMP",
                                     $"Найдена метка RMP с сигнатурой: {data[1] << 8 | data[0]}",
                                     ToolTipIcon.Info);
+                            if (!RepeatSettingsRMLR.Checked) break;
                             await Task.Delay(1000, Options.activeToken.Token);
                         }
                         else linkSettingsRMLR_RMP_Signature.Text = "0:0 hz";
