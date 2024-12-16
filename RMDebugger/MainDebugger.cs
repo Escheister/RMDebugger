@@ -193,11 +193,6 @@ namespace RMDebugger
             saveToCsvInfoMenuStrip.Click += InfoSaveToCSVButtonClick;
             clearInfoMenuStrip.Click += InfoClearGridClick;
 
-
-
-
-
-            
             SettingsRMLRGrid.DataSource = settingsRMLRData;
             SettingsRMLRGrid.CellToolTipTextNeeded += (s, e) =>
             {
@@ -209,6 +204,11 @@ namespace RMDebugger
                         e.ToolTipText = ((FieldConfiguration)SettingsRMLRGrid.Rows[e.RowIndex].DataBoundItem).uploadToolTip;
                 }
 
+            };
+            ClearGridSettingsRMLR.Click += (s, e) =>
+            {
+                foreach (FieldConfiguration field in settingsRMLRData) field.ClearValues();
+                SettingsRMLRGrid.Refresh();
             };
             resetSettingsRmlrToolStrip.CheckedChanged += (s, e) 
                 => UploadSettingRMLRButton.Image = resetSettingsRmlrToolStrip.Checked 
@@ -1231,7 +1231,11 @@ namespace RMDebugger
             Options.activeToken = new CancellationTokenSource();
             AfterLoadFieldsEvent(true);
             offTabsExcept(RMData, ConfigPage);
-            try { await Task.Run(() => LoadFields()); } catch { }
+            using (Configuration config = NeedThrough.Checked
+                ? new Configuration(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
+                : new Configuration(Options.mainInterface, TargetSignID.GetBytes())) {
+                try { await Task.Run(() => LoadFields(config)); } catch { }
+            }
             AfterLoadFieldsEvent(false);
             onTabPages(RMData);
         }
@@ -1247,56 +1251,51 @@ namespace RMDebugger
             LoadFieldsConfigButton.Image = sw ? Resources.StatusStopped : Resources.DatabaseSource;
         }
 
-        async private Task LoadFields()
+        async private Task LoadFields(Configuration config)
         {
-            using (Configuration config = NeedThrough.Checked
-                ? new Configuration(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
-                : new Configuration(Options.mainInterface, TargetSignID.GetBytes()))
+            config.ToReply += ToReplyStatus;
+            config.ToDebug += ToDebuggerWindow;
+            List<FieldConfiguration> newFields = new List<FieldConfiguration>();
+            for (byte i = (byte)minIxScanConfig.Value; i <= (byte)maxIxScanConfig.Value && !Options.activeToken.IsCancellationRequested; i++)
             {
-                config.ToReply += ToReplyStatus;
-                config.ToDebug += ToDebuggerWindow;
-                List<FieldConfiguration> newFields = new List<FieldConfiguration>();
-                for(byte i = (byte)minIxScanConfig.Value; i <= (byte)maxIxScanConfig.Value && !Options.activeToken.IsCancellationRequested; i++)
+                byte[] cmdOut = config.buildCmdGetFieldsDelegate(i);
+                Tuple<byte[], ProtocolReply> reply;
+                byte[] cmdIn;
+                do
                 {
-                    byte[] cmdOut = config.buildCmdGetFieldsDelegate(i);
-                    Tuple<byte[], ProtocolReply> reply;
-                    byte[] cmdIn;
-                    do
+                    try
                     {
-                        try
+                        await Task.Delay((int)ConfigButtonsTimeout.Value, Options.activeToken.Token);
+                        reply = await config.GetData(cmdOut, 50);
+                        cmdIn = config.ReturnWithoutThrough(reply.Item1);
+                        byte[] data = new byte[cmdIn.Length - 6];
+                        Array.Copy(cmdIn, 4, data, 0, data.Length);
+                        if (data.Length > 0)
                         {
-                            await Task.Delay((int)ConfigButtonsTimeout.Value, Options.activeToken.Token);
-                            reply = await config.GetData(cmdOut, 50);
-                            cmdIn = config.ReturnWithoutThrough(reply.Item1);
-                            byte[] data = new byte[cmdIn.Length - 6];
-                            Array.Copy(cmdIn, 4, data, 0, data.Length);
-                            if (data.Length > 0)
+                            List<byte[]> splited = data.SplitBytteArrayBy(0x00);
+                            ToMessageStatus($"Field added: {config.GetSymbols(splited[0])} | ID: {i}");
+                            newFields.Add(new FieldConfiguration()
                             {
-                                List<byte[]> splited = data.SplitBytteArrayBy(0x00);
-                                ToMessageStatus($"Field added: {config.GetSymbols(splited[0])} | ID: {i}");
-                                newFields.Add(new FieldConfiguration()
-                                {
-                                    fieldName = config.GetSymbols(splited[0]),
-                                    loadValue = splited.Count > 1 ? config.GetSymbols(splited[1]) : "",
-                                    fieldActive = true,
-                                });
-                            }
-                            break;
+                                fieldName = config.GetSymbols(splited[0]),
+                                loadValue = splited.Count > 1 ? config.GetSymbols(splited[1]) : "",
+                                fieldActive = true,
+                            });
                         }
-                        catch { }
+                        break;
                     }
-                    while (!Options.activeToken.IsCancellationRequested);
+                    catch { }
                 }
-                if (newFields.Count == 0) return;
-                Action action = () =>
-                {
-                    if (clearAfterScanCheckBox.Checked) fieldsData.Clear();
-                    foreach (FieldConfiguration field in newFields)
-                        fieldsData.Add(field);
-                };
-                if (InvokeRequired) Invoke(action);
-                else action();
+                while (!Options.activeToken.IsCancellationRequested);
             }
+            if (newFields.Count == 0) return;
+            Action action = () =>
+            {
+                if (clearAfterScanCheckBox.Checked) fieldsData.Clear();
+                foreach (FieldConfiguration field in newFields)
+                    fieldsData.Add(field);
+            };
+            if (InvokeRequired) Invoke(action);
+            else action();
         }
 
         //Get info
@@ -1587,7 +1586,6 @@ namespace RMDebugger
                 catch { }
             }
         }
-
         private async void SettingRMLRTestClick(object sender, EventArgs e)
         {
             if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
@@ -1611,7 +1609,6 @@ namespace RMDebugger
                 SettingsRMLRGrid.Enabled = !sw;
             TestSettingRMLRButton.Text = sw ? "Stop" : "Test";
             TestSettingRMLRButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
-
         }
         private async Task StartTestSettingsRMLR()
         {
@@ -1642,6 +1639,8 @@ namespace RMDebugger
                                 NotifyMessage.ShowBalloonTip(5, "Найдена метка RMP",
                                     $"Найдена метка RMP с сигнатурой: {data[1] << 8 | data[0]}",
                                     ToolTipIcon.Info);
+                            if (RmpDataReadSettingsRMLR.Checked)
+                                await LoadFields(new Configuration(Options.mainInterface, (data[1] << 8 | data[0]).GetBytes(), TargetSignID.GetBytes()));
                             if (!RepeatSettingsRMLR.Checked) break;
                             await Task.Delay(1000, Options.activeToken.Token);
                         }
