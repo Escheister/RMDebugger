@@ -46,7 +46,7 @@ namespace StaticSettings
 
         //RS485Test
         public static TimeSpan easyTimer { get; set; }
-        public static Stopwatch TesterTimer { get; set; } = null;
+        public static Stopwatch TesterTimer { get; set; } = new Stopwatch();
 
         //Logger
         public static LogState logState { get; set; } = LogState.ERRORState;

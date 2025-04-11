@@ -1963,8 +1963,6 @@ namespace RMDebugger
                                (int)numericHoursTest.Value,
                                (int)numericMinutesTest.Value,
                                (int)numericSecondsTest.Value);
-            if (Options.TesterTimer == null)
-                Options.TesterTimer = new Stopwatch();
             Options.TesterTimer.Start();
             Invoke((MethodInvoker)(() => WorkTestTimer.Start()));
             try
@@ -2197,7 +2195,7 @@ namespace RMDebugger
         }
 
         // //ExtendedMenu
-        private void ClearDataStatusRM_Click(object sender, EventArgs e) => testerData.Clear();
+        private void ClearDataStatusRM_Click(object sender, EventArgs e) => testerData?.Clear();
         private void ClearInfoTestRS485Click(object sender, EventArgs e)
         {
             Options.TesterTimer?.Restart();
