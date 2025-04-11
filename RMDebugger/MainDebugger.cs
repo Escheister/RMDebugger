@@ -427,6 +427,7 @@ namespace RMDebugger
 
             TimerSettingsTestBox.CheckedChanged += (s, e) => timerPanelTest.Visible = TimerSettingsTestBox.Checked;
             WorkTestTimer.Tick += (s, e) => RefreshGridTask();
+            FreqTestRSNumeric.ValueChanged += (s, e) => WorkTestTimer.Interval = (int)FreqTestRSNumeric.Value;
             StatusRS485GridView.DataSource = testerData;
             StatusRS485GridView.RowPrePaint += CellValueChangedRS485;
             foreach (ToolStripDropDownItem item in RS485SortMenuStrip.Items) item.Click += ChooseSortedBy;
@@ -1991,7 +1992,7 @@ namespace RMDebugger
             WorkingTimeLabel.Text = $"Total: {(time.Days > 0 ? $"{time.Days}d, " : "")}" +
                                     $"{time.Hours:00}:{time.Minutes:00}:{time.Seconds:00}.{time.Milliseconds:000}";
             if (TimerSettingsTestBox.Checked
-                && TimeSpan.FromTicks(Options.TesterTimer.ElapsedTicks) >= Options.easyTimer)
+                && TimeSpan.FromTicks(Options.TesterTimer.ElapsedTicks) > Options.easyTimer)
             {
                 Options.activeToken?.Cancel();
                 if (Options.showMessages)

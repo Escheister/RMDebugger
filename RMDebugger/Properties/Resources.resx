@@ -154,9 +154,6 @@
   <data name="CloudDownload" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\CloudDownload.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="DatabaseSource" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\DatabaseSource.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="dinosaur" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\dinosaur.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -210,5 +207,8 @@
   </data>
   <data name="FontDialogControl" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\FontDialogControl.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="DatabaseSource" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\DatabaseSource1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
