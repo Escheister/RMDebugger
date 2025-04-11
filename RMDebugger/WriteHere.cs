@@ -30,7 +30,6 @@ namespace RMDebugger
                 sKey.SetValue("UDPGateIP", $"{debugger.IPaddressBox.Text}");
                 sKey.SetValue("UDPGatePort", $"{debugger.numericPort.Value}");
                 sKey.SetValue("LastPageSize", $"{debugger.HexPageSize.Value}");
-                sKey.SetValue("LastPathToHex", $"{debugger.HexPathBox.Text}");
                 sKey.SetValue("LastComPort", $"{debugger.comPort.Text}");
                 sKey.SetValue("LastBaudrate", $"{debugger.BaudRate.Text}");
                 sKey.Close();

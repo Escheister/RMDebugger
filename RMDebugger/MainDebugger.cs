@@ -1,7 +1,6 @@
 ﻿using System.Net.NetworkInformation;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ConfigurationProtocol;
 using RMDebugger.Properties;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -18,14 +17,12 @@ using System.Net;
 using System.IO;
 using System;
 
+using ConfigurationProtocol;
 using BootloaderProtocol;
 using SearchProtocol;
 using File_Verifier;
 using ProtocolEnums;
-using CRC16;
 using CSV;
-using System.DirectoryServices;
-using System.Runtime.CompilerServices;
 
 namespace RMDebugger
 {
@@ -35,7 +32,10 @@ namespace RMDebugger
         Color mirClr = Color.PaleGreen;
         private readonly string mainName = Assembly.GetEntryAssembly().GetName().Name;
         string ver;
+
         private string[] fieldsFounded = new string[5] { "addr", "fio", "lamp", "puid", "rmb" };
+
+        BindingList<FileInfoClass> MainFileObjects = new BindingList<FileInfoClass>();
 
         BindingList<FieldConfiguration> fieldsData = new BindingList<FieldConfiguration>();
         BindingList<FieldConfiguration> settingsRMLRData = new BindingList<FieldConfiguration>();
@@ -44,16 +44,13 @@ namespace RMDebugger
 
         CancellationTokenSource pingToken;
 
-        private int setTimerTest;
-        private int realTimeWorkingTest = 0;
-
         public MainDebugger()
         {
             InitializeComponent();
             Options.debugger = this;
             NotifyMessage.Text = 
                 this.Text = 
-                $"{Assembly.GetEntryAssembly().GetName().Name} {Assembly.GetEntryAssembly().GetName().Version}";
+                $"{Assembly.GetEntryAssembly().GetName().Name} v{Assembly.GetEntryAssembly().GetName().Version}";
             AddEvents();
         }
         private void AddEvents()
@@ -98,6 +95,9 @@ namespace RMDebugger
             comPort.SelectedIndexChanged += (s, e) => mainPort.PortName = comPort.SelectedItem.ToString();
             BaudRate.SelectedIndexChanged += (s, e) => BaudRateSelectedIndexChanged(s, e);
             RefreshSerial.Click += (s, e) => AddPorts(comPort);
+
+
+            foreach (ToolStripMenuItem item in PriorityToolStripMenuItem.DropDownItems) item.Click += SetPriority;
             foreach (ToolStripDropDownItem item in dataBits.DropDownItems) item.Click += DataBitsForSerial;
             foreach (ToolStripDropDownItem item in Parity.DropDownItems) item.Click += ParityForSerial;
             foreach (ToolStripDropDownItem item in stopBits.DropDownItems) item.Click += StopBitsForSerial;
@@ -117,6 +117,34 @@ namespace RMDebugger
                 if (MirrorColor.ShowDialog() == DialogResult.OK)
                     mirClr = MirrorColor.Color;
             };
+
+            void FontChanging(bool check)
+            {
+                if (check)
+                {
+                    SearchGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+                    SearchGrid.ColumnHeadersHeight = SearchGrid.RowTemplate.Height = (int)(FontDialog.Font.Size*2) + 2;
+                    SearchGrid.ColumnHeadersDefaultCellStyle.Font = FontDialog.Font;
+                    SearchGrid.DefaultCellStyle.Font = FontDialog.Font;
+                }
+                else
+                {
+                    SearchGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+                    SearchGrid.ColumnHeadersDefaultCellStyle.Font = new Font("Consolas", 9);
+                    SearchGrid.DefaultCellStyle.Font = new Font("Consolas", 11);
+                    SearchGrid.ColumnHeadersHeight = SearchGrid.RowTemplate.Height = 18;
+                }
+            }
+
+            SearchChangeFontMenuItem.Click += (s, e) =>
+            {
+                if (FontDialog.ShowDialog() == DialogResult.OK)
+                    FontChanging(SearchAnotherFontMode.Checked);
+            };
+            SearchAnotherFontMode.CheckedChanged += (s, e) => {
+                FontChanging(SearchAnotherFontMode.Checked);
+            };
+
             SearchGetNear.CheckedChanged += (s, e) =>
             {
                 SearchFilterMode.Enabled =
@@ -132,9 +160,157 @@ namespace RMDebugger
                     TargetSignID.Value = Convert.ToDecimal(SearchGrid[0, e.RowIndex].Value);
             };
 
-
             HexCheckCrc.CheckedChanged += (s, e) => Options.checkCrc = HexCheckCrc.Checked;
+            HexUploadClearFileList.Click += (s, e) => MainFileObjects.Clear();
+
             HexUploadButton.Click += HexUploadButtonClick;
+            void AddFileToFilePathListBox()
+            {
+                OpenFileDialog fileDialog = new OpenFileDialog
+                {
+                    Multiselect = true,
+                    Filter = "Hex файл (*.hex)|*.hex",
+                    Title = "Выберите файлы с расширением *.hex"
+                };
+                if (fileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    BindingList<FileInfoClass> list = GetFileDataSource(ListOfMainFiles);
+                    foreach (string file in fileDialog.FileNames)
+                    {
+                        FileInfoClass fileIn = list.OfType<FileInfoClass>().SingleOrDefault(x => x.Filepath == file);
+                        if (fileIn == null)
+                            list.Add(new FileInfoClass(file));
+                    }
+                    SelectedIndexChangedForFileList(ListOfMainFiles, null);
+                }
+            }
+            HexUploadPathButton.Click += (s, e) => AddFileToFilePathListBox();
+
+            ListOfMainFiles.DataSource = MainFileObjects;
+            ListOfMainFiles.DisplayMember = "Filepath";
+
+
+            HexUploadUpFile.Click += (s, e) =>
+            {
+                FileInfoClass file = (FileInfoClass)ListOfMainFiles.SelectedItem;
+                int indexOfItem = MainFileObjects.IndexOf(file);
+                if (indexOfItem > 0)
+                {
+                    MainFileObjects.RemoveAt(indexOfItem);
+                    MainFileObjects.Insert(indexOfItem - 1, file);
+                    ListOfMainFiles.SetSelected(indexOfItem - 1, true);
+                }
+            };
+            HexUploadDownFile.Click += (s, e) =>
+            {
+                FileInfoClass file = (FileInfoClass)ListOfMainFiles.SelectedItem;
+                int indexOfItem = MainFileObjects.IndexOf(file);
+                if (indexOfItem < MainFileObjects.Count - 1)
+                {
+                    MainFileObjects.RemoveAt(indexOfItem);
+                    MainFileObjects.Insert(indexOfItem + 1, file);
+                    ListOfMainFiles.SetSelected(indexOfItem + 1, true);
+                }
+            };
+
+            void DragEnter(object sender, DragEventArgs e)
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                    e.Effect = DragDropEffects.Copy;
+            }
+
+            BindingList<FileInfoClass> GetFileDataSource(ListBox box)
+                => (BindingList<FileInfoClass>)box.DataSource;
+
+            void DragDropForFileList(object sender, DragEventArgs e)
+            {
+                string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop);
+                BindingList<FileInfoClass> list = GetFileDataSource((ListBox)sender);
+                foreach (string path in filePaths)
+                {
+                    FileInfoClass fileIn = list.OfType<FileInfoClass>().SingleOrDefault(x => x.Filepath == path);
+                    if (fileIn == null)
+                        list.Add(new FileInfoClass(path));
+                }
+                SelectedIndexChangedForFileList(sender, null);
+            }
+
+            void SelectedIndexChangedForFileList(object sender, EventArgs e)
+            {
+                ListBox box = (ListBox)sender;
+                if (box.SelectedIndex >= 0)
+                {
+                    FileInfoClass file = (FileInfoClass)box.SelectedItem;
+                    UpdateBar.Maximum = file.LinesCount;
+                    SetHexUploadProgress(file.Filename, end: file.LinesCount);
+                }
+                else
+                {
+                    HexFirmwareFilename.Text = "";
+                    UpdateBar.Maximum = 100;
+                    SetHexUploadProgress("");
+                }
+            }
+
+            void RemoveFromFilePathListBox(object sender)
+            {
+                ListBox box = (ListBox)sender;
+                BindingList<FileInfoClass> list = GetFileDataSource(box);
+                list.Remove((FileInfoClass)box.SelectedItem);
+            }
+            void OpenInExplorer()
+            {
+                if (ListOfMainFiles.SelectedIndex >= 0 && HexFirmwareFilename.Text != "")
+                {
+                    FileInfoClass fileInfo = (FileInfoClass)ListOfMainFiles.SelectedItem;
+                    if (File.Exists(fileInfo.Filepath))
+                        Process.Start("explorer.exe", $" /select, \"{fileInfo.Filepath}\"");
+                    else
+                        MessageBox.Show($"Файла {fileInfo.Filepath} не существует");
+                }
+            }
+            HexFirmwareFilename.Click += (s, e) => OpenInExplorer();
+            HexUploadOpenInExplorer.Click += (s, e) => OpenInExplorer();
+            HexUploadQueueModeCheck.CheckedChanged += (s, e) => Options.checkQueue = HexUploadQueueModeCheck.Checked;
+            QueueFirstFileIsMainCheck.CheckedChanged += (s, e) => Options.checkFirstMain = QueueFirstFileIsMainCheck.Checked;
+
+            ListOfMainFiles.DragEnter += DragEnter;
+
+            ListOfMainFiles.DragDrop += DragDropForFileList;
+
+            ListOfMainFiles.SelectedIndexChanged += SelectedIndexChangedForFileList;
+
+            ListOfMainFiles.DoubleClick += (s, e) => {
+                ListBox box = (ListBox)s;
+                BindingList<FileInfoClass> list = GetFileDataSource(box);
+                if (list.Count > 0) list.Remove((FileInfoClass)box.SelectedItem);
+                else AddFileToFilePathListBox();
+            };
+
+            ListOfMainFiles.KeyDown += (s, e) =>
+            {
+                if (e.KeyValue == (char)Keys.Delete)
+                    RemoveFromFilePathListBox(s);
+            };
+
+            MainFileObjects.ListChanged += (s, e) 
+                => HexUploadButton.Enabled = 
+                    HexUploadOpenInExplorer.Enabled = 
+                    HexUploadDownFile.Enabled = 
+                    HexUploadUpFile.Enabled =
+                    MainFileObjects.Count > 0;
+
+            void HideCotrolPanel(bool sw)
+            {
+                Panel panel = HexUpdateSettingsPanel;
+                panel.Tag = sw ? "Hided" : "Unhided";
+                HexUploadControlPanelButton.Image = sw ? Resources.Settings : Resources.Unhide;
+                panel.Location = new Point(sw ? panel.Location.X + 143 : panel.Location.X - 143, 0);
+            }
+            HexUploadControlPanelButton.Click += (s, e) => HideCotrolPanel((string)HexUpdateSettingsPanel.Tag == "Unhided");
+            HideCotrolPanel((string)HexUpdateSettingsPanel.Tag == "Unhided");
+            
+
 
             CloseFromToolStrip.Click += (s, e) => this.Close();
             OpenDebugFromToolStrip.Click += (s, e) =>
@@ -188,10 +364,13 @@ namespace RMDebugger
                     maxIxScanConfig.Value = minIxScanConfig.Value;
             };
 
-            InfoTree.NodeMouseClick += InfoTreeNodeClick;
-            buttonInfoStop.Click += (s, e) => Options.activeToken?.Cancel();
+            InfoTree.NodeMouseClick += (s, e) =>
+                TargetSignID.Value = UInt16.TryParse(e.Node.Text, out ushort newSignTarget) 
+                    ? newSignTarget 
+                    : TargetSignID.Value;
+            InfoGetInfoButton.Click += InfoTreeNodeClick;
             saveToCsvInfoMenuStrip.Click += InfoSaveToCSVButtonClick;
-            clearInfoMenuStrip.Click += InfoClearGridClick;
+            InfoAutoCheckBox.CheckedChanged += (s, e) => InfoTimeout.Visible = label3.Visible = InfoAutoCheckBox.Checked;
 
             SettingsRMLRGrid.DataSource = settingsRMLRData;
             SettingsRMLRGrid.CellToolTipTextNeeded += (s, e) =>
@@ -247,6 +426,7 @@ namespace RMDebugger
             };
 
             TimerSettingsTestBox.CheckedChanged += (s, e) => timerPanelTest.Visible = TimerSettingsTestBox.Checked;
+            WorkTestTimer.Tick += (s, e) => RefreshGridTask();
             StatusRS485GridView.DataSource = testerData;
             StatusRS485GridView.RowPrePaint += CellValueChangedRS485;
             foreach (ToolStripDropDownItem item in RS485SortMenuStrip.Items) item.Click += ChooseSortedBy;
@@ -258,8 +438,8 @@ namespace RMDebugger
             ResetButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.RESET);
             SetBootloaderStartButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.START_BOOTLOADER);
             SetBootloaderStopButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.STOP_BOOTLOADER);
-            AutoExtraButtons.CheckedChanged += (s, e)
-                => AutoExtraButtonsTimeout.Visible = label15.Visible = AutoExtraButtons.Checked;
+            ExtendedRepeatMenuItem.CheckedChanged += (s, e)
+                => AutoExtraButtonsTimeout.Visible = label24.Visible = ExtendedRepeatMenuItem.Checked;
         }
 
         private void HideConfigPanelClick(bool sw)
@@ -289,8 +469,6 @@ namespace RMDebugger
             numericPort.Value = Settings.Default.UDPGatePort;
             HexPageSize.Value = Settings.Default.LastPageSize;
             IPaddressBox.Text = Settings.Default.UDPGateIP;
-            HexPathBox.Items.Add(Settings.Default.LastPathToHex);
-            if (HexPathBox.Items.Count != 0) HexPathBox.SelectedItem = HexPathBox.Items[0];
             ThroughOrNot();
             if (Settings.Default.LastPortName != string.Empty && comPort.Items.Contains(Settings.Default.LastPortName))
                 comPort.Text = Settings.Default.LastPortName;
@@ -300,6 +478,34 @@ namespace RMDebugger
             Options.checkCrc = HexCheckCrc.Checked = Settings.Default.LastCheckCrc;
             HexTimeout.Value = Settings.Default.LastHexTimeout;
             Options.hexTimeout = (int)HexTimeout.Value;
+        }
+        private void SetPriority(object sender, EventArgs e)
+        {
+            ToolStripMenuItem toolstrip = (ToolStripMenuItem)sender;
+            Process proc = Process.GetCurrentProcess();
+            ProcessPriorityClass thisPriority = proc.PriorityClass;
+            if (Enum.TryParse(toolstrip.Tag.ToString(), out ProcessPriorityClass newPriority))
+            {
+                foreach (ToolStripMenuItem item in PriorityToolStripMenuItem.DropDownItems)
+                    item.CheckState = CheckState.Unchecked;
+                if (toolstrip.Name == "RealTimeToolItem" && thisPriority != ProcessPriorityClass.RealTime)
+                {
+                    DialogResult message = 
+                        MessageBox.Show(this, 
+                        "Вы уверены что хотите этого? Возможны проблемы в работе с устройствами USB.", 
+                        "Set Priority", MessageBoxButtons.YesNo);
+                    newPriority = message == DialogResult.No
+                        ? thisPriority
+                        : ProcessPriorityClass.RealTime;
+                }
+                proc.PriorityClass = proc.PriorityClass != newPriority ? newPriority : proc.PriorityClass;
+                foreach (ToolStripMenuItem item in PriorityToolStripMenuItem.DropDownItems)
+                    if (item.Tag.ToString() == proc.PriorityClass.ToString())
+                    {
+                        item.CheckState = CheckState.Checked;
+                        break;
+                    }
+            }
         }
         private void NotifyMessage_Click(object sender, EventArgs e)
             => this.WindowState = FormWindowState.Normal;
@@ -312,7 +518,6 @@ namespace RMDebugger
             Settings.Default.UDPGatePort = (ushort)numericPort.Value;
             Settings.Default.LastPageSize = (int)HexPageSize.Value;
             Settings.Default.UDPGateIP = IPaddressBox.Text;
-            Settings.Default.LastPathToHex = HexPathBox.Text;
             Settings.Default.LastPortName = comPort.Text;
             Settings.Default.LastBaudRate = Int32.TryParse(BaudRate.Text, out int digit)
                 ? digit
@@ -479,7 +684,7 @@ namespace RMDebugger
                     HexPageSize.Value = Convert.ToInt32(rKey.GetValue("LastPageSize"));
                     IPaddressBox.Text = rKey.GetValue("UDPGateIP").ToString();
                     numericPort.Value = Convert.ToUInt16(rKey.GetValue("UDPGatePort"));
-                    HexPathBox.Text = rKey.GetValue("LastPathToHex").ToString();
+                    /*HexPathBox.Text = rKey.GetValue("LastPathToHex").ToString();*/
                     ThroughSignID.Value = Convert.ToUInt16(rKey.GetValue("ThroughSignatureID"));
                     comPort.Text = rKey.GetValue("LastComPort").ToString();
                     BaudRate.Text = rKey.GetValue("LastBaudrate").ToString();
@@ -795,6 +1000,18 @@ namespace RMDebugger
         }
         async private void SearchButtonClick(object sender, EventArgs e)
         {
+            void AfterSearchEvent(bool sw, bool manual)
+            {
+                AfterAnyAutoEvent(sw);
+                if (!SearchAutoButton.Enabled) SearchAutoButton.Enabled = true;
+                if (manual) SearchAutoButton.Enabled = !sw;
+                else
+                {
+                    SearchAutoButton.Text = sw ? "Stop" : "Auto";
+                    SearchAutoButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
+                }
+                SearchManualButton.Enabled = !sw;
+            }
             if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
             Button btn = (Button)sender;
             bool manual = btn == SearchManualButton; 
@@ -806,18 +1023,6 @@ namespace RMDebugger
             onTabPages(RMData);
             AfterSearchEvent(false, manual);
             Options.activeTask = null;
-        }
-        private void AfterSearchEvent(bool sw, bool manual)
-        {
-            AfterAnyAutoEvent(sw);
-            if (!SearchAutoButton.Enabled) SearchAutoButton.Enabled = true;
-            if (manual) SearchAutoButton.Enabled = !sw;
-            else
-            {
-                SearchAutoButton.Text = sw ? "Stop" : "Auto";
-                SearchAutoButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
-            }
-            SearchManualButton.Enabled = !sw;
         }
         
         async private Task StartSearchAsync(bool auto)
@@ -852,19 +1057,19 @@ namespace RMDebugger
                     }
                     if (SearchDistTof.Checked)
                     {
-                        if (data.Count == 0) data = await search.GetDataFromDevice(CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes(), ThroughSignID.GetBytes());
+                        List<DeviceData> dataDistTof = await search.GetDataFromDevice(CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes(), ThroughSignID.GetBytes());
+                        if (data.Count == 0) 
+                            data.AddRange(dataDistTof);
                         else
                         {
-                            List<DeviceData> dataDistTof = await search.GetDataFromDevice(CmdOutput.ONLINE_DIST_TOF, TargetSignID.GetBytes(), ThroughSignID.GetBytes());
-                            foreach(DeviceData dDt in dataDistTof)
+                            foreach(DeviceData device in dataDistTof)
                             {
-                                foreach (DeviceData dGn in data)
-                                    if (dDt.devSign == dGn.devSign)
-                                    {
-                                        dGn.devDist = dDt.devDist;
-                                        dGn.devRSSI = dDt.devRSSI;
-                                        break;
-                                    }
+                                DeviceData devIn = data.OfType<DeviceData>().FirstOrDefault(x => x.devSign == device.devSign);
+                                if (devIn != null)
+                                {
+                                    devIn.devDist = device.devDist;
+                                    devIn.devRSSI = device.devRSSI;
+                                }
                             }
                         }
                     }
@@ -875,14 +1080,19 @@ namespace RMDebugger
 
                     Action action = () =>
                     {
+                        int ScrollLastPos = SearchGrid.FirstDisplayedScrollingRowIndex;
                         deviceData.Clear();
+                        bool find = SearchFindSignatireMode.Checked && SearchFindSignatireMode.Enabled;
                         foreach (DeviceData dData in data)
                         {
                             deviceData.Add(dData);
-                            if (SearchFindSignatireMode.Checked && SearchFindSignatireMode.Enabled)
-                                SearchGrid.Rows[data.IndexOf(dData)].DefaultCellStyle.BackColor = dData.inOneBus ? mirClr : Color.White;
+                            if (find)
+                                SearchGrid.Rows[data.IndexOf(dData)].DefaultCellStyle.BackColor = 
+                                    dData.inOneBus ? mirClr : Color.White;
                         }
-                        
+
+                        if (deviceData.Count > ScrollLastPos && ScrollLastPos >= 0)
+                            SearchGrid.FirstDisplayedScrollingRowIndex = ScrollLastPos;
                     };
                     if (InvokeRequired) Invoke(action);
                     else action();
@@ -912,33 +1122,77 @@ namespace RMDebugger
         //Hex uploader
         async private void HexUploadButtonClick(object sender, EventArgs e)
         {
+            void AfterHexUploadEvent(bool sw)
+            {
+                AfterAnyAutoEvent(sw);
+                HexPageSize.Enabled =
+                    ListOfMainFiles.Enabled =
+                    HexUploadDownFile.Enabled =
+                    HexUploadUpFile.Enabled =
+                    HexUploadPathButton.Enabled =
+                    HexTimeout.Enabled =
+                    SignaturePanel.Enabled = !sw;
+                HexUploadButton.Text = sw ? "Stop" : "Upload";
+                HexUploadButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
+            }
             if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
             Options.activeToken = new CancellationTokenSource();
             AfterHexUploadEvent(true);
             offTabsExcept(RMData, HexUpdatePage);
-            try { await Task.Run(() => HexUploadAsync()); } catch { }
+            try
+            {
+                do
+                {
+                    if (Options.checkQueue)
+                    {
+                        FileInfoClass mainFile = Options.checkFirstMain
+                            ? (FileInfoClass)ListOfMainFiles.Items[0]
+                            : (FileInfoClass)ListOfMainFiles.SelectedItem;
+                        for(int i = Options.checkFirstMain ? 1 : 0; i < ListOfMainFiles.Items.Count && Options.checkQueue; i++)
+                        {
+                            ListOfMainFiles.SetSelected(i, true);
+                            if (Options.checkFirstMain)
+                            {
+                                await Task.Run(() => HexUploadAsync(mainFile));
+                                await Task.Delay((int)HexPauseAfterUpload.Value * 1000, Options.activeToken.Token);
+                            }
+                            FileInfoClass file = (FileInfoClass)ListOfMainFiles.SelectedItem;
+                            await Task.Run(() => HexUploadAsync(file));
+                            await Task.Delay(Options.checkFirstMain
+                                ? (int)HexPauseAfterUploadMainAndSec.Value * 1000
+                                : (int)HexPauseAfterUpload.Value * 1000, Options.activeToken.Token);
+                        }
+                    }
+                    else
+                    {
+                        if (Options.checkFirstMain && ListOfMainFiles.SelectedIndex != 0)
+                        {
+                            await Task.Run(() => HexUploadAsync((FileInfoClass)ListOfMainFiles.Items[0]));
+                            await Task.Delay((int)HexPauseAfterUpload.Value * 1000, Options.activeToken.Token);
+                        }
+                        FileInfoClass file = (FileInfoClass)ListOfMainFiles.SelectedItem;
+                        await Task.Run(() => HexUploadAsync(file));
+                        await Task.Delay(HexUploadRepeatToolItem.Checked 
+                            ? (int)HexPauseAfterUpload.Value * 1000 
+                            : 0, Options.activeToken.Token);
+                    }
+                }
+                while (HexUploadRepeatToolItem.Checked && !Options.activeToken.IsCancellationRequested );
+            }
+            catch { }
             AfterHexUploadEvent(false);
             onTabPages(RMData);
         }
-        private void AfterHexUploadEvent(bool sw)
+        private void SetHexUploadProgress(string filename, int start = 0, int end = 0)
         {
-            AfterAnyAutoEvent(sw);
-            HexPathBox.Enabled = 
-                HexPageSize.Enabled = 
-                HexPathButton.Enabled =
-                HexTimeout.Enabled =
-                SignaturePanel.Enabled = !sw;
-            HexUploadButton.Text = sw ? "Stop" : "Upload";
-            HexUploadButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
-            UpdateBar.Value = 0;
-            BytesStart.Text = "0";
+            UpdateBar.Value = start;
+            UpdateBar.Maximum = end;
+            if (end > 0) HexFirmwareProgressLabel.Text = $"{start}/{end, -5}";
+            else HexFirmwareProgressLabel.Text = $"{0}/{0}";
+
+            HexFirmwareFilename.Text = end > 0 ? filename : "";
         }
-        private void SetHexUploadProgress(int progress = 0)
-        {
-            UpdateBar.Value = progress;
-            BytesStart.Text = progress.ToString();
-        }
-        async private Task HexUploadAsync()
+        async private Task HexUploadAsync(FileInfoClass fileInfo)
         {
             using (Bootloader boot = NeedThrough.Checked
                 ? new Bootloader(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
@@ -947,7 +1201,7 @@ namespace RMDebugger
                 boot.ToReply += ToReplyStatus;
                 boot.ToDebug += ToDebuggerWindow;
                 boot.SetProgress += SetHexUploadProgress;
-                try { boot.SetQueueFromHex(Options.hexPath); }
+                try { boot.SetQueueFromHex(fileInfo.Filepath); }
                 catch (Exception ex) { ToMessageStatus(ex.Message); return; }
                 //async method
                 async Task<bool> GetReplyFromDevice(byte[] cmdOut)
@@ -968,7 +1222,7 @@ namespace RMDebugger
                             if ((DateTime.Now - t0).Seconds >= Options.hexTimeout)
                             {
                                 DialogResult message = MessageBox.Show(this, "Timeout", "Something wrong...", MessageBoxButtons.RetryCancel);
-                                if (message == DialogResult.Cancel) return false;
+                                if (message == DialogResult.Cancel) Options.activeToken?.Cancel();
                                 else t0 = DateTime.Now;
                             }
                             await Task.Delay((int)HexTimeoutCmdRepeat.Value, Options.activeToken.Token);
@@ -991,7 +1245,7 @@ namespace RMDebugger
 
                 while (boot.HexQueue.Count() > 0)
                 {
-                    boot.GetDataForUpload(out byte[] dataOutput); 
+                    boot.GetDataForUpload(out byte[] dataOutput);
                     if (!await GetReplyFromDevice(boot.buildDataCmdDelegate(dataOutput))) return;
                     if (!await GetReplyFromDevice(cmdConfirmData)) return;
                 }
@@ -1004,53 +1258,12 @@ namespace RMDebugger
                     if (Options.showMessages)
                         NotifyMessage.ShowBalloonTip(5,
                             "Прошивка устройства",
-                            $"Файл {Path.GetFileName(Options.hexPath)} успешно загружен на устройство за " + timeUplod,
+                            $"Файл {fileInfo.Filename} успешно загружен на устройство за " + timeUplod,
                             ToolTipIcon.Info);
                 }
-            }
-        }
-        private void HexPathButton_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog file = new OpenFileDialog
-            {
-                Filter = "Hex файл (*.hex)|*.hex",
-                Title = "Укажите файл с расширением *.hex"
-            };
-            if (HexPathBox.Text != string.Empty) file.InitialDirectory = Path.GetDirectoryName(HexPathBox.Text);
-            if (file.ShowDialog() == DialogResult.OK)
-            {
-                if (!HexPathBox.Items.Contains(file.FileName))
-                    HexPathBox.Items.Add(file.FileName);
-                HexPathBox.SelectedItem = file.FileName;
-            }
-        }
-        private void Hex_Box_DragDrop(object sender, DragEventArgs e)
-        {
-            string[] FilePath = (string[])e.Data.GetData(DataFormats.FileDrop);
-            foreach (string path in FilePath)
-                if (!HexPathBox.Items.Contains(path) && new FileInfo(path).Extension == ".hex")
-                    HexPathBox.Items.Add(path);
-            HexPathBox.SelectedItem = FilePath[0];
-        }
-        private void Hex_Box_DragEnter(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-                e.Effect = DragDropEffects.Copy;
-        }
-        private void Hex_Box_TextChanged(object sender, EventArgs e)
-        {
-            bool exists = File.Exists(HexPathBox.Text);
-            if (exists)
-            {
-                Options.hexPath = HexPathBox.Text;
-                int linesCount = File.ReadLines(HexPathBox.Text).Count();
-                BytesEnd.Text = linesCount.ToString();
-                UpdateBar.Maximum = linesCount;
-            }
-            HexUploadButton.Enabled = exists;
-            HexUploadFilename.Text = exists ? $"Filename: {Path.GetFileName(HexPathBox.Text)}" : string.Empty;
-        }
 
+            }
+        }
 
         //Config
         private void ColoredRow(int index, DataGridView dgv, Color color)
@@ -1063,6 +1276,17 @@ namespace RMDebugger
         // //Load
         async private void LoadConfigButtonClick(object sender, EventArgs e)
         {
+            void AfterLoadConfigEvent(bool sw)
+            {
+                AfterAnyAutoEvent(sw);
+                ConfigDataGrid.Enabled =
+                    SignaturePanel.Enabled =
+                    LoadFieldsConfigButton.Enabled =
+                    UploadConfigButton.Enabled =
+                    settingsBoxConfig.Enabled = !sw;
+                LoadConfigButton.Text = sw ? "Stop" : "Load from fields";
+                LoadConfigButton.Image = sw ? Resources.StatusStopped : Resources.CloudDownload;
+            }
             bool CheckFields() {
                 foreach (FieldConfiguration field in fieldsData)
                     if (field.fieldActive) return true;
@@ -1080,18 +1304,6 @@ namespace RMDebugger
                 onTabPages(RMData);
             }
         }
-        private void AfterLoadConfigEvent(bool sw)
-        {
-            AfterAnyAutoEvent(sw);
-            ConfigDataGrid.Enabled =
-                SignaturePanel.Enabled =
-                LoadFieldsConfigButton.Enabled =
-                UploadConfigButton.Enabled =
-                settingsBoxConfig.Enabled = !sw;
-            LoadConfigButton.Text = sw ? "Stop" : "Load from fields";
-            LoadConfigButton.Image = sw ? Resources.StatusStopped : Resources.CloudDownload;
-        }
-
         async private Task LoadField()
         {
             Configuration config = NeedThrough.Checked
@@ -1145,6 +1357,17 @@ namespace RMDebugger
         // //Upload
         async private void UploadConfigButtonClick(object sender, EventArgs e)
         {
+            void AfterUploadConfigEvent(bool sw)
+            {
+                AfterAnyAutoEvent(sw);
+                ConfigDataGrid.Enabled =
+                    SignaturePanel.Enabled =
+                    LoadConfigButton.Enabled =
+                    LoadFieldsConfigButton.Enabled =
+                    settingsBoxConfig.Enabled = !sw;
+                UploadConfigButton.Text = sw ? "Stop" : "Upload to fields";
+                UploadConfigButton.Image = sw ? Resources.StatusStopped : Resources.CloudUpload;
+            }
             bool CheckFields() {
                 foreach (FieldConfiguration field in fieldsData)
                     if (field.fieldActive)
@@ -1162,17 +1385,6 @@ namespace RMDebugger
                 onTabPages(RMData);
                 AfterUploadConfigEvent(false);
             }
-        }
-        private void AfterUploadConfigEvent(bool sw)
-        {
-            AfterAnyAutoEvent(sw);
-            ConfigDataGrid.Enabled =
-                SignaturePanel.Enabled =
-                LoadConfigButton.Enabled =
-                LoadFieldsConfigButton.Enabled =
-                settingsBoxConfig.Enabled = !sw;
-            UploadConfigButton.Text = sw ? "Stop" : "Upload to fields";
-            UploadConfigButton.Image = sw ? Resources.StatusStopped : Resources.CloudUpload;
         }
         async private Task UploadField()
         {
@@ -1227,6 +1439,17 @@ namespace RMDebugger
 
         async private void LoadFieldsConfigButtonClick(object sender, EventArgs e)
         {
+            void AfterLoadFieldsEvent(bool sw)
+            {
+                AfterAnyAutoEvent(sw);
+                ConfigDataGrid.Enabled =
+                    SignaturePanel.Enabled =
+                    LoadConfigButton.Enabled =
+                    UploadConfigButton.Enabled =
+                    settingsBoxConfig.Enabled = !sw;
+                LoadFieldsConfigButton.Text = sw ? "Stop" : "Scan fields";
+                LoadFieldsConfigButton.Image = sw ? Resources.StatusStopped : Resources.DatabaseSource;
+            }
             if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
             Options.activeToken = new CancellationTokenSource();
             AfterLoadFieldsEvent(true);
@@ -1239,18 +1462,6 @@ namespace RMDebugger
             AfterLoadFieldsEvent(false);
             onTabPages(RMData);
         }
-        private void AfterLoadFieldsEvent(bool sw)
-        {
-            AfterAnyAutoEvent(sw);
-            ConfigDataGrid.Enabled =
-                SignaturePanel.Enabled =
-                LoadConfigButton.Enabled =
-                UploadConfigButton.Enabled =
-                settingsBoxConfig.Enabled = !sw;
-            LoadFieldsConfigButton.Text = sw ? "Stop" : "Scan fields";
-            LoadFieldsConfigButton.Image = sw ? Resources.StatusStopped : Resources.DatabaseSource;
-        }
-
         async private Task LoadFields(Configuration config)
         {
             config.ToReply += ToReplyStatus;
@@ -1299,55 +1510,61 @@ namespace RMDebugger
         }
 
         //Get info
-        async private void InfoTreeNodeClick(object sender, TreeNodeMouseClickEventArgs e)
+        async private void InfoTreeNodeClick(object sender, EventArgs e)
         {
-            if (UInt16.TryParse(e.Node.Text, out ushort newSignTarget)) { TargetSignID.Value = newSignTarget; return; }
-            switch (e.Node.Name)
+            void AfterInfoEvent(bool sw)
             {
-                case "GetNearInfo":
-                    Options.activeTask = Task.Run(() => GetInfoNearFromDevice(e.Node));
-                    break;
-                case "WhoAreYouInfo":
-                    Options.activeTask = Task.Run(() => GetInfoAboutDevice(CmdOutput.GRAPH_WHO_ARE_YOU, e.Node));
-                    break;
-                case "StatusInfo":
-                    Options.activeTask = Task.Run(() => GetInfoAboutDevice(CmdOutput.STATUS, e.Node));
-                    break;
-                default:
-                    return;
+                AfterAnyAutoEvent(sw);
+                InfoGetInfoButton.Text = sw ? "Stop" : "Get Info";
             }
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
+            Options.activeToken = new CancellationTokenSource();
             AfterInfoEvent(true);
             offTabsExcept(RMData, InfoPage);
-            try { await Options.activeTask; } catch { }
+            do
+            {
+                try
+                {
+                    InfoTree.BeginUpdate();
+                    foreach (TreeNode node in InfoTree.Nodes)
+                    {
+                        if (node.Name == InfoWhoAreYouToolStrip.Tag && InfoWhoAreYouToolStrip.Checked)
+                            await Task.Run(() => GetInfoAboutDevice(CmdOutput.GRAPH_WHO_ARE_YOU, node));
+                        else if (node.Name == InfoStatusToolStrip.Tag && InfoStatusToolStrip.Checked)
+                            await Task.Run(() => GetInfoAboutDevice(CmdOutput.STATUS, node));
+                        else if (node.Name == InfoGetNearToolStrip.Tag && InfoGetNearToolStrip.Checked)
+                            await Task.Run(() => GetInfoNearFromDevice(node));
+                        await Task.Delay(1);
+                    }
+                    InfoTree.EndUpdate();
+                    await Task.Delay(InfoAutoCheckBox.Checked ? (int)InfoTimeout.Value : 50, Options.activeToken.Token);
+                }
+                catch { }
+            }
+            while (!Options.activeToken.IsCancellationRequested && InfoAutoCheckBox.Checked); 
+            if (Options.activeToken.IsCancellationRequested)
+                InfoTree.EndUpdate();
             AfterInfoEvent(false);
             onTabPages(RMData);
-            Options.activeTask = null;
-        }
-        private void AfterInfoEvent(bool sw)
-        {
-            AfterAnyAutoEvent(sw);
-            SignaturePanel.Enabled =
-                numericInfoSeconds.Enabled =
-                InfoTree.Enabled = !sw;
-            buttonInfoStop.Visible = sw;
         }
         async private Task GetInfoAboutDevice(CmdOutput cmdOutput, TreeNode treeNode)
         {
-            Options.activeToken = numericInfoSeconds.Value > 0
-                ? new CancellationTokenSource((int)numericInfoSeconds.Value * 1000)
-                : new CancellationTokenSource();
             using (Information info = NeedThrough.Checked
                 ? new Information(Options.mainInterface, TargetSignID.GetBytes(), ThroughSignID.GetBytes())
                 : new Information(Options.mainInterface, TargetSignID.GetBytes()))
             {
                 info.ToReply += ToReplyStatus;
                 info.ToDebug += ToDebuggerWindow;
+                ToMessageStatus($"Sign:{TargetSignID.Value}, {cmdOutput}");
                 byte[] cmdOut = info.buildCmdDelegate(cmdOutput);
                 int size = !NeedThrough.Checked ? (int)cmdOutput : (int)cmdOutput + 4;
-                async Task _GetInfoCycle()
+                async Task<List<TreeNode>> GetInfo()
                 {
+                    List<TreeNode> typeNodesList;
+                    CancellationTokenSource timeoutToken = new CancellationTokenSource(500);
                     do
                     {
+                        typeNodesList = new List<TreeNode>();
                         try
                         {
                             Tuple<byte[], ProtocolReply> reply = await info.GetData(cmdOut, size);
@@ -1356,120 +1573,86 @@ namespace RMDebugger
                             data.Add($"{infoEnum.Date}", DateTime.Now.ToString("dd-MM-yy HH:mm"));
 
                             foreach (PropertyInfo info in Options.infoData.GetType().GetProperties())
-                                if (data.ContainsKey(info.Name)) info.SetValue(Options.infoData, data[info.Name], null);
+                                if (data.ContainsKey(info.Name)) 
+                                    info.SetValue(Options.infoData, data[info.Name], null);
 
-
-                            List<TreeNode> typeNodesList = new List<TreeNode>();
-                            Invoke((MethodInvoker)(() =>
+                            foreach (string str in data.Keys)
                             {
-                                foreach (string str in data.Keys)
-                                {
-                                    bool csvInfo = Enum.IsDefined(typeof(infoEnum), str);
-                                    typeNodesList.Add(
-                                        new TreeNode($"{str}: {data[str]}")
-                                        {
-                                            ToolTipText = csvInfo ? "Данные для csv" : "",
-                                            ForeColor = csvInfo ? Color.ForestGreen : Color.Black,
-                                        });
-                                }
-                                treeNode.Nodes.Clear();
-                                treeNode.Nodes.AddRange(typeNodesList.ToArray());
-                                treeNode.Expand();
-                            }));
-                            return;
+                                bool csvInfo = Enum.IsDefined(typeof(infoEnum), str);
+                                typeNodesList.Add(
+                                    new TreeNode($"{str}: {data[str]}")
+                                    {
+                                        ToolTipText = csvInfo ? "Данные для csv" : "",
+                                        ForeColor = csvInfo ? Color.ForestGreen : Color.Black,
+                                    });
+                            }
+                            break;
                         }
-                        catch { }
-                        await Task.Delay(25, Options.activeToken.Token);
+                        catch { await Task.Delay(10); }
                     }
-                    while (!Options.activeToken.IsCancellationRequested);
+                    while (!Options.activeToken.IsCancellationRequested && !timeoutToken.IsCancellationRequested);
+                    return typeNodesList;
                 }
-                treeNode.Nodes.Clear();
-                do
-                {
-                    await _GetInfoCycle();
-                    if (numericInfoSeconds.Value > 0) return;
-                    await Task.Delay(250, Options.activeToken.Token);
-                }
-                while (!Options.activeToken.IsCancellationRequested);
+                List<TreeNode> newNodes = await GetInfo();
+                Invoke((MethodInvoker)(() => { 
+                    treeNode.Nodes.Clear();
+                    treeNode.Nodes.AddRange(newNodes.ToArray()); 
+                }));
             };
         }
         async private Task GetInfoNearFromDevice(TreeNode treeNode)
         {
-            Options.activeToken = numericInfoSeconds.Value > 0
-                ? new CancellationTokenSource((int)numericInfoSeconds.Value * 1000)
-                : new CancellationTokenSource();
             using (Searching search = new Searching(Options.mainInterface))
             {
                 search.ToReply += ToReplyStatus;
                 search.ToDebug += ToDebuggerWindow;
-                List<DeviceData> data;
-                async Task _GetGetNear()
+                ToMessageStatus($"Sign:{TargetSignID.Value}, GRAPH_GET_NEAR");
+                async Task<TreeNode> GetNear()
                 {
-                    do
+                    List<DeviceData> data = await search.GetDataFromDevice(CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes(), ThroughSignID.GetBytes());
+                    Options.infoData.Radio = data.Count > 0 ? "Ok" : "Empty";
+                    TreeNode getnear = new TreeNode($"{(infoEnum)3}: {Options.infoData.Radio}")
                     {
-                        data = await search.GetDataFromDevice(CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes(), ThroughSignID.GetBytes());
-                        await Task.Delay(25, Options.activeToken.Token);
-                        Options.activeToken.Token.ThrowIfCancellationRequested();
-                    }
-                    while (!Options.activeToken.IsCancellationRequested && data.Count == 0);
-
-                    Invoke((MethodInvoker)(() =>
+                        ToolTipText = "Данные для csv",
+                        ForeColor = Color.ForestGreen
+                    };
+                    
+                    if (data.Count > 0)
                     {
-                        Options.infoData.Radio = "Ok";
-                        TreeNode getnear = new TreeNode($"{(infoEnum)3}: Ok")
+                        data = data.OrderBy(s => s.devSign).GroupBy(a => a.devSign).Select(g => g.First()).ToList();
+                        Dictionary<string, List<int>> typeNodesData = new Dictionary<string, List<int>>();
+                        foreach (DeviceData device in data)
                         {
-                            ToolTipText = "Данные для csv",
-                            ForeColor = Color.ForestGreen
-                        };
-
-                        if (data.Count > 0)
-                        {
-                            treeNode.Expand();
-                            Dictionary<string, List<int>> typeNodesData = new Dictionary<string, List<int>>();
-                            foreach (DeviceData device in data)
-                            {
-                                string type = $"{device.devType}";
-                                if (!typeNodesData.ContainsKey(type)) typeNodesData[type] = new List<int>();
-                                typeNodesData[type].Add(device.devSign);
-                            }
-
-                            List<TreeNode> typeNodesList = new List<TreeNode>();
-                            foreach (string key in typeNodesData.Keys)
-                            {
-                                TreeNode typeNode = new TreeNode($"{key}: {typeNodesData[key].Count}");
-                                foreach (int sign in typeNodesData[key])
-                                    typeNode.Nodes.Add(
-                                        new TreeNode($"{sign}")
-                                        {
-                                            ToolTipText = $"Нажмите на сигнатуру {sign}, что бы опросить",
-                                            ForeColor = SystemColors.HotTrack
-                                        });
-                                typeNodesList.Add(typeNode);
-                            }
-                            treeNode.Nodes.Clear();
-                            getnear.Nodes.AddRange(typeNodesList.ToArray());
-                            treeNode.Nodes.Add(getnear);
-                            getnear.Expand();
+                            string type = $"{device.devType}";
+                            if (!typeNodesData.ContainsKey(type)) typeNodesData[type] = new List<int>();
+                            typeNodesData[type].Add(device.devSign);
                         }
-                        treeNode.Expand();
-                    }));
+
+                        List<TreeNode> typeNodesList = new List<TreeNode>();
+                        foreach (string key in typeNodesData.Keys)
+                        {
+                            TreeNode typeNode = new TreeNode($"{key}: {typeNodesData[key].Count}");
+                            foreach (int sign in typeNodesData[key])
+                                typeNode.Nodes.Add(
+                                    new TreeNode($"{sign}")
+                                    {
+                                        ToolTipText = $"Нажмите на сигнатуру {sign}, что бы опросить",
+                                        ForeColor = SystemColors.HotTrack
+                                    });
+                            typeNodesList.Add(typeNode);
+                        }
+                        getnear.Nodes.AddRange(typeNodesList.ToArray());
+                        getnear.Expand();
+                    }
+                    return getnear;
                 }
-                treeNode.Nodes.Clear();
-                Options.infoData.Radio = "None";
-                do
-                {
-                    await _GetGetNear();
-                    if (numericInfoSeconds.Value > 0) return;
-                    await Task.Delay(250, Options.activeToken.Token);
-                }
-                while (!Options.activeToken.IsCancellationRequested);
+                TreeNode newNode = await GetNear();
+                Invoke((MethodInvoker)(() => {
+                    treeNode.Nodes.Clear(); 
+                    treeNode.Nodes.Add(newNode); 
+                }));
             };
         }
-        private void InfoClearGridClick(object sender, EventArgs e) 
-        {
-            foreach (TreeNode node in InfoTree.Nodes) node.Nodes.Clear();
-            Options.infoData = new InformationData();
-        } 
         private void InfoSaveToCSVButtonClick(object sender, EventArgs e)
         {
             if (Options.infoData.haveDataForCSV)
@@ -1588,6 +1771,16 @@ namespace RMDebugger
         }
         private async void SettingRMLRTestClick(object sender, EventArgs e)
         {
+            void AfterStartRMLRTest(bool sw)
+            {
+                AfterAnyAutoEvent(sw);
+                SignaturePanel.Enabled =
+                    LoadSettingRMLRButton.Enabled =
+                    UploadSettingRMLRButton.Enabled =
+                    SettingsRMLRGrid.Enabled = !sw;
+                TestSettingRMLRButton.Text = sw ? "Stop" : "Test";
+                TestSettingRMLRButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
+            }
             if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
             Options.activeToken = new CancellationTokenSource();
             Options.activeTask = Task.Run(() => StartTestSettingsRMLR());
@@ -1599,16 +1792,6 @@ namespace RMDebugger
             onTabPages(ModeDeviceTabs);
             AfterStartRMLRTest(false);
             Options.activeTask = null;
-        }
-        private void AfterStartRMLRTest(bool sw)
-        {
-            AfterAnyAutoEvent(sw);
-            SignaturePanel.Enabled =
-                LoadSettingRMLRButton.Enabled = 
-                UploadSettingRMLRButton.Enabled =
-                SettingsRMLRGrid.Enabled = !sw;
-            TestSettingRMLRButton.Text = sw ? "Stop" : "Test";
-            TestSettingRMLRButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
         }
         private async Task StartTestSettingsRMLR()
         {
@@ -1736,6 +1919,21 @@ namespace RMDebugger
 
         async private void StartTestRSButtonClick(object sender, EventArgs e)
         {
+            void AfterStartTestRSEvent(bool sw)
+            {
+                AfterAnyAutoEvent(sw);
+                StatusRS485GridView.AllowUserToDeleteRows =
+                    SignaturePanel.Enabled =
+                    AutoScanToTest.Enabled =
+                    scanGroupBox.Enabled =
+                    settingsGroupBox.Enabled =
+                    ClearDataTestRS485.Enabled =
+                    timerPanelTest.Enabled =
+                    SortByButton.Enabled = !sw;
+                StatusRS485GridView.Cursor = sw ? Cursors.AppStarting : Cursors.Default;
+                StartTestRSButton.Text = sw ? "&Stop" : "&Start Test";
+                StartTestRSButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
+            }
             if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
             Options.activeToken = new CancellationTokenSource();
             Options.activeTask = Task.Run(() => StartTaskRS485Test()); 
@@ -1744,26 +1942,12 @@ namespace RMDebugger
             offTabsExcept(TestPages, RS485Page);
             ToMessageStatus($"Device count: {testerData.Count}");
             try { await Options.activeTask; } catch { }
+            RefreshGridTask();
             WorkTestTimer.Stop();
             onTabPages(RMData);
             onTabPages(TestPages);
             AfterStartTestRSEvent(false);
             Options.activeTask = null;
-        }
-        private void AfterStartTestRSEvent(bool sw)
-        {
-            AfterAnyAutoEvent(sw);
-            StatusRS485GridView.AllowUserToDeleteRows =
-                SignaturePanel.Enabled = 
-                AutoScanToTest.Enabled = 
-                scanGroupBox.Enabled = 
-                settingsGroupBox.Enabled = 
-                ClearDataTestRS485.Enabled =
-                timerPanelTest.Enabled =
-                SortByButton.Enabled = !sw;
-            StatusRS485GridView.Cursor = sw ? Cursors.AppStarting : Cursors.Default;
-            StartTestRSButton.Text = sw ? "&Stop" : "&Start Test";
-            StartTestRSButton.Image = sw ? Resources.StatusStopped : Resources.StatusRunning;
         }
 
         async private Task StartTaskRS485Test()
@@ -1774,13 +1958,14 @@ namespace RMDebugger
             string connectedInterface = GetConnectedInterfaceString();
 
             if (TimerSettingsTestBox.Checked)
-                setTimerTest = (int)new TimeSpan(
-                               (int)numericDaysTest.Value,
+                Options.easyTimer = new TimeSpan(
                                (int)numericHoursTest.Value,
                                (int)numericMinutesTest.Value,
-                               (int)numericSecondsTest.Value).TotalSeconds;
+                               (int)numericSecondsTest.Value);
+            if (Options.TesterTimer == null)
+                Options.TesterTimer = new Stopwatch();
+            Options.TesterTimer.Start();
             Invoke((MethodInvoker)(() => WorkTestTimer.Start()));
-
             try
             {
                 foreach (string key in devices.Keys)
@@ -1793,25 +1978,20 @@ namespace RMDebugger
             }
             catch (OperationCanceledException) { MessageBox.Show("Задача остановлена"); }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
-            finally {
-                RefreshGridTask();
+            finally
+            {
+                Options.TesterTimer.Stop();
                 ToMessageStatus($"Device count: {testerData.Count} | Завершено");
             }
         }
-        private void RefreshGridTask()
-            => BeginInvoke((MethodInvoker)(() => {
-                testerData.ResetBindings();
-                StatusRS485GridView.ClearSelection();
-                StatusRS485GridView.Refresh();
-            }));
 
-        private void WorkTestTimer_Tick(object sender, EventArgs e)
+        private void ElapsedWorkTime()
         {
-            setTimerTest -= 1;
-            realTimeWorkingTest += 1;
-            RefreshGridTask();
-            ChangeWorkTestTime(realTimeWorkingTest);
-            if (TimerSettingsTestBox.Checked && setTimerTest == 0)
+            TimeSpan time = TimeSpan.FromTicks(Options.TesterTimer.ElapsedTicks);
+            WorkingTimeLabel.Text = $"Total: {(time.Days > 0 ? $"{time.Days}d, " : "")}" +
+                                    $"{time.Hours:00}:{time.Minutes:00}:{time.Seconds:00}.{time.Milliseconds:000}";
+            if (TimerSettingsTestBox.Checked
+                && TimeSpan.FromTicks(Options.TesterTimer.ElapsedTicks) >= Options.easyTimer)
             {
                 Options.activeToken?.Cancel();
                 if (Options.showMessages)
@@ -1820,6 +2000,15 @@ namespace RMDebugger
                         "Время истекло, тест завершен",
                         ToolTipIcon.Info);
             }
+        }
+        private void RefreshGridTask()
+        {
+            int ScrollLastPos = StatusRS485GridView.FirstDisplayedScrollingRowIndex;
+            testerData.ResetBindings();
+            StatusRS485GridView.ClearSelection();
+            StatusRS485GridView.Refresh();
+            if (testerData.Count > ScrollLastPos && ScrollLastPos >= 0)
+                StatusRS485GridView.FirstDisplayedScrollingRowIndex = ScrollLastPos;
         }
         async private Task ConnectInterfaceAndStartTest(string[] interfaceSettings, List<DeviceClass> devices)
         {
@@ -1843,6 +2032,7 @@ namespace RMDebugger
         async private Task StartTest(ForTests forTests)
         {
             forTests.TestDebug += ToDebuggerWindow;
+            forTests.TimeRefresh += ElapsedWorkTime;
             forTests.clearAfterError = ClearBufferSettingsTestBox.Checked;
             Random random = new Random();
             do
@@ -1895,33 +2085,32 @@ namespace RMDebugger
         // //Manual scan
         async private void ManualScanToTestClick(object sender, EventArgs e)
         {
+            void AfterRS485ManualScanEvent(bool sw)
+            {
+                AfterAnyAutoEvent(sw);
+                StatusRS485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
+                StatusRS485GridView.AllowUserToDeleteRows =
+                    minSigToScan.Enabled =
+                    maxSigToScan.Enabled =
+                    StartTestRSButton.Enabled =
+                    SignaturePanel.Enabled =
+                    AutoScanToTest.Enabled =
+                    settingsGroupBox.Enabled =
+                    ClearDataTestRS485.Enabled =
+                    AddSignatureIDToTest.Enabled =
+                    timerPanelTest.Enabled = !sw;
+                ManualScanToTest.Text = sw ? "Stop" : "Manual Scan";
+                ManualScanToTest.Image = sw ? Resources.StatusStopped : Resources.Search;
+            }
             if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
             Options.activeToken = new CancellationTokenSource();
             AfterRS485ManualScanEvent(true);
             offTabsExcept(RMData, TestPage);
             offTabsExcept(TestPages, RS485Page);
             await ManualScanRange();
-            Options.RS485ManualScanState = false;
             onTabPages(RMData);
             onTabPages(TestPages);
             AfterRS485ManualScanEvent(false);
-        }
-        private void AfterRS485ManualScanEvent(bool sw)
-        {
-            AfterAnyAutoEvent(sw);
-            StatusRS485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
-            StatusRS485GridView.AllowUserToDeleteRows =
-                minSigToScan.Enabled = 
-                maxSigToScan.Enabled =
-                StartTestRSButton.Enabled =
-                SignaturePanel.Enabled =
-                AutoScanToTest.Enabled =
-                settingsGroupBox.Enabled =
-                ClearDataTestRS485.Enabled =
-                AddSignatureIDToTest.Enabled =
-                timerPanelTest.Enabled = !sw;
-            ManualScanToTest.Text = sw ? "Stop" : "Manual Scan";
-            ManualScanToTest.Image = sw ? Resources.StatusStopped : Resources.Search;
         }
         async private Task ManualScanRange()
         {
@@ -1952,23 +2141,22 @@ namespace RMDebugger
         // //Auto scan
         async private void AutoScanToTestClick(object sender, EventArgs e)
         {
+            void AfterRS485AutoScanEvent(bool sw)
+            {
+                AfterAnyAutoEvent(sw);
+                StatusRS485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
+                StatusRS485GridView.AllowUserToDeleteRows =
+                    extendedMenuPanel.Enabled = !sw;
+            }
             if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
             Options.activeToken = new CancellationTokenSource();
             AfterRS485AutoScanEvent(true);
             offTabsExcept(RMData, TestPage);
             offTabsExcept(TestPages, RS485Page);
             await AutoScanAdd();
-            Options.RS485ManualScanState = false;
             onTabPages(RMData);
             onTabPages(TestPages);
             AfterRS485AutoScanEvent(false);
-        }
-        private void AfterRS485AutoScanEvent(bool sw)
-        {
-            AfterAnyAutoEvent(sw);
-            StatusRS485GridView.Cursor = sw ? Cursors.WaitCursor : Cursors.Default;
-            StatusRS485GridView.AllowUserToDeleteRows =
-                extendedMenuPanel.Enabled = !sw;
         }
         async private Task AutoScanAdd()
         {
@@ -2011,11 +2199,11 @@ namespace RMDebugger
         private void ClearDataStatusRM_Click(object sender, EventArgs e) => testerData.Clear();
         private void ClearInfoTestRS485Click(object sender, EventArgs e)
         {
+            Options.TesterTimer?.Restart();
             foreach (DeviceClass device in testerData)
                 device.Reset();
+            ElapsedWorkTime();
             RefreshGridTask();
-            realTimeWorkingTest = 0;
-            ChangeWorkTestTime(realTimeWorkingTest);
         }
         private void MoreInfoTestRS485Click(object sender, EventArgs e)
         {
@@ -2062,12 +2250,6 @@ namespace RMDebugger
                     byDescMenuItem.Checked = true;
                     break;
             }
-        }
-        private void ChangeWorkTestTime(int seconds)
-        {
-            TimeSpan time = TimeSpan.FromSeconds(seconds);
-            WorkingTimeLabel.Text = $"{(time.Days > 0 ? $"{time.Days}d " : "")}" +
-                                    $"{time.Hours:00}:{time.Minutes:00}:{time.Seconds:00}";
         }
         private void SaveLogTestRS485_Click(object sender, EventArgs e)
         {
@@ -2150,32 +2332,27 @@ namespace RMDebugger
                 numericHoursTest.Value += 1;
             }
         }
-        private void numericHoursTest_ValueChanged(object sender, EventArgs e)
-        {
-            if (numericHoursTest.Value == 24)
-            {
-                numericHoursTest.Value = 0;
-                numericDaysTest.Value += 1;
-            }
-        }
 
 
         //Extra Buttons
-        private void AfterSendExtraButtonEvent(bool sw)
-        {
-            SerUdpPages.Enabled =
-                BaudRate.Enabled =
-                dataBits.Enabled =
-                Parity.Enabled =
-                stopBits.Enabled =
-                ButtonsPanel.Enabled =
-                SignaturePanel.Enabled =
-                RMData.Enabled = !sw;
-            DinoRunningProcessOk.Enabled =
-                DinoRunningProcessOk.Visible = sw;
-        }
         async private void SendCommandFromExtraButton(CmdOutput cmdOutput)
         {
+            void AfterSendExtraButtonEvent(bool sw)
+            {
+                SerUdpPages.Enabled =
+                    BaudRate.Enabled =
+                    dataBits.Enabled =
+                    Parity.Enabled =
+                    stopBits.Enabled =
+                    SignaturePanel.Enabled =
+                    RMData.Enabled =
+                    SetOnlineFreqNumeric.Enabled = !sw;
+                DinoRunningProcessOk.Enabled =
+                    DinoRunningProcessOk.Visible =
+                    Options.activeProgress = sw;
+            }
+            if (Options.activeProgress) { Options.activeToken?.Cancel(); return; }
+            Options.activeToken = new CancellationTokenSource();
             AfterSendExtraButtonEvent(true);
             try { await Task.Run(() => SendCommandFromButtonTask(cmdOutput)); } catch { }
             AfterSendExtraButtonEvent(false);
@@ -2184,7 +2361,6 @@ namespace RMDebugger
         {
             using (CommandsOutput cOutput = new CommandsOutput(Options.mainInterface))
             {
-                Options.activeToken = new CancellationTokenSource();
                 cOutput.ToReply += ToReplyStatus;
                 cOutput.ToDebug += ToDebuggerWindow;
                 byte[] cmdOut;
@@ -2232,9 +2408,8 @@ namespace RMDebugger
                     catch { }
                     await Task.Delay((int)AutoExtraButtonsTimeout.Value, Options.activeToken.Token);
                 }
-                while (AutoExtraButtons.Checked && !Options.activeToken.IsCancellationRequested);
+                while (ExtendedRepeatMenuItem.Checked && !Options.activeToken.IsCancellationRequested);
             };
         }
-
     }
 }

@@ -25,7 +25,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>false</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.9.1.0</ApplicationVersion>
+    <ApplicationVersion>1.9.2.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -52,19 +52,19 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>70CB9475C1FB84E303AE4DAC56DB66D0D051AE2A</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>72B35EE1896B134C1D064BC7A211E291BA95FB7F</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>RSSI_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>RMDebugger_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>false</SignManifests>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>photo_2023-04-04_20-13-58.ico</ApplicationIcon>
+    <ApplicationIcon>PepeAndPie64x64.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -140,7 +140,6 @@
       <DependentUpon>WriteHere.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
-    <None Include="Properties\DataSources\SearchProtocol.SearchDevice.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -150,6 +149,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="RMDebugger_TemporaryKey.pfx" />
     <None Include="RSSI_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -165,7 +165,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="photo_2023-04-04_20-13-58.ico" />
+    <Content Include="PepeAndPie64x64.ico" />
+    <None Include="Resources\FontDialogControl.png" />
+    <None Include="Resources\Processor.png" />
     <None Include="Resources\DatabaseSource1.png" />
     <None Include="Resources\SortDescending.png" />
     <None Include="Resources\SortAscending.png" />

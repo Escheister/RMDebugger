@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Diagnostics;
 using System.Threading;
+using System;
+
 using ProtocolEnums;
 using RMDebugger;
 
@@ -32,15 +36,17 @@ namespace StaticSettings
 
 
         //Hex uploader
-        public static string hexPath { get; set; }
         public static int hexTimeout { get; set; } = 20;
         public static bool checkCrc { get; set; }
+        public static bool checkQueue { get; set; }
+        public static bool checkFirstMain { get; set; }
 
         //Info
         public static InformationData infoData = new InformationData();
 
         //RS485Test
-        public static bool RS485ManualScanState { get; set; } = false;
+        public static TimeSpan easyTimer { get; set; }
+        public static Stopwatch TesterTimer { get; set; } = null;
 
         //Logger
         public static LogState logState { get; set; } = LogState.ERRORState;

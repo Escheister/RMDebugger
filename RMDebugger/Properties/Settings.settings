@@ -11,9 +11,6 @@
     <Setting Name="UDPGatePort" Type="System.UInt16" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="LastPathToHex" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="LastPageSize" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">64</Value>
     </Setting>
@@ -31,9 +28,6 @@
     </Setting>
     <Setting Name="LastTransparent" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="LastCRCValidate" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="LastShowMessages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

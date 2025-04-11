@@ -15,7 +15,7 @@ namespace BootloaderProtocol
         public delegate byte[] BuildCmdDelegate(CmdOutput cmdOutput);
         public delegate byte[] BuildDataCmdDelegate(byte[] data);
 
-        public delegate void SetProgressEvent(int data);
+        public delegate void SetProgressEvent(string filename, int start, int end);
         public event SetProgressEvent SetProgress;
 
         public Bootloader(object sender, byte[] targetSign) : base(sender)
@@ -57,7 +57,8 @@ namespace BootloaderProtocol
 
         private Queue<byte[]> hexQueue;
         public Queue<byte[]> HexQueue { get { return hexQueue; } }
-        public int hexLinesCount = 0;
+        public int hexLinesCount { get; set; }
+        public string hexFilename { get; set; }
 
         private int pageSize;
         public int PageSize
@@ -86,6 +87,7 @@ namespace BootloaderProtocol
         }
         private void GetStringsFromFile(string path, out string[] fileStrings)
         {
+            hexFilename = Path.GetFileName(path);
             using StreamReader file = new StreamReader(path);
             Task<string> data = file.ReadToEndAsync();
             fileStrings = data.Result.Trim().Split('\n');
@@ -126,7 +128,7 @@ namespace BootloaderProtocol
         public void GetDataForUpload(out byte[] dataOutput)
         {
             bool GetAccessToDequeuing(byte[] dequeued)
-                =>  dequeued[0] == 0x10 && hexQueue.Count != 0 && (RecordType)hexQueue.Peek()[3] == RecordType.Rec;
+                => dequeued[0] % 0x10 == 0 && hexQueue.Count != 0 && (RecordType)hexQueue.Peek()[3] == RecordType.Rec;
 
             List<byte> data = new List<byte>();
             List<byte> cmd = new List<byte>();
@@ -149,8 +151,29 @@ namespace BootloaderProtocol
             cmd.AddRange(_addrHex);
             cmd.AddRange(_addrElar);
             cmd.AddRange(data);
-            SetProgress?.BeginInvoke(hexLinesCount - hexQueue.Count, null, null);
+            int progress = hexLinesCount - hexQueue.Count;
+            SetProgress?.BeginInvoke(   hexFilename,
+                                        progress == hexLinesCount 
+                                            ? 0 
+                                            : progress, 
+                                        hexLinesCount, null, null);
             dataOutput = cmd.ToArray();
         }
+    }
+    public class FileInfoClass
+    {
+        public FileInfoClass(string filepath) {
+            _filepath = filepath;
+            _filename = Path.GetFileName(filepath);
+            _linesCount = File.ReadAllLines(filepath).Length;
+        }
+        private string _filename;
+        private string _filepath;
+        private int _linesCount;
+
+        public string Filename { get => _filename; set => _filename = value; }
+        public string Filepath { get => _filepath; set => _filepath = value; }
+        public int LinesCount { get => _linesCount; set => _linesCount = value; }
+
     }
 }

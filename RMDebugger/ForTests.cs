@@ -18,6 +18,8 @@ namespace RMDebugger
         public ForTests(object sender, List<DeviceClass> _listDeviceClass) : base(sender) => listDeviceClass = _listDeviceClass;
         public delegate void TestDebugEvent(string msg, ProtocolReply reply);
         public event TestDebugEvent TestDebug;
+        public delegate void TimeRefreshingEvent();
+        public event TimeRefreshingEvent TimeRefresh;
         private List<DeviceClass> listDeviceClass;
         public List<DeviceClass> ListDeviceClass { get => listDeviceClass; }
         public bool clearAfterError { get; set; }
@@ -33,6 +35,7 @@ namespace RMDebugger
             ProtocolReply reply = GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
             message += $"{DateTime.Now:dd.HH:mm:ss:fff} : {reply,-6}<- {cmdIn.GetStringOfBytes()}\n";
             TestDebug?.BeginInvoke(message, reply, null, null);
+            TimeRefresh?.Invoke();
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);
         }
 
