@@ -685,7 +685,6 @@ namespace RMDebugger
                     HexPageSize.Value = Convert.ToInt32(rKey.GetValue("LastPageSize"));
                     IPaddressBox.Text = rKey.GetValue("UDPGateIP").ToString();
                     numericPort.Value = Convert.ToUInt16(rKey.GetValue("UDPGatePort"));
-                    /*HexPathBox.Text = rKey.GetValue("LastPathToHex").ToString();*/
                     ThroughSignID.Value = Convert.ToUInt16(rKey.GetValue("ThroughSignatureID"));
                     comPort.Text = rKey.GetValue("LastComPort").ToString();
                     BaudRate.Text = rKey.GetValue("LastBaudrate").ToString();
@@ -1045,6 +1044,7 @@ namespace RMDebugger
                             List<DeviceData> dataNew = new List<DeviceData>();
                             foreach (DeviceData device in data)
                             {
+                                if (!Enum.IsDefined(typeof(RS485Type), device.devType.ToString())) continue;
                                 device.inOneBus = await ThisDeviceInOneBus(search, device);
                                 if (SearchExtendedFindMode.Checked && SearchExtendedFindMode.Enabled && device.inOneBus)
                                 {
@@ -2136,6 +2136,12 @@ namespace RMDebugger
             });
             AddToGridDevices(devices);
         }
+        private void minSigToScan_ValueChanged(object sender, EventArgs e)
+        {
+            maxSigToScan.Minimum = minSigToScan.Value;
+            if (minSigToScan.Value > maxSigToScan.Value)
+                maxSigToScan.Value = minSigToScan.Value;
+        }
 
         // //Auto scan
         async private void AutoScanToTestClick(object sender, EventArgs e)
@@ -2173,8 +2179,8 @@ namespace RMDebugger
                         List<DeviceData> data = await search.GetDataFromDevice(CmdOutput.GRAPH_GET_NEAR, TargetSignID.GetBytes(), null);
                         foreach (DeviceData device in data)
                         {
-                            try
-                            {
+                            if (!Enum.IsDefined(typeof(RS485Type), device.devType.ToString())) continue;
+                            try {
                                 devices.Add(await GetDeviceInfo(search, device.devSign));
                                 ToMessageStatus($"Signature: {device.devSign}");
                             }
@@ -2187,18 +2193,14 @@ namespace RMDebugger
             });
             AddToGridDevices(devices);
         }
-        private void minSigToScan_ValueChanged(object sender, EventArgs e)
-        {
-            maxSigToScan.Minimum = minSigToScan.Value;
-            if (minSigToScan.Value > maxSigToScan.Value)
-                maxSigToScan.Value = minSigToScan.Value;
-        }
 
         // //ExtendedMenu
         private void ClearDataStatusRM_Click(object sender, EventArgs e) => testerData?.Clear();
         private void ClearInfoTestRS485Click(object sender, EventArgs e)
         {
-            Options.TesterTimer?.Restart();
+            if (Options.TesterTimer.IsRunning)
+                Options.TesterTimer.Restart();
+            else Options.TesterTimer.Reset();
             foreach (DeviceClass device in testerData)
                 device.Reset();
             ElapsedWorkTime();

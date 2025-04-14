@@ -30,44 +30,44 @@
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.Panel PanelInsidePanel1;
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle55 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle56 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle57 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle58 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Who are you");
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Status");
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Get Near");
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle59 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle62 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle63 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle60 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle61 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainDebugger));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Who are you");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Status");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Get Near");
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle64 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle65 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle35 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle36 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle52 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle53 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle54 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle37 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle38 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle39 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle40 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle41 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle42 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle43 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle44 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle45 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle46 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle47 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle48 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle49 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle50 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle51 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainDebugger));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle32 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle33 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle34 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle28 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle29 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle30 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle31 = new System.Windows.Forms.DataGridViewCellStyle();
             this.HexUploadQueueModeCheck = new System.Windows.Forms.CheckBox();
             this.QueueFirstFileIsMainCheck = new System.Windows.Forms.CheckBox();
             this.HexPauseAfterUploadMainAndSec = new System.Windows.Forms.NumericUpDown();
@@ -92,6 +92,7 @@
             this.SearchExtraGroup = new System.Windows.Forms.GroupBox();
             this.SearchAnotherFontMode = new System.Windows.Forms.CheckBox();
             this.SearchAnotherFontMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.SearchChangeFontMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SearchFilterMode = new System.Windows.Forms.CheckBox();
             this.SearchFilterMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.rM485ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -103,12 +104,14 @@
             this.SearchKnockMode = new System.Windows.Forms.CheckBox();
             this.SearchFindSignatireMode = new System.Windows.Forms.CheckBox();
             this.SearchFindSignatureColorMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.SearchChangeColorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SearchModesPanel = new System.Windows.Forms.Panel();
             this.label12 = new System.Windows.Forms.Label();
             this.SearchGetNear = new System.Windows.Forms.CheckBox();
             this.SearchTimeout = new System.Windows.Forms.NumericUpDown();
             this.SearchDistTof = new System.Windows.Forms.CheckBox();
             this.SearchManualButton = new System.Windows.Forms.Button();
+            this.SearchAutoButton = new System.Windows.Forms.Button();
             this.SearchGrid = new System.Windows.Forms.DataGridView();
             this.signSearch = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.typeSearch = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -118,9 +121,16 @@
             this.HexFirmwareProgressLabel = new System.Windows.Forms.Label();
             this.HexFirmwareFilename = new System.Windows.Forms.LinkLabel();
             this.HexUpdateSettingsPanel = new System.Windows.Forms.Panel();
+            this.HexUploadClearFileList = new System.Windows.Forms.Button();
+            this.HexUploadUpFile = new System.Windows.Forms.Button();
+            this.HexUploadDownFile = new System.Windows.Forms.Button();
+            this.HexUploadOpenInExplorer = new System.Windows.Forms.Button();
+            this.HexUploadControlPanelButton = new System.Windows.Forms.Button();
+            this.HexUploadPathButton = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.UpdateBar = new System.Windows.Forms.ProgressBar();
+            this.HexUploadButton = new System.Windows.Forms.Button();
             this.HexUploadContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.HexUploadRepeatToolItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ListOfMainFiles = new System.Windows.Forms.ListBox();
@@ -146,6 +156,10 @@
             this.label19 = new System.Windows.Forms.Label();
             this.maxIxScanConfig = new System.Windows.Forms.NumericUpDown();
             this.minIxScanConfig = new System.Windows.Forms.NumericUpDown();
+            this.HideConfigPanel = new System.Windows.Forms.Button();
+            this.LoadConfigButton = new System.Windows.Forms.Button();
+            this.LoadFieldsConfigButton = new System.Windows.Forms.Button();
+            this.UploadConfigButton = new System.Windows.Forms.Button();
             this.ConfigDataGrid = new System.Windows.Forms.DataGridView();
             this.FieldsColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EnabledColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
@@ -162,6 +176,7 @@
             this.ModeDeviceTabs = new System.Windows.Forms.TabControl();
             this.rmlrPage = new System.Windows.Forms.TabPage();
             this.linkSettingsRMLR_RMP_Signature = new System.Windows.Forms.LinkLabel();
+            this.TestSettingRMLRButton = new System.Windows.Forms.Button();
             this.RMLRTestMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.RepeatSettingsRMLR = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
@@ -171,8 +186,10 @@
             this.GreenSettingsRMLR = new System.Windows.Forms.ToolStripMenuItem();
             this.BlueSettingsRMLR = new System.Windows.Forms.ToolStripMenuItem();
             this.BuzzerSettingsRMLR = new System.Windows.Forms.ToolStripMenuItem();
+            this.UploadSettingRMLRButton = new System.Windows.Forms.Button();
             this.UploadRMLRButtonMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.resetSettingsRmlrToolStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.LoadSettingRMLRButton = new System.Windows.Forms.Button();
             this.SettingsRMLRGrid = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -184,14 +201,22 @@
             this.TestPages = new System.Windows.Forms.TabControl();
             this.RS485Page = new System.Windows.Forms.TabPage();
             this.extendedMenuPanel = new System.Windows.Forms.Panel();
+            this.FreqTestRSNumeric = new System.Windows.Forms.NumericUpDown();
             this.SortedColumnCombo = new System.Windows.Forms.ComboBox();
+            this.SortByButton = new System.Windows.Forms.Button();
             this.RS485SortMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.byAscMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.byDescMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MoreInfoTestRS485 = new System.Windows.Forms.Button();
             this.timerPanelTest = new System.Windows.Forms.Panel();
             this.numericHoursTest = new System.Windows.Forms.NumericUpDown();
             this.numericSecondsTest = new System.Windows.Forms.NumericUpDown();
             this.numericMinutesTest = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
             this.WorkingTimeLabel = new System.Windows.Forms.Label();
+            this.SaveLogTestRS485 = new System.Windows.Forms.Button();
+            this.ClearDataTestRS485 = new System.Windows.Forms.Button();
+            this.ClearInfoTestRS485 = new System.Windows.Forms.Button();
             this.settingsGroupBox = new System.Windows.Forms.GroupBox();
             this.ClearBufferSettingsTestBox = new System.Windows.Forms.CheckBox();
             this.TimerSettingsTestBox = new System.Windows.Forms.CheckBox();
@@ -199,8 +224,14 @@
             this.scanGroupBox = new System.Windows.Forms.GroupBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.ManualScanToTest = new System.Windows.Forms.Button();
             this.maxSigToScan = new System.Windows.Forms.NumericUpDown();
+            this.AddSignatureIDToTest = new System.Windows.Forms.Button();
             this.minSigToScan = new System.Windows.Forms.NumericUpDown();
+            this.ShowExtendedMenu = new System.Windows.Forms.Button();
+            this.StartTestRSButton = new System.Windows.Forms.Button();
+            this.AutoScanToTest = new System.Windows.Forms.Button();
+            this.label9 = new System.Windows.Forms.Label();
             this.StatusRS485GridView = new System.Windows.Forms.DataGridView();
             this.InterfaceStatusRM = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SignStatusRM = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -239,49 +270,10 @@
             this.label16 = new System.Windows.Forms.Label();
             this.mainMenuToolStrip = new System.Windows.Forms.ToolStrip();
             this.settingsToolStrip = new System.Windows.Forms.ToolStripDropDownButton();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.dataBitsInfo = new System.Windows.Forms.ToolStripLabel();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.ParityInfo = new System.Windows.Forms.ToolStripLabel();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.StopBitsInfo = new System.Windows.Forms.ToolStripLabel();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.SignaturePanel = new System.Windows.Forms.Panel();
-            this.ThroughSignID = new System.Windows.Forms.NumericUpDown();
-            this.NeedThrough = new System.Windows.Forms.CheckBox();
-            this.ExtraButtonsGroup = new System.Windows.Forms.GroupBox();
-            this.ButtonsPanel = new System.Windows.Forms.Panel();
-            this.label24 = new System.Windows.Forms.Label();
-            this.ExtendedMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.ExtendedRepeatMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.AutoExtraButtonsTimeout = new System.Windows.Forms.NumericUpDown();
-            this.SetOnlineFreqNumeric = new System.Windows.Forms.NumericUpDown();
-            this.label18 = new System.Windows.Forms.Label();
-            this.ToolTipHelper = new System.Windows.Forms.ToolTip(this.components);
-            this.MirrorColor = new System.Windows.Forms.ColorDialog();
-            this.ErrorMessage = new System.Windows.Forms.ErrorProvider(this.components);
-            this.NotifyMessage = new System.Windows.Forms.NotifyIcon(this.components);
-            this.notifyMessageStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
-            this.CloseFromToolStrip = new System.Windows.Forms.ToolStripMenuItem();
-            this.WorkTestTimer = new System.Windows.Forms.Timer(this.components);
-            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.BottomToolStripPanel = new System.Windows.Forms.ToolStripPanel();
-            this.TopToolStripPanel = new System.Windows.Forms.ToolStripPanel();
-            this.RightToolStripPanel = new System.Windows.Forms.ToolStripPanel();
-            this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
-            this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FontDialog = new System.Windows.Forms.FontDialog();
-            this.SetBootloaderStopButton = new System.Windows.Forms.Button();
-            this.ResetButton = new System.Windows.Forms.Button();
-            this.SetBootloaderStartButton = new System.Windows.Forms.Button();
-            this.SetOnlineButton = new System.Windows.Forms.Button();
             this.saveToRegToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFromPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteSaveFromPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.transparentToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.messagesToolStrip = new System.Windows.Forms.ToolStripMenuItem();
@@ -294,55 +286,63 @@
             this.NormalToolItem = new System.Windows.Forms.ToolStripMenuItem();
             this.BelowNormalToolItem = new System.Windows.Forms.ToolStripMenuItem();
             this.IdleToolItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.clearSettingsToolStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.dataBits = new System.Windows.Forms.ToolStripDropDownButton();
             this.dataBits7 = new System.Windows.Forms.ToolStripMenuItem();
             this.dataBits8 = new System.Windows.Forms.ToolStripMenuItem();
+            this.dataBitsInfo = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.Parity = new System.Windows.Forms.ToolStripDropDownButton();
             this.ParityNone = new System.Windows.Forms.ToolStripMenuItem();
             this.ParityOdd = new System.Windows.Forms.ToolStripMenuItem();
             this.ParityEven = new System.Windows.Forms.ToolStripMenuItem();
             this.ParityMark = new System.Windows.Forms.ToolStripMenuItem();
             this.ParitySpace = new System.Windows.Forms.ToolStripMenuItem();
+            this.ParityInfo = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.stopBits = new System.Windows.Forms.ToolStripDropDownButton();
             this.stopBits1 = new System.Windows.Forms.ToolStripMenuItem();
             this.stopBits2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.StopBitsInfo = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.AboutButton = new System.Windows.Forms.ToolStripButton();
             this.UpdateButton = new System.Windows.Forms.ToolStripButton();
             this.DinoRunningProcessOk = new System.Windows.Forms.ToolStripButton();
-            this.SearchChangeFontMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.SearchChangeColorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.SearchAutoButton = new System.Windows.Forms.Button();
-            this.HexUploadClearFileList = new System.Windows.Forms.Button();
-            this.HexUploadUpFile = new System.Windows.Forms.Button();
-            this.HexUploadDownFile = new System.Windows.Forms.Button();
-            this.HexUploadOpenInExplorer = new System.Windows.Forms.Button();
-            this.HexUploadControlPanelButton = new System.Windows.Forms.Button();
-            this.HexUploadPathButton = new System.Windows.Forms.Button();
-            this.HexUploadButton = new System.Windows.Forms.Button();
-            this.HideConfigPanel = new System.Windows.Forms.Button();
-            this.LoadConfigButton = new System.Windows.Forms.Button();
-            this.LoadFieldsConfigButton = new System.Windows.Forms.Button();
-            this.UploadConfigButton = new System.Windows.Forms.Button();
-            this.TestSettingRMLRButton = new System.Windows.Forms.Button();
-            this.UploadSettingRMLRButton = new System.Windows.Forms.Button();
-            this.LoadSettingRMLRButton = new System.Windows.Forms.Button();
-            this.SortByButton = new System.Windows.Forms.Button();
-            this.MoreInfoTestRS485 = new System.Windows.Forms.Button();
-            this.SaveLogTestRS485 = new System.Windows.Forms.Button();
-            this.ClearDataTestRS485 = new System.Windows.Forms.Button();
-            this.ClearInfoTestRS485 = new System.Windows.Forms.Button();
-            this.ManualScanToTest = new System.Windows.Forms.Button();
-            this.AddSignatureIDToTest = new System.Windows.Forms.Button();
-            this.ShowExtendedMenu = new System.Windows.Forms.Button();
-            this.StartTestRSButton = new System.Windows.Forms.Button();
-            this.AutoScanToTest = new System.Windows.Forms.Button();
-            this.byAscMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.byDescMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SignaturePanel = new System.Windows.Forms.Panel();
+            this.ThroughSignID = new System.Windows.Forms.NumericUpDown();
+            this.NeedThrough = new System.Windows.Forms.CheckBox();
+            this.ExtraButtonsGroup = new System.Windows.Forms.GroupBox();
+            this.ButtonsPanel = new System.Windows.Forms.Panel();
+            this.label24 = new System.Windows.Forms.Label();
+            this.SetBootloaderStopButton = new System.Windows.Forms.Button();
+            this.ExtendedMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ExtendedRepeatMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.AutoExtraButtonsTimeout = new System.Windows.Forms.NumericUpDown();
+            this.ResetButton = new System.Windows.Forms.Button();
+            this.SetBootloaderStartButton = new System.Windows.Forms.Button();
+            this.SetOnlineFreqNumeric = new System.Windows.Forms.NumericUpDown();
+            this.label18 = new System.Windows.Forms.Label();
+            this.SetOnlineButton = new System.Windows.Forms.Button();
+            this.ToolTipHelper = new System.Windows.Forms.ToolTip(this.components);
+            this.MirrorColor = new System.Windows.Forms.ColorDialog();
+            this.ErrorMessage = new System.Windows.Forms.ErrorProvider(this.components);
+            this.NotifyMessage = new System.Windows.Forms.NotifyIcon(this.components);
+            this.notifyMessageStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.OpenDebugFromToolStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.AboutFromToolStrip = new System.Windows.Forms.ToolStripMenuItem();
-            this.FreqTestRSNumeric = new System.Windows.Forms.NumericUpDown();
-            this.label9 = new System.Windows.Forms.Label();
+            this.CloseFromToolStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.WorkTestTimer = new System.Windows.Forms.Timer(this.components);
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.BottomToolStripPanel = new System.Windows.Forms.ToolStripPanel();
+            this.TopToolStripPanel = new System.Windows.Forms.ToolStripPanel();
+            this.RightToolStripPanel = new System.Windows.Forms.ToolStripPanel();
+            this.LeftToolStripPanel = new System.Windows.Forms.ToolStripPanel();
+            this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FontDialog = new System.Windows.Forms.FontDialog();
             PanelInsidePanel1 = new System.Windows.Forms.Panel();
             PanelInsidePanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.HexPauseAfterUploadMainAndSec)).BeginInit();
@@ -389,6 +389,7 @@
             this.TestPages.SuspendLayout();
             this.RS485Page.SuspendLayout();
             this.extendedMenuPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.FreqTestRSNumeric)).BeginInit();
             this.RS485SortMenuStrip.SuspendLayout();
             this.timerPanelTest.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericHoursTest)).BeginInit();
@@ -414,7 +415,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.SetOnlineFreqNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ErrorMessage)).BeginInit();
             this.notifyMessageStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.FreqTestRSNumeric)).BeginInit();
             this.SuspendLayout();
             // 
             // PanelInsidePanel1
@@ -832,6 +832,13 @@
             this.SearchAnotherFontMenuStrip.Name = "SearchAnotherFontMenuStrip";
             this.SearchAnotherFontMenuStrip.Size = new System.Drawing.Size(143, 26);
             // 
+            // SearchChangeFontMenuItem
+            // 
+            this.SearchChangeFontMenuItem.Image = global::RMDebugger.Properties.Resources.FontDialogControl;
+            this.SearchChangeFontMenuItem.Name = "SearchChangeFontMenuItem";
+            this.SearchChangeFontMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.SearchChangeFontMenuItem.Text = "Change Font";
+            // 
             // SearchFilterMode
             // 
             this.SearchFilterMode.ContextMenuStrip = this.SearchFilterMenuStrip;
@@ -937,6 +944,14 @@
             this.SearchFindSignatureColorMenuStrip.Name = "SearchMirrorColorMenuStrip";
             this.SearchFindSignatureColorMenuStrip.Size = new System.Drawing.Size(146, 26);
             // 
+            // SearchChangeColorMenuItem
+            // 
+            this.SearchChangeColorMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("SearchChangeColorMenuItem.Image")));
+            this.SearchChangeColorMenuItem.Name = "SearchChangeColorMenuItem";
+            this.SearchChangeColorMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.SearchChangeColorMenuItem.Text = "Change color";
+            this.SearchChangeColorMenuItem.ToolTipText = "Выбрать цвет выделения";
+            // 
             // SearchModesPanel
             // 
             this.SearchModesPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -1024,13 +1039,26 @@
             this.SearchManualButton.Text = "Manual";
             this.SearchManualButton.UseVisualStyleBackColor = true;
             // 
+            // SearchAutoButton
+            // 
+            this.SearchAutoButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SearchAutoButton.Image = ((System.Drawing.Image)(resources.GetObject("SearchAutoButton.Image")));
+            this.SearchAutoButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.SearchAutoButton.Location = new System.Drawing.Point(211, 24);
+            this.SearchAutoButton.Margin = new System.Windows.Forms.Padding(1);
+            this.SearchAutoButton.Name = "SearchAutoButton";
+            this.SearchAutoButton.Size = new System.Drawing.Size(107, 23);
+            this.SearchAutoButton.TabIndex = 23;
+            this.SearchAutoButton.Text = "Auto";
+            this.SearchAutoButton.UseVisualStyleBackColor = true;
+            // 
             // SearchGrid
             // 
             this.SearchGrid.AllowUserToAddRows = false;
             this.SearchGrid.AllowUserToDeleteRows = false;
             this.SearchGrid.AllowUserToResizeRows = false;
-            dataGridViewCellStyle55.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.SearchGrid.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle55;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.SearchGrid.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.SearchGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -1039,14 +1067,14 @@
             this.SearchGrid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SunkenHorizontal;
             this.SearchGrid.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
             this.SearchGrid.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle56.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle56.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle56.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle56.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle56.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle56.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle56.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.SearchGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle56;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.SearchGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.SearchGrid.ColumnHeadersHeight = 18;
             this.SearchGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.SearchGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -1054,28 +1082,28 @@
             this.typeSearch,
             this.distSearch,
             this.rssiSearch});
-            dataGridViewCellStyle57.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle57.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle57.Font = new System.Drawing.Font("Consolas", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle57.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle57.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle57.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle57.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.SearchGrid.DefaultCellStyle = dataGridViewCellStyle57;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Consolas", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.SearchGrid.DefaultCellStyle = dataGridViewCellStyle3;
             this.SearchGrid.GridColor = System.Drawing.Color.White;
             this.SearchGrid.Location = new System.Drawing.Point(0, 0);
             this.SearchGrid.Margin = new System.Windows.Forms.Padding(0);
             this.SearchGrid.Name = "SearchGrid";
             this.SearchGrid.ReadOnly = true;
             this.SearchGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle58.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle58.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle58.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle58.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle58.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle58.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle58.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.SearchGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle58;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.SearchGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.SearchGrid.RowHeadersVisible = false;
             this.SearchGrid.RowHeadersWidth = 25;
             this.SearchGrid.RowTemplate.DefaultCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
@@ -1201,6 +1229,92 @@
             this.HexUpdateSettingsPanel.TabIndex = 41;
             this.HexUpdateSettingsPanel.Tag = "Unhided";
             // 
+            // HexUploadClearFileList
+            // 
+            this.HexUploadClearFileList.BackColor = System.Drawing.Color.Transparent;
+            this.HexUploadClearFileList.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.HexUploadClearFileList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.HexUploadClearFileList.Image = global::RMDebugger.Properties.Resources.Delete;
+            this.HexUploadClearFileList.Location = new System.Drawing.Point(-1, 104);
+            this.HexUploadClearFileList.Margin = new System.Windows.Forms.Padding(0);
+            this.HexUploadClearFileList.Name = "HexUploadClearFileList";
+            this.HexUploadClearFileList.Size = new System.Drawing.Size(22, 22);
+            this.HexUploadClearFileList.TabIndex = 45;
+            this.ToolTipHelper.SetToolTip(this.HexUploadClearFileList, "Очистка списка");
+            this.HexUploadClearFileList.UseVisualStyleBackColor = false;
+            // 
+            // HexUploadUpFile
+            // 
+            this.HexUploadUpFile.BackColor = System.Drawing.Color.Transparent;
+            this.HexUploadUpFile.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.HexUploadUpFile.Enabled = false;
+            this.HexUploadUpFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.HexUploadUpFile.Image = ((System.Drawing.Image)(resources.GetObject("HexUploadUpFile.Image")));
+            this.HexUploadUpFile.Location = new System.Drawing.Point(-1, 62);
+            this.HexUploadUpFile.Margin = new System.Windows.Forms.Padding(0);
+            this.HexUploadUpFile.Name = "HexUploadUpFile";
+            this.HexUploadUpFile.Size = new System.Drawing.Size(22, 22);
+            this.HexUploadUpFile.TabIndex = 44;
+            this.ToolTipHelper.SetToolTip(this.HexUploadUpFile, "Поднять выленный файл в списке");
+            this.HexUploadUpFile.UseVisualStyleBackColor = false;
+            // 
+            // HexUploadDownFile
+            // 
+            this.HexUploadDownFile.BackColor = System.Drawing.Color.Transparent;
+            this.HexUploadDownFile.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.HexUploadDownFile.Enabled = false;
+            this.HexUploadDownFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.HexUploadDownFile.Image = ((System.Drawing.Image)(resources.GetObject("HexUploadDownFile.Image")));
+            this.HexUploadDownFile.Location = new System.Drawing.Point(-1, 83);
+            this.HexUploadDownFile.Margin = new System.Windows.Forms.Padding(0);
+            this.HexUploadDownFile.Name = "HexUploadDownFile";
+            this.HexUploadDownFile.Size = new System.Drawing.Size(22, 22);
+            this.HexUploadDownFile.TabIndex = 43;
+            this.ToolTipHelper.SetToolTip(this.HexUploadDownFile, "Опустить выленный файл в списке");
+            this.HexUploadDownFile.UseVisualStyleBackColor = false;
+            // 
+            // HexUploadOpenInExplorer
+            // 
+            this.HexUploadOpenInExplorer.BackColor = System.Drawing.Color.Transparent;
+            this.HexUploadOpenInExplorer.Enabled = false;
+            this.HexUploadOpenInExplorer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.HexUploadOpenInExplorer.Image = ((System.Drawing.Image)(resources.GetObject("HexUploadOpenInExplorer.Image")));
+            this.HexUploadOpenInExplorer.Location = new System.Drawing.Point(-1, 41);
+            this.HexUploadOpenInExplorer.Margin = new System.Windows.Forms.Padding(0);
+            this.HexUploadOpenInExplorer.Name = "HexUploadOpenInExplorer";
+            this.HexUploadOpenInExplorer.Size = new System.Drawing.Size(22, 22);
+            this.HexUploadOpenInExplorer.TabIndex = 41;
+            this.ToolTipHelper.SetToolTip(this.HexUploadOpenInExplorer, "Открыть выделенный файл в проводнике");
+            this.HexUploadOpenInExplorer.UseVisualStyleBackColor = false;
+            // 
+            // HexUploadControlPanelButton
+            // 
+            this.HexUploadControlPanelButton.BackColor = System.Drawing.Color.Transparent;
+            this.HexUploadControlPanelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.HexUploadControlPanelButton.Image = global::RMDebugger.Properties.Resources.Unhide;
+            this.HexUploadControlPanelButton.Location = new System.Drawing.Point(-1, -1);
+            this.HexUploadControlPanelButton.Margin = new System.Windows.Forms.Padding(0);
+            this.HexUploadControlPanelButton.Name = "HexUploadControlPanelButton";
+            this.HexUploadControlPanelButton.Size = new System.Drawing.Size(22, 22);
+            this.HexUploadControlPanelButton.TabIndex = 40;
+            this.ToolTipHelper.SetToolTip(this.HexUploadControlPanelButton, "Открывает панель управления");
+            this.HexUploadControlPanelButton.UseVisualStyleBackColor = false;
+            // 
+            // HexUploadPathButton
+            // 
+            this.HexUploadPathButton.BackColor = System.Drawing.Color.Transparent;
+            this.HexUploadPathButton.CausesValidation = false;
+            this.HexUploadPathButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.HexUploadPathButton.Image = ((System.Drawing.Image)(resources.GetObject("HexUploadPathButton.Image")));
+            this.HexUploadPathButton.Location = new System.Drawing.Point(-1, 20);
+            this.HexUploadPathButton.Margin = new System.Windows.Forms.Padding(0);
+            this.HexUploadPathButton.Name = "HexUploadPathButton";
+            this.HexUploadPathButton.Size = new System.Drawing.Size(22, 22);
+            this.HexUploadPathButton.TabIndex = 23;
+            this.HexUploadPathButton.TabStop = false;
+            this.ToolTipHelper.SetToolTip(this.HexUploadPathButton, "Открывает проводник для выбора файлов");
+            this.HexUploadPathButton.UseVisualStyleBackColor = false;
+            // 
             // label4
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -1233,6 +1347,23 @@
             this.UpdateBar.Size = new System.Drawing.Size(319, 10);
             this.UpdateBar.Step = 1;
             this.UpdateBar.TabIndex = 6;
+            // 
+            // HexUploadButton
+            // 
+            this.HexUploadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.HexUploadButton.ContextMenuStrip = this.HexUploadContextMenu;
+            this.HexUploadButton.Enabled = false;
+            this.HexUploadButton.Image = ((System.Drawing.Image)(resources.GetObject("HexUploadButton.Image")));
+            this.HexUploadButton.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.HexUploadButton.Location = new System.Drawing.Point(-1, 230);
+            this.HexUploadButton.Margin = new System.Windows.Forms.Padding(1);
+            this.HexUploadButton.Name = "HexUploadButton";
+            this.HexUploadButton.Size = new System.Drawing.Size(65, 22);
+            this.HexUploadButton.TabIndex = 2;
+            this.HexUploadButton.Text = "Upload";
+            this.HexUploadButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolTipHelper.SetToolTip(this.HexUploadButton, "ПКМ для дополнительных настроек");
+            this.HexUploadButton.UseVisualStyleBackColor = true;
             // 
             // HexUploadContextMenu
             // 
@@ -1364,25 +1495,25 @@
             this.InfoTree.Location = new System.Drawing.Point(0, 0);
             this.InfoTree.Margin = new System.Windows.Forms.Padding(1);
             this.InfoTree.Name = "InfoTree";
-            treeNode4.BackColor = System.Drawing.Color.White;
-            treeNode4.ForeColor = System.Drawing.SystemColors.HotTrack;
-            treeNode4.Name = "InfoWhoAreYou";
-            treeNode4.NodeFont = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            treeNode4.Text = "Who are you";
-            treeNode5.BackColor = System.Drawing.Color.White;
-            treeNode5.ForeColor = System.Drawing.SystemColors.HotTrack;
-            treeNode5.Name = "InfoStatus";
-            treeNode5.NodeFont = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            treeNode5.Text = "Status";
-            treeNode6.BackColor = System.Drawing.Color.White;
-            treeNode6.ForeColor = System.Drawing.SystemColors.HotTrack;
-            treeNode6.Name = "InfoGetNear";
-            treeNode6.NodeFont = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            treeNode6.Text = "Get Near";
+            treeNode1.BackColor = System.Drawing.Color.White;
+            treeNode1.ForeColor = System.Drawing.SystemColors.HotTrack;
+            treeNode1.Name = "InfoWhoAreYou";
+            treeNode1.NodeFont = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            treeNode1.Text = "Who are you";
+            treeNode2.BackColor = System.Drawing.Color.White;
+            treeNode2.ForeColor = System.Drawing.SystemColors.HotTrack;
+            treeNode2.Name = "InfoStatus";
+            treeNode2.NodeFont = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            treeNode2.Text = "Status";
+            treeNode3.BackColor = System.Drawing.Color.White;
+            treeNode3.ForeColor = System.Drawing.SystemColors.HotTrack;
+            treeNode3.Name = "InfoGetNear";
+            treeNode3.NodeFont = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            treeNode3.Text = "Get Near";
             this.InfoTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode4,
-            treeNode5,
-            treeNode6});
+            treeNode1,
+            treeNode2,
+            treeNode3});
             this.InfoTree.ShowNodeToolTips = true;
             this.InfoTree.Size = new System.Drawing.Size(319, 244);
             this.InfoTree.TabIndex = 1;
@@ -1595,6 +1726,62 @@
             this.ToolTipHelper.SetToolTip(this.minIxScanConfig, "ID поля");
             this.minIxScanConfig.UpDownAlign = System.Windows.Forms.LeftRightAlignment.Left;
             // 
+            // HideConfigPanel
+            // 
+            this.HideConfigPanel.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.HideConfigPanel.Image = global::RMDebugger.Properties.Resources.Unhide;
+            this.HideConfigPanel.Location = new System.Drawing.Point(296, -1);
+            this.HideConfigPanel.Name = "HideConfigPanel";
+            this.HideConfigPanel.Size = new System.Drawing.Size(22, 22);
+            this.HideConfigPanel.TabIndex = 34;
+            this.HideConfigPanel.Tag = "Unhided";
+            this.ToolTipHelper.SetToolTip(this.HideConfigPanel, "Скрыть\\Раскрыть дополнительную панель настроек");
+            this.HideConfigPanel.UseVisualStyleBackColor = true;
+            // 
+            // LoadConfigButton
+            // 
+            this.LoadConfigButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.LoadConfigButton.Image = ((System.Drawing.Image)(resources.GetObject("LoadConfigButton.Image")));
+            this.LoadConfigButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.LoadConfigButton.Location = new System.Drawing.Point(-1, -1);
+            this.LoadConfigButton.Margin = new System.Windows.Forms.Padding(0);
+            this.LoadConfigButton.Name = "LoadConfigButton";
+            this.LoadConfigButton.Size = new System.Drawing.Size(106, 22);
+            this.LoadConfigButton.TabIndex = 1;
+            this.LoadConfigButton.Text = "Load from fields";
+            this.LoadConfigButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolTipHelper.SetToolTip(this.LoadConfigButton, "Загрузка конфигурации из устройства");
+            this.LoadConfigButton.UseVisualStyleBackColor = true;
+            // 
+            // LoadFieldsConfigButton
+            // 
+            this.LoadFieldsConfigButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.LoadFieldsConfigButton.Image = ((System.Drawing.Image)(resources.GetObject("LoadFieldsConfigButton.Image")));
+            this.LoadFieldsConfigButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.LoadFieldsConfigButton.Location = new System.Drawing.Point(209, -1);
+            this.LoadFieldsConfigButton.Name = "LoadFieldsConfigButton";
+            this.LoadFieldsConfigButton.Size = new System.Drawing.Size(88, 22);
+            this.LoadFieldsConfigButton.TabIndex = 32;
+            this.LoadFieldsConfigButton.Text = "Scan fields";
+            this.LoadFieldsConfigButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolTipHelper.SetToolTip(this.LoadFieldsConfigButton, "Сканирование устройство на наличие полей");
+            this.LoadFieldsConfigButton.UseVisualStyleBackColor = true;
+            // 
+            // UploadConfigButton
+            // 
+            this.UploadConfigButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.UploadConfigButton.Image = ((System.Drawing.Image)(resources.GetObject("UploadConfigButton.Image")));
+            this.UploadConfigButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.UploadConfigButton.Location = new System.Drawing.Point(104, -1);
+            this.UploadConfigButton.Margin = new System.Windows.Forms.Padding(0);
+            this.UploadConfigButton.Name = "UploadConfigButton";
+            this.UploadConfigButton.Size = new System.Drawing.Size(106, 22);
+            this.UploadConfigButton.TabIndex = 2;
+            this.UploadConfigButton.Text = "Upload to fields";
+            this.UploadConfigButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolTipHelper.SetToolTip(this.UploadConfigButton, "Загрузка конфигурации на устройства");
+            this.UploadConfigButton.UseVisualStyleBackColor = true;
+            // 
             // ConfigDataGrid
             // 
             this.ConfigDataGrid.AllowUserToAddRows = false;
@@ -1608,14 +1795,14 @@
             this.ConfigDataGrid.BackgroundColor = System.Drawing.Color.White;
             this.ConfigDataGrid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Raised;
             this.ConfigDataGrid.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
-            dataGridViewCellStyle59.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle59.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle59.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle59.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle59.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle59.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle59.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ConfigDataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle59;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ConfigDataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.ConfigDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.ConfigDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.FieldsColumn,
@@ -1623,27 +1810,27 @@
             this.LoadFieldColumn,
             this.UploadFieldColumn});
             this.ConfigDataGrid.ContextMenuStrip = this.ConfigMenuStrip;
-            dataGridViewCellStyle62.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle62.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle62.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle62.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle62.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle62.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle62.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ConfigDataGrid.DefaultCellStyle = dataGridViewCellStyle62;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ConfigDataGrid.DefaultCellStyle = dataGridViewCellStyle8;
             this.ConfigDataGrid.EnableHeadersVisualStyles = false;
             this.ConfigDataGrid.Location = new System.Drawing.Point(0, 0);
             this.ConfigDataGrid.Margin = new System.Windows.Forms.Padding(1);
             this.ConfigDataGrid.Name = "ConfigDataGrid";
             this.ConfigDataGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle63.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle63.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle63.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle63.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle63.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle63.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle63.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ConfigDataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle63;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle9.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ConfigDataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this.ConfigDataGrid.RowHeadersVisible = false;
             this.ConfigDataGrid.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
             this.ConfigDataGrid.ShowEditingIcon = false;
@@ -1682,8 +1869,8 @@
             // 
             this.LoadFieldColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.LoadFieldColumn.DataPropertyName = "loadValue";
-            dataGridViewCellStyle60.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.LoadFieldColumn.DefaultCellStyle = dataGridViewCellStyle60;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.LoadFieldColumn.DefaultCellStyle = dataGridViewCellStyle6;
             this.LoadFieldColumn.FillWeight = 200F;
             this.LoadFieldColumn.HeaderText = "Load";
             this.LoadFieldColumn.MaxInputLength = 16;
@@ -1697,8 +1884,8 @@
             // 
             this.UploadFieldColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.UploadFieldColumn.DataPropertyName = "uploadValue";
-            dataGridViewCellStyle61.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.UploadFieldColumn.DefaultCellStyle = dataGridViewCellStyle61;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.UploadFieldColumn.DefaultCellStyle = dataGridViewCellStyle7;
             this.UploadFieldColumn.FillWeight = 200F;
             this.UploadFieldColumn.HeaderText = "Upload";
             this.UploadFieldColumn.MaxInputLength = 16;
@@ -1812,6 +1999,23 @@
             this.linkSettingsRMLR_RMP_Signature.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.ToolTipHelper.SetToolTip(this.linkSettingsRMLR_RMP_Signature, "Сигнатура RMP  :  частота PGLR");
             // 
+            // TestSettingRMLRButton
+            // 
+            this.TestSettingRMLRButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.TestSettingRMLRButton.ContextMenuStrip = this.RMLRTestMenuStrip;
+            this.TestSettingRMLRButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.TestSettingRMLRButton.Image = global::RMDebugger.Properties.Resources.StatusRunning;
+            this.TestSettingRMLRButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.TestSettingRMLRButton.Location = new System.Drawing.Point(128, 212);
+            this.TestSettingRMLRButton.Margin = new System.Windows.Forms.Padding(0);
+            this.TestSettingRMLRButton.Name = "TestSettingRMLRButton";
+            this.TestSettingRMLRButton.Size = new System.Drawing.Size(55, 22);
+            this.TestSettingRMLRButton.TabIndex = 4;
+            this.TestSettingRMLRButton.Text = "Test";
+            this.TestSettingRMLRButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolTipHelper.SetToolTip(this.TestSettingRMLRButton, "Проверка, на сколько хорошо RMLR видит RMP\r\n> ПКМ для дополнительных настроек");
+            this.TestSettingRMLRButton.UseVisualStyleBackColor = true;
+            // 
             // RMLRTestMenuStrip
             // 
             this.RMLRTestMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1891,6 +2095,23 @@
             this.BuzzerSettingsRMLR.Size = new System.Drawing.Size(183, 22);
             this.BuzzerSettingsRMLR.Text = "Buzzer";
             // 
+            // UploadSettingRMLRButton
+            // 
+            this.UploadSettingRMLRButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.UploadSettingRMLRButton.ContextMenuStrip = this.UploadRMLRButtonMenuStrip;
+            this.UploadSettingRMLRButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.UploadSettingRMLRButton.Image = ((System.Drawing.Image)(resources.GetObject("UploadSettingRMLRButton.Image")));
+            this.UploadSettingRMLRButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.UploadSettingRMLRButton.Location = new System.Drawing.Point(64, 212);
+            this.UploadSettingRMLRButton.Margin = new System.Windows.Forms.Padding(0);
+            this.UploadSettingRMLRButton.Name = "UploadSettingRMLRButton";
+            this.UploadSettingRMLRButton.Size = new System.Drawing.Size(65, 22);
+            this.UploadSettingRMLRButton.TabIndex = 3;
+            this.UploadSettingRMLRButton.Text = "Upload";
+            this.UploadSettingRMLRButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolTipHelper.SetToolTip(this.UploadSettingRMLRButton, "Загрузка настроек в RMLR\r\n> ПКМ для дополнительных настроек");
+            this.UploadSettingRMLRButton.UseVisualStyleBackColor = true;
+            // 
             // UploadRMLRButtonMenuStrip
             // 
             this.UploadRMLRButtonMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1906,6 +2127,22 @@
             this.resetSettingsRmlrToolStrip.Text = "Reset";
             this.resetSettingsRmlrToolStrip.ToolTipText = "Режим сброса настроек";
             // 
+            // LoadSettingRMLRButton
+            // 
+            this.LoadSettingRMLRButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.LoadSettingRMLRButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.LoadSettingRMLRButton.Image = ((System.Drawing.Image)(resources.GetObject("LoadSettingRMLRButton.Image")));
+            this.LoadSettingRMLRButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.LoadSettingRMLRButton.Location = new System.Drawing.Point(0, 212);
+            this.LoadSettingRMLRButton.Margin = new System.Windows.Forms.Padding(0);
+            this.LoadSettingRMLRButton.Name = "LoadSettingRMLRButton";
+            this.LoadSettingRMLRButton.Size = new System.Drawing.Size(65, 22);
+            this.LoadSettingRMLRButton.TabIndex = 2;
+            this.LoadSettingRMLRButton.Text = "Load";
+            this.LoadSettingRMLRButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolTipHelper.SetToolTip(this.LoadSettingRMLRButton, "Загрузка настроек из RMLR");
+            this.LoadSettingRMLRButton.UseVisualStyleBackColor = true;
+            // 
             // SettingsRMLRGrid
             // 
             this.SettingsRMLRGrid.AllowUserToAddRows = false;
@@ -1920,42 +2157,42 @@
             this.SettingsRMLRGrid.BackgroundColor = System.Drawing.Color.White;
             this.SettingsRMLRGrid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Raised;
             this.SettingsRMLRGrid.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.SettingsRMLRGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle10.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.SettingsRMLRGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
             this.SettingsRMLRGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.SettingsRMLRGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn2,
             this.dataGridViewTextBoxColumn3,
             this.dataGridViewTextBoxColumn4});
             this.SettingsRMLRGrid.ContextMenuStrip = this.RMLRGridMenuStrip;
-            dataGridViewCellStyle64.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle64.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle64.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle64.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle64.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle64.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle64.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.SettingsRMLRGrid.DefaultCellStyle = dataGridViewCellStyle64;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.SettingsRMLRGrid.DefaultCellStyle = dataGridViewCellStyle13;
             this.SettingsRMLRGrid.EnableHeadersVisualStyles = false;
             this.SettingsRMLRGrid.GridColor = System.Drawing.Color.DarkGray;
             this.SettingsRMLRGrid.Location = new System.Drawing.Point(0, 0);
             this.SettingsRMLRGrid.Margin = new System.Windows.Forms.Padding(1);
             this.SettingsRMLRGrid.Name = "SettingsRMLRGrid";
             this.SettingsRMLRGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle65.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle65.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle65.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle65.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle65.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle65.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle65.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.SettingsRMLRGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle65;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle14.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.SettingsRMLRGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle14;
             this.SettingsRMLRGrid.RowHeadersVisible = false;
             this.SettingsRMLRGrid.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
             this.SettingsRMLRGrid.ShowEditingIcon = false;
@@ -1983,8 +2220,8 @@
             // 
             this.dataGridViewTextBoxColumn3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.dataGridViewTextBoxColumn3.DataPropertyName = "loadValue";
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewTextBoxColumn3.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewTextBoxColumn3.DefaultCellStyle = dataGridViewCellStyle11;
             this.dataGridViewTextBoxColumn3.FillWeight = 200F;
             this.dataGridViewTextBoxColumn3.HeaderText = "Load";
             this.dataGridViewTextBoxColumn3.MaxInputLength = 5;
@@ -1999,8 +2236,8 @@
             // 
             this.dataGridViewTextBoxColumn4.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.dataGridViewTextBoxColumn4.DataPropertyName = "uploadValue";
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewTextBoxColumn4.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewTextBoxColumn4.DefaultCellStyle = dataGridViewCellStyle12;
             this.dataGridViewTextBoxColumn4.FillWeight = 200F;
             this.dataGridViewTextBoxColumn4.HeaderText = "Upload";
             this.dataGridViewTextBoxColumn4.MaxInputLength = 5;
@@ -2103,6 +2340,36 @@
             this.extendedMenuPanel.Size = new System.Drawing.Size(305, 169);
             this.extendedMenuPanel.TabIndex = 31;
             // 
+            // FreqTestRSNumeric
+            // 
+            this.FreqTestRSNumeric.Increment = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.FreqTestRSNumeric.Location = new System.Drawing.Point(238, 123);
+            this.FreqTestRSNumeric.Margin = new System.Windows.Forms.Padding(1);
+            this.FreqTestRSNumeric.Maximum = new decimal(new int[] {
+            60000,
+            0,
+            0,
+            0});
+            this.FreqTestRSNumeric.Minimum = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            this.FreqTestRSNumeric.Name = "FreqTestRSNumeric";
+            this.FreqTestRSNumeric.Size = new System.Drawing.Size(64, 20);
+            this.FreqTestRSNumeric.TabIndex = 47;
+            this.FreqTestRSNumeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.ToolTipHelper.SetToolTip(this.FreqTestRSNumeric, "Частота обнновления таблицы, мс");
+            this.FreqTestRSNumeric.Value = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            // 
             // SortedColumnCombo
             // 
             this.SortedColumnCombo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -2120,6 +2387,20 @@
             this.SortedColumnCombo.Size = new System.Drawing.Size(87, 21);
             this.SortedColumnCombo.TabIndex = 46;
             // 
+            // SortByButton
+            // 
+            this.SortByButton.ContextMenuStrip = this.RS485SortMenuStrip;
+            this.SortByButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.SortByButton.Image = ((System.Drawing.Image)(resources.GetObject("SortByButton.Image")));
+            this.SortByButton.Location = new System.Drawing.Point(192, 100);
+            this.SortByButton.Margin = new System.Windows.Forms.Padding(0);
+            this.SortByButton.Name = "SortByButton";
+            this.SortByButton.Size = new System.Drawing.Size(21, 21);
+            this.SortByButton.TabIndex = 44;
+            this.SortByButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolTipHelper.SetToolTip(this.SortByButton, "Нажмите правой кнопкой мыши, для выбора сортировки");
+            this.SortByButton.UseVisualStyleBackColor = true;
+            // 
             // RS485SortMenuStrip
             // 
             this.RS485SortMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -2127,6 +2408,39 @@
             this.byDescMenuItem});
             this.RS485SortMenuStrip.Name = "RS485SortMenuStrip";
             this.RS485SortMenuStrip.Size = new System.Drawing.Size(153, 48);
+            // 
+            // byAscMenuItem
+            // 
+            this.byAscMenuItem.Checked = true;
+            this.byAscMenuItem.CheckOnClick = true;
+            this.byAscMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.byAscMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("byAscMenuItem.Image")));
+            this.byAscMenuItem.Name = "byAscMenuItem";
+            this.byAscMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.byAscMenuItem.Text = "By Ascending";
+            // 
+            // byDescMenuItem
+            // 
+            this.byDescMenuItem.CheckOnClick = true;
+            this.byDescMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("byDescMenuItem.Image")));
+            this.byDescMenuItem.Name = "byDescMenuItem";
+            this.byDescMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.byDescMenuItem.Text = "By Descending";
+            // 
+            // MoreInfoTestRS485
+            // 
+            this.MoreInfoTestRS485.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.MoreInfoTestRS485.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.MoreInfoTestRS485.Image = ((System.Drawing.Image)(resources.GetObject("MoreInfoTestRS485.Image")));
+            this.MoreInfoTestRS485.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.MoreInfoTestRS485.Location = new System.Drawing.Point(192, 76);
+            this.MoreInfoTestRS485.Margin = new System.Windows.Forms.Padding(0);
+            this.MoreInfoTestRS485.Name = "MoreInfoTestRS485";
+            this.MoreInfoTestRS485.Size = new System.Drawing.Size(110, 22);
+            this.MoreInfoTestRS485.TabIndex = 43;
+            this.MoreInfoTestRS485.Text = "More info";
+            this.MoreInfoTestRS485.UseVisualStyleBackColor = true;
             // 
             // timerPanelTest
             // 
@@ -2217,6 +2531,53 @@
             this.WorkingTimeLabel.TabIndex = 41;
             this.WorkingTimeLabel.Text = "Total: 00:00:00.000";
             this.WorkingTimeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // SaveLogTestRS485
+            // 
+            this.SaveLogTestRS485.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SaveLogTestRS485.Enabled = false;
+            this.SaveLogTestRS485.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.SaveLogTestRS485.Image = ((System.Drawing.Image)(resources.GetObject("SaveLogTestRS485.Image")));
+            this.SaveLogTestRS485.Location = new System.Drawing.Point(282, -1);
+            this.SaveLogTestRS485.Margin = new System.Windows.Forms.Padding(0);
+            this.SaveLogTestRS485.Name = "SaveLogTestRS485";
+            this.SaveLogTestRS485.Size = new System.Drawing.Size(22, 22);
+            this.SaveLogTestRS485.TabIndex = 34;
+            this.SaveLogTestRS485.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolTipHelper.SetToolTip(this.SaveLogTestRS485, "Сохранить текущие данные из таблицы в log файл");
+            this.SaveLogTestRS485.UseVisualStyleBackColor = true;
+            this.SaveLogTestRS485.Click += new System.EventHandler(this.SaveLogTestRS485_Click);
+            // 
+            // ClearDataTestRS485
+            // 
+            this.ClearDataTestRS485.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ClearDataTestRS485.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.ClearDataTestRS485.Image = ((System.Drawing.Image)(resources.GetObject("ClearDataTestRS485.Image")));
+            this.ClearDataTestRS485.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.ClearDataTestRS485.Location = new System.Drawing.Point(192, 28);
+            this.ClearDataTestRS485.Margin = new System.Windows.Forms.Padding(0);
+            this.ClearDataTestRS485.Name = "ClearDataTestRS485";
+            this.ClearDataTestRS485.Size = new System.Drawing.Size(110, 22);
+            this.ClearDataTestRS485.TabIndex = 25;
+            this.ClearDataTestRS485.Text = "Clear all";
+            this.ClearDataTestRS485.UseVisualStyleBackColor = true;
+            this.ClearDataTestRS485.Click += new System.EventHandler(this.ClearDataStatusRM_Click);
+            // 
+            // ClearInfoTestRS485
+            // 
+            this.ClearInfoTestRS485.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ClearInfoTestRS485.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.ClearInfoTestRS485.Image = ((System.Drawing.Image)(resources.GetObject("ClearInfoTestRS485.Image")));
+            this.ClearInfoTestRS485.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.ClearInfoTestRS485.Location = new System.Drawing.Point(192, 52);
+            this.ClearInfoTestRS485.Margin = new System.Windows.Forms.Padding(0);
+            this.ClearInfoTestRS485.Name = "ClearInfoTestRS485";
+            this.ClearInfoTestRS485.Size = new System.Drawing.Size(110, 22);
+            this.ClearInfoTestRS485.TabIndex = 24;
+            this.ClearInfoTestRS485.Text = "Clear info";
+            this.ClearInfoTestRS485.UseVisualStyleBackColor = true;
             // 
             // settingsGroupBox
             // 
@@ -2312,6 +2673,20 @@
             this.label5.Text = "min";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // ManualScanToTest
+            // 
+            this.ManualScanToTest.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.ManualScanToTest.Image = ((System.Drawing.Image)(resources.GetObject("ManualScanToTest.Image")));
+            this.ManualScanToTest.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.ManualScanToTest.Location = new System.Drawing.Point(6, 39);
+            this.ManualScanToTest.Margin = new System.Windows.Forms.Padding(0);
+            this.ManualScanToTest.Name = "ManualScanToTest";
+            this.ManualScanToTest.Size = new System.Drawing.Size(90, 22);
+            this.ManualScanToTest.TabIndex = 30;
+            this.ManualScanToTest.Text = "Manual Scan";
+            this.ManualScanToTest.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ManualScanToTest.UseVisualStyleBackColor = true;
+            // 
             // maxSigToScan
             // 
             this.maxSigToScan.Location = new System.Drawing.Point(51, 78);
@@ -2336,6 +2711,20 @@
             0,
             0,
             0});
+            // 
+            // AddSignatureIDToTest
+            // 
+            this.AddSignatureIDToTest.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.AddSignatureIDToTest.Image = ((System.Drawing.Image)(resources.GetObject("AddSignatureIDToTest.Image")));
+            this.AddSignatureIDToTest.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.AddSignatureIDToTest.Location = new System.Drawing.Point(6, 16);
+            this.AddSignatureIDToTest.Margin = new System.Windows.Forms.Padding(0);
+            this.AddSignatureIDToTest.Name = "AddSignatureIDToTest";
+            this.AddSignatureIDToTest.Size = new System.Drawing.Size(90, 22);
+            this.AddSignatureIDToTest.TabIndex = 26;
+            this.AddSignatureIDToTest.Text = "Signature ID";
+            this.AddSignatureIDToTest.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.AddSignatureIDToTest.UseVisualStyleBackColor = true;
             // 
             // minSigToScan
             // 
@@ -2364,13 +2753,70 @@
             0});
             this.minSigToScan.ValueChanged += new System.EventHandler(this.minSigToScan_ValueChanged);
             // 
+            // ShowExtendedMenu
+            // 
+            this.ShowExtendedMenu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ShowExtendedMenu.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.ShowExtendedMenu.Image = ((System.Drawing.Image)(resources.GetObject("ShowExtendedMenu.Image")));
+            this.ShowExtendedMenu.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ShowExtendedMenu.Location = new System.Drawing.Point(147, -1);
+            this.ShowExtendedMenu.Margin = new System.Windows.Forms.Padding(0);
+            this.ShowExtendedMenu.Name = "ShowExtendedMenu";
+            this.ShowExtendedMenu.Size = new System.Drawing.Size(136, 22);
+            this.ShowExtendedMenu.TabIndex = 31;
+            this.ShowExtendedMenu.Text = "Hide &menu";
+            this.ToolTipHelper.SetToolTip(this.ShowExtendedMenu, "Показать расширенное меню");
+            this.ShowExtendedMenu.UseVisualStyleBackColor = true;
+            // 
+            // StartTestRSButton
+            // 
+            this.StartTestRSButton.Enabled = false;
+            this.StartTestRSButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.StartTestRSButton.Image = ((System.Drawing.Image)(resources.GetObject("StartTestRSButton.Image")));
+            this.StartTestRSButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.StartTestRSButton.Location = new System.Drawing.Point(-1, -1);
+            this.StartTestRSButton.Margin = new System.Windows.Forms.Padding(0);
+            this.StartTestRSButton.Name = "StartTestRSButton";
+            this.StartTestRSButton.Size = new System.Drawing.Size(75, 22);
+            this.StartTestRSButton.TabIndex = 23;
+            this.StartTestRSButton.Text = "&Start Test";
+            this.StartTestRSButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolTipHelper.SetToolTip(this.StartTestRSButton, "Запуск \\ Остановка теста");
+            this.StartTestRSButton.UseVisualStyleBackColor = true;
+            // 
+            // AutoScanToTest
+            // 
+            this.AutoScanToTest.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.AutoScanToTest.Image = ((System.Drawing.Image)(resources.GetObject("AutoScanToTest.Image")));
+            this.AutoScanToTest.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.AutoScanToTest.Location = new System.Drawing.Point(73, -1);
+            this.AutoScanToTest.Margin = new System.Windows.Forms.Padding(0);
+            this.AutoScanToTest.Name = "AutoScanToTest";
+            this.AutoScanToTest.Size = new System.Drawing.Size(75, 22);
+            this.AutoScanToTest.TabIndex = 22;
+            this.AutoScanToTest.Text = "&Auto Scan";
+            this.AutoScanToTest.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ToolTipHelper.SetToolTip(this.AutoScanToTest, "Сканирование путём соединения расширенного и зеркального поисков, что бы найти вс" +
+        "е RS485 устройства в одной шине");
+            this.AutoScanToTest.UseVisualStyleBackColor = true;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(203, 125);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(31, 13);
+            this.label9.TabIndex = 48;
+            this.label9.Text = "Freq:";
+            // 
             // StatusRS485GridView
             // 
             this.StatusRS485GridView.AllowUserToAddRows = false;
             this.StatusRS485GridView.AllowUserToOrderColumns = true;
             this.StatusRS485GridView.AllowUserToResizeRows = false;
-            dataGridViewCellStyle35.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.StatusRS485GridView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle35;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.StatusRS485GridView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle15;
             this.StatusRS485GridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -2379,14 +2825,14 @@
             this.StatusRS485GridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.StatusRS485GridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
             this.StatusRS485GridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle36.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle36.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle36.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle36.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle36.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle36.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle36.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.StatusRS485GridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle36;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle16.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle16.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle16.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.StatusRS485GridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle16;
             this.StatusRS485GridView.ColumnHeadersHeight = 18;
             this.StatusRS485GridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.StatusRS485GridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -2405,33 +2851,33 @@
             this.RadioNearbyStatusRM,
             this.WorkTimeStatusRM,
             this.VerStatusRM});
-            dataGridViewCellStyle52.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle52.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle52.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle52.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle52.SelectionBackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            dataGridViewCellStyle52.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle52.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.StatusRS485GridView.DefaultCellStyle = dataGridViewCellStyle52;
+            dataGridViewCellStyle32.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle32.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle32.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle32.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle32.SelectionBackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            dataGridViewCellStyle32.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle32.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.StatusRS485GridView.DefaultCellStyle = dataGridViewCellStyle32;
             this.StatusRS485GridView.GridColor = System.Drawing.Color.White;
             this.StatusRS485GridView.Location = new System.Drawing.Point(0, 0);
             this.StatusRS485GridView.Margin = new System.Windows.Forms.Padding(1);
             this.StatusRS485GridView.Name = "StatusRS485GridView";
             this.StatusRS485GridView.ReadOnly = true;
             this.StatusRS485GridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle53.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle53.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle53.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle53.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle53.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle53.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle53.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.StatusRS485GridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle53;
+            dataGridViewCellStyle33.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle33.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle33.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle33.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle33.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle33.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle33.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.StatusRS485GridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle33;
             this.StatusRS485GridView.RowHeadersVisible = false;
             this.StatusRS485GridView.RowHeadersWidth = 25;
             this.StatusRS485GridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle54.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.StatusRS485GridView.RowsDefaultCellStyle = dataGridViewCellStyle54;
+            dataGridViewCellStyle34.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.StatusRS485GridView.RowsDefaultCellStyle = dataGridViewCellStyle34;
             this.StatusRS485GridView.RowTemplate.DefaultCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.StatusRS485GridView.RowTemplate.ErrorText = "???";
             this.StatusRS485GridView.RowTemplate.Height = 12;
@@ -2450,8 +2896,8 @@
             // 
             this.InterfaceStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.InterfaceStatusRM.DataPropertyName = "devInterface";
-            dataGridViewCellStyle37.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            this.InterfaceStatusRM.DefaultCellStyle = dataGridViewCellStyle37;
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            this.InterfaceStatusRM.DefaultCellStyle = dataGridViewCellStyle17;
             this.InterfaceStatusRM.HeaderText = "Interface";
             this.InterfaceStatusRM.MaxInputLength = 5;
             this.InterfaceStatusRM.MinimumWidth = 50;
@@ -2464,8 +2910,8 @@
             // 
             this.SignStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.SignStatusRM.DataPropertyName = "devSign";
-            dataGridViewCellStyle38.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.SignStatusRM.DefaultCellStyle = dataGridViewCellStyle38;
+            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.SignStatusRM.DefaultCellStyle = dataGridViewCellStyle18;
             this.SignStatusRM.FillWeight = 50F;
             this.SignStatusRM.HeaderText = "Sign";
             this.SignStatusRM.MaxInputLength = 5;
@@ -2479,8 +2925,8 @@
             // 
             this.TypeStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.TypeStatusRM.DataPropertyName = "devType";
-            dataGridViewCellStyle39.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.TypeStatusRM.DefaultCellStyle = dataGridViewCellStyle39;
+            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.TypeStatusRM.DefaultCellStyle = dataGridViewCellStyle19;
             this.TypeStatusRM.FillWeight = 45F;
             this.TypeStatusRM.HeaderText = "Type";
             this.TypeStatusRM.MaxInputLength = 5;
@@ -2494,8 +2940,8 @@
             // 
             this.StatusStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.StatusStatusRM.DataPropertyName = "devStatus";
-            dataGridViewCellStyle40.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.StatusStatusRM.DefaultCellStyle = dataGridViewCellStyle40;
+            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.StatusStatusRM.DefaultCellStyle = dataGridViewCellStyle20;
             this.StatusStatusRM.FillWeight = 45F;
             this.StatusStatusRM.HeaderText = "Status";
             this.StatusStatusRM.MaxInputLength = 4;
@@ -2509,8 +2955,8 @@
             // 
             this.TxStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.TxStatusRM.DataPropertyName = "devTx";
-            dataGridViewCellStyle41.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.TxStatusRM.DefaultCellStyle = dataGridViewCellStyle41;
+            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.TxStatusRM.DefaultCellStyle = dataGridViewCellStyle21;
             this.TxStatusRM.FillWeight = 75F;
             this.TxStatusRM.HeaderText = "Tx";
             this.TxStatusRM.MaxInputLength = 7;
@@ -2524,8 +2970,8 @@
             // 
             this.RxStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.RxStatusRM.DataPropertyName = "devRx";
-            dataGridViewCellStyle42.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.RxStatusRM.DefaultCellStyle = dataGridViewCellStyle42;
+            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.RxStatusRM.DefaultCellStyle = dataGridViewCellStyle22;
             this.RxStatusRM.FillWeight = 75F;
             this.RxStatusRM.HeaderText = "Rx";
             this.RxStatusRM.MaxInputLength = 7;
@@ -2539,8 +2985,8 @@
             // 
             this.ErrorStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.ErrorStatusRM.DataPropertyName = "devErrors";
-            dataGridViewCellStyle43.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.ErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle43;
+            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle23;
             this.ErrorStatusRM.FillWeight = 75F;
             this.ErrorStatusRM.HeaderText = "Error";
             this.ErrorStatusRM.MaxInputLength = 7;
@@ -2554,10 +3000,10 @@
             // 
             this.PercentErrorStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.PercentErrorStatusRM.DataPropertyName = "devPercentErrors";
-            dataGridViewCellStyle44.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle44.Format = "N3";
-            dataGridViewCellStyle44.NullValue = null;
-            this.PercentErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle44;
+            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle24.Format = "N3";
+            dataGridViewCellStyle24.NullValue = null;
+            this.PercentErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle24;
             this.PercentErrorStatusRM.FillWeight = 75F;
             this.PercentErrorStatusRM.HeaderText = "%Error";
             this.PercentErrorStatusRM.MaxInputLength = 7;
@@ -2571,8 +3017,8 @@
             // 
             this.DisconnectedStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.DisconnectedStatusRM.DataPropertyName = "devNoReply";
-            dataGridViewCellStyle45.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.DisconnectedStatusRM.DefaultCellStyle = dataGridViewCellStyle45;
+            dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.DisconnectedStatusRM.DefaultCellStyle = dataGridViewCellStyle25;
             this.DisconnectedStatusRM.FillWeight = 75F;
             this.DisconnectedStatusRM.HeaderText = "No Reply";
             this.DisconnectedStatusRM.MaxInputLength = 7;
@@ -2587,8 +3033,8 @@
             // 
             this.BadReplyStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.BadReplyStatusRM.DataPropertyName = "devBadReply";
-            dataGridViewCellStyle46.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.BadReplyStatusRM.DefaultCellStyle = dataGridViewCellStyle46;
+            dataGridViewCellStyle26.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.BadReplyStatusRM.DefaultCellStyle = dataGridViewCellStyle26;
             this.BadReplyStatusRM.FillWeight = 75F;
             this.BadReplyStatusRM.HeaderText = "Bad Reply";
             this.BadReplyStatusRM.MaxInputLength = 7;
@@ -2603,8 +3049,8 @@
             // 
             this.BadCrcStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.BadCrcStatusRM.DataPropertyName = "devBadCRC";
-            dataGridViewCellStyle47.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.BadCrcStatusRM.DefaultCellStyle = dataGridViewCellStyle47;
+            dataGridViewCellStyle27.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.BadCrcStatusRM.DefaultCellStyle = dataGridViewCellStyle27;
             this.BadCrcStatusRM.FillWeight = 75F;
             this.BadCrcStatusRM.HeaderText = "Bad CRC";
             this.BadCrcStatusRM.MaxInputLength = 7;
@@ -2619,8 +3065,8 @@
             // 
             this.RadioErrorStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.RadioErrorStatusRM.DataPropertyName = "devBadRadio";
-            dataGridViewCellStyle48.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.RadioErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle48;
+            dataGridViewCellStyle28.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.RadioErrorStatusRM.DefaultCellStyle = dataGridViewCellStyle28;
             this.RadioErrorStatusRM.FillWeight = 75F;
             this.RadioErrorStatusRM.HeaderText = "Bad Radio";
             this.RadioErrorStatusRM.MaxInputLength = 7;
@@ -2635,8 +3081,8 @@
             // 
             this.RadioNearbyStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.RadioNearbyStatusRM.DataPropertyName = "devNearbyDevs";
-            dataGridViewCellStyle49.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.RadioNearbyStatusRM.DefaultCellStyle = dataGridViewCellStyle49;
+            dataGridViewCellStyle29.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.RadioNearbyStatusRM.DefaultCellStyle = dataGridViewCellStyle29;
             this.RadioNearbyStatusRM.HeaderText = "Nearby";
             this.RadioNearbyStatusRM.MaxInputLength = 2;
             this.RadioNearbyStatusRM.Name = "RadioNearbyStatusRM";
@@ -2649,9 +3095,9 @@
             // 
             this.WorkTimeStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.WorkTimeStatusRM.DataPropertyName = "devWorkTime";
-            dataGridViewCellStyle50.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle50.NullValue = null;
-            this.WorkTimeStatusRM.DefaultCellStyle = dataGridViewCellStyle50;
+            dataGridViewCellStyle30.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle30.NullValue = null;
+            this.WorkTimeStatusRM.DefaultCellStyle = dataGridViewCellStyle30;
             this.WorkTimeStatusRM.HeaderText = "Work Time";
             this.WorkTimeStatusRM.MaxInputLength = 32;
             this.WorkTimeStatusRM.MinimumWidth = 70;
@@ -2664,8 +3110,8 @@
             // 
             this.VerStatusRM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.VerStatusRM.DataPropertyName = "devVer";
-            dataGridViewCellStyle51.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.VerStatusRM.DefaultCellStyle = dataGridViewCellStyle51;
+            dataGridViewCellStyle31.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.VerStatusRM.DefaultCellStyle = dataGridViewCellStyle31;
             this.VerStatusRM.FillWeight = 35F;
             this.VerStatusRM.HeaderText = "Ver";
             this.VerStatusRM.MaxInputLength = 4;
@@ -2953,385 +3399,6 @@
             this.settingsToolStrip.Size = new System.Drawing.Size(51, 25);
             this.settingsToolStrip.Text = "Menu";
             // 
-            // toolStripSeparator4
-            // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(151, 6);
-            // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(151, 6);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
-            // 
-            // dataBitsInfo
-            // 
-            this.dataBitsInfo.Enabled = false;
-            this.dataBitsInfo.Name = "dataBitsInfo";
-            this.dataBitsInfo.Size = new System.Drawing.Size(0, 22);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
-            // 
-            // ParityInfo
-            // 
-            this.ParityInfo.Enabled = false;
-            this.ParityInfo.Name = "ParityInfo";
-            this.ParityInfo.Size = new System.Drawing.Size(0, 22);
-            // 
-            // toolStripSeparator5
-            // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 25);
-            // 
-            // StopBitsInfo
-            // 
-            this.StopBitsInfo.Enabled = false;
-            this.StopBitsInfo.Name = "StopBitsInfo";
-            this.StopBitsInfo.Size = new System.Drawing.Size(0, 22);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
-            // 
-            // SignaturePanel
-            // 
-            this.SignaturePanel.BackColor = System.Drawing.Color.White;
-            this.SignaturePanel.Controls.Add(this.ThroughSignID);
-            this.SignaturePanel.Controls.Add(this.label1);
-            this.SignaturePanel.Controls.Add(this.TargetSignID);
-            this.SignaturePanel.Controls.Add(this.NeedThrough);
-            this.SignaturePanel.Location = new System.Drawing.Point(9, 177);
-            this.SignaturePanel.Name = "SignaturePanel";
-            this.SignaturePanel.Size = new System.Drawing.Size(163, 46);
-            this.SignaturePanel.TabIndex = 21;
-            // 
-            // ThroughSignID
-            // 
-            this.ThroughSignID.Enabled = false;
-            this.ThroughSignID.Location = new System.Drawing.Point(109, 23);
-            this.ThroughSignID.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
-            this.ThroughSignID.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.ThroughSignID.Name = "ThroughSignID";
-            this.ThroughSignID.Size = new System.Drawing.Size(52, 20);
-            this.ThroughSignID.TabIndex = 2;
-            this.ThroughSignID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.ThroughSignID.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // NeedThrough
-            // 
-            this.NeedThrough.AutoSize = true;
-            this.NeedThrough.BackColor = System.Drawing.Color.Transparent;
-            this.NeedThrough.Location = new System.Drawing.Point(3, 25);
-            this.NeedThrough.Margin = new System.Windows.Forms.Padding(0);
-            this.NeedThrough.Name = "NeedThrough";
-            this.NeedThrough.Size = new System.Drawing.Size(107, 17);
-            this.NeedThrough.TabIndex = 4;
-            this.NeedThrough.Text = "Through RM485:";
-            this.NeedThrough.UseVisualStyleBackColor = false;
-            // 
-            // ExtraButtonsGroup
-            // 
-            this.ExtraButtonsGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.ExtraButtonsGroup.Controls.Add(this.ButtonsPanel);
-            this.ExtraButtonsGroup.Enabled = false;
-            this.ExtraButtonsGroup.Location = new System.Drawing.Point(9, 223);
-            this.ExtraButtonsGroup.Margin = new System.Windows.Forms.Padding(0);
-            this.ExtraButtonsGroup.Name = "ExtraButtonsGroup";
-            this.ExtraButtonsGroup.Size = new System.Drawing.Size(163, 96);
-            this.ExtraButtonsGroup.TabIndex = 3;
-            this.ExtraButtonsGroup.TabStop = false;
-            this.ExtraButtonsGroup.Text = "Extra buttons";
-            // 
-            // ButtonsPanel
-            // 
-            this.ButtonsPanel.Controls.Add(this.label24);
-            this.ButtonsPanel.Controls.Add(this.SetBootloaderStopButton);
-            this.ButtonsPanel.Controls.Add(this.AutoExtraButtonsTimeout);
-            this.ButtonsPanel.Controls.Add(this.ResetButton);
-            this.ButtonsPanel.Controls.Add(this.SetBootloaderStartButton);
-            this.ButtonsPanel.Controls.Add(this.SetOnlineFreqNumeric);
-            this.ButtonsPanel.Controls.Add(this.label18);
-            this.ButtonsPanel.Controls.Add(this.SetOnlineButton);
-            this.ButtonsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ButtonsPanel.Location = new System.Drawing.Point(3, 16);
-            this.ButtonsPanel.Margin = new System.Windows.Forms.Padding(0);
-            this.ButtonsPanel.Name = "ButtonsPanel";
-            this.ButtonsPanel.Size = new System.Drawing.Size(157, 77);
-            this.ButtonsPanel.TabIndex = 20;
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(55, 50);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(20, 13);
-            this.label24.TabIndex = 22;
-            this.label24.Text = "ms";
-            this.label24.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            this.label24.Visible = false;
-            // 
-            // ExtendedMenuStrip
-            // 
-            this.ExtendedMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ExtendedRepeatMenuItem});
-            this.ExtendedMenuStrip.Name = "ExtendedMenuStrip";
-            this.ExtendedMenuStrip.Size = new System.Drawing.Size(111, 26);
-            // 
-            // ExtendedRepeatMenuItem
-            // 
-            this.ExtendedRepeatMenuItem.CheckOnClick = true;
-            this.ExtendedRepeatMenuItem.Name = "ExtendedRepeatMenuItem";
-            this.ExtendedRepeatMenuItem.Size = new System.Drawing.Size(110, 22);
-            this.ExtendedRepeatMenuItem.Text = "Repeat";
-            // 
-            // AutoExtraButtonsTimeout
-            // 
-            this.AutoExtraButtonsTimeout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.AutoExtraButtonsTimeout.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.AutoExtraButtonsTimeout.Location = new System.Drawing.Point(1, 43);
-            this.AutoExtraButtonsTimeout.Margin = new System.Windows.Forms.Padding(0);
-            this.AutoExtraButtonsTimeout.Maximum = new decimal(new int[] {
-            5000,
-            0,
-            0,
-            0});
-            this.AutoExtraButtonsTimeout.Name = "AutoExtraButtonsTimeout";
-            this.AutoExtraButtonsTimeout.Size = new System.Drawing.Size(51, 20);
-            this.AutoExtraButtonsTimeout.TabIndex = 21;
-            this.ToolTipHelper.SetToolTip(this.AutoExtraButtonsTimeout, "Период опроса, мс");
-            this.AutoExtraButtonsTimeout.Value = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            this.AutoExtraButtonsTimeout.Visible = false;
-            // 
-            // SetOnlineFreqNumeric
-            // 
-            this.SetOnlineFreqNumeric.Location = new System.Drawing.Point(22, 1);
-            this.SetOnlineFreqNumeric.Margin = new System.Windows.Forms.Padding(0);
-            this.SetOnlineFreqNumeric.Maximum = new decimal(new int[] {
-            240,
-            0,
-            0,
-            0});
-            this.SetOnlineFreqNumeric.Name = "SetOnlineFreqNumeric";
-            this.SetOnlineFreqNumeric.Size = new System.Drawing.Size(41, 20);
-            this.SetOnlineFreqNumeric.TabIndex = 4;
-            this.ToolTipHelper.SetToolTip(this.SetOnlineFreqNumeric, "Канал отправки для входа устройства в Online режим");
-            this.SetOnlineFreqNumeric.Value = new decimal(new int[] {
-            120,
-            0,
-            0,
-            0});
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(63, 5);
-            this.label18.Margin = new System.Windows.Forms.Padding(0);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(25, 13);
-            this.label18.TabIndex = 5;
-            this.label18.Text = "freq";
-            // 
-            // ToolTipHelper
-            // 
-            this.ToolTipHelper.AutomaticDelay = 100;
-            this.ToolTipHelper.AutoPopDelay = 5000;
-            this.ToolTipHelper.BackColor = System.Drawing.Color.White;
-            this.ToolTipHelper.ForeColor = System.Drawing.Color.Black;
-            this.ToolTipHelper.InitialDelay = 100;
-            this.ToolTipHelper.ReshowDelay = 20;
-            // 
-            // ErrorMessage
-            // 
-            this.ErrorMessage.BlinkRate = 500;
-            this.ErrorMessage.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.AlwaysBlink;
-            this.ErrorMessage.ContainerControl = this;
-            // 
-            // NotifyMessage
-            // 
-            this.NotifyMessage.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.NotifyMessage.ContextMenuStrip = this.notifyMessageStrip;
-            this.NotifyMessage.Icon = ((System.Drawing.Icon)(resources.GetObject("NotifyMessage.Icon")));
-            this.NotifyMessage.Text = "RM Debugger";
-            this.NotifyMessage.Visible = true;
-            this.NotifyMessage.Click += new System.EventHandler(this.NotifyMessage_Click);
-            // 
-            // notifyMessageStrip
-            // 
-            this.notifyMessageStrip.BackColor = System.Drawing.Color.White;
-            this.notifyMessageStrip.DropShadowEnabled = false;
-            this.notifyMessageStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.OpenDebugFromToolStrip,
-            this.toolStripSeparator6,
-            this.AboutFromToolStrip,
-            this.CloseFromToolStrip});
-            this.notifyMessageStrip.Name = "notifyMessageStrip";
-            this.notifyMessageStrip.Size = new System.Drawing.Size(186, 76);
-            // 
-            // toolStripSeparator6
-            // 
-            this.toolStripSeparator6.ForeColor = System.Drawing.Color.Black;
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(182, 6);
-            // 
-            // CloseFromToolStrip
-            // 
-            this.CloseFromToolStrip.Name = "CloseFromToolStrip";
-            this.CloseFromToolStrip.Size = new System.Drawing.Size(185, 22);
-            this.CloseFromToolStrip.Text = "Close";
-            // 
-            // WorkTestTimer
-            // 
-            this.WorkTestTimer.Interval = 999;
-            // 
-            // saveFileDialog
-            // 
-            this.saveFileDialog.FileName = "RS485Log";
-            this.saveFileDialog.Filter = "Log files (*.log)|*.log|All files (*.*)|*.*";
-            this.saveFileDialog.RestoreDirectory = true;
-            // 
-            // BottomToolStripPanel
-            // 
-            this.BottomToolStripPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.BottomToolStripPanel.Location = new System.Drawing.Point(0, 175);
-            this.BottomToolStripPanel.Name = "BottomToolStripPanel";
-            this.BottomToolStripPanel.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            this.BottomToolStripPanel.RowMargin = new System.Windows.Forms.Padding(3, 0, 0, 0);
-            this.BottomToolStripPanel.Size = new System.Drawing.Size(150, 0);
-            // 
-            // TopToolStripPanel
-            // 
-            this.TopToolStripPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.TopToolStripPanel.Location = new System.Drawing.Point(0, 0);
-            this.TopToolStripPanel.Name = "TopToolStripPanel";
-            this.TopToolStripPanel.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            this.TopToolStripPanel.RowMargin = new System.Windows.Forms.Padding(3, 0, 0, 0);
-            this.TopToolStripPanel.Size = new System.Drawing.Size(150, 0);
-            // 
-            // RightToolStripPanel
-            // 
-            this.RightToolStripPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.RightToolStripPanel.Location = new System.Drawing.Point(283, 0);
-            this.RightToolStripPanel.Name = "RightToolStripPanel";
-            this.RightToolStripPanel.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.RightToolStripPanel.RowMargin = new System.Windows.Forms.Padding(0, 3, 0, 0);
-            this.RightToolStripPanel.Size = new System.Drawing.Size(25, 172);
-            // 
-            // LeftToolStripPanel
-            // 
-            this.LeftToolStripPanel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.LeftToolStripPanel.Location = new System.Drawing.Point(0, 0);
-            this.LeftToolStripPanel.Name = "LeftToolStripPanel";
-            this.LeftToolStripPanel.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.LeftToolStripPanel.RowMargin = new System.Windows.Forms.Padding(0, 3, 0, 0);
-            this.LeftToolStripPanel.Size = new System.Drawing.Size(0, 175);
-            // 
-            // ContentPanel
-            // 
-            this.ContentPanel.Size = new System.Drawing.Size(283, 172);
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.dataGridViewTextBoxColumn1.DataPropertyName = "devType";
-            this.dataGridViewTextBoxColumn1.FillWeight = 60F;
-            this.dataGridViewTextBoxColumn1.HeaderText = "Type";
-            this.dataGridViewTextBoxColumn1.MaxInputLength = 6;
-            this.dataGridViewTextBoxColumn1.MinimumWidth = 60;
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            this.dataGridViewTextBoxColumn1.ReadOnly = true;
-            this.dataGridViewTextBoxColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewTextBoxColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.dataGridViewTextBoxColumn1.Width = 60;
-            // 
-            // SetBootloaderStopButton
-            // 
-            this.SetBootloaderStopButton.ContextMenuStrip = this.ExtendedMenuStrip;
-            this.SetBootloaderStopButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.SetBootloaderStopButton.Image = ((System.Drawing.Image)(resources.GetObject("SetBootloaderStopButton.Image")));
-            this.SetBootloaderStopButton.Location = new System.Drawing.Point(43, 22);
-            this.SetBootloaderStopButton.Margin = new System.Windows.Forms.Padding(0);
-            this.SetBootloaderStopButton.Name = "SetBootloaderStopButton";
-            this.SetBootloaderStopButton.Size = new System.Drawing.Size(20, 20);
-            this.SetBootloaderStopButton.TabIndex = 3;
-            this.ToolTipHelper.SetToolTip(this.SetBootloaderStopButton, "Отправляет команду для остановки Bootloader\r\nПовторное нажатие останавливает проц" +
-        "есс отправки команды дополнительных кннопок");
-            this.SetBootloaderStopButton.UseVisualStyleBackColor = true;
-            this.SetBootloaderStopButton.Visible = false;
-            // 
-            // ResetButton
-            // 
-            this.ResetButton.ContextMenuStrip = this.ExtendedMenuStrip;
-            this.ResetButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.ResetButton.Image = ((System.Drawing.Image)(resources.GetObject("ResetButton.Image")));
-            this.ResetButton.Location = new System.Drawing.Point(1, 22);
-            this.ResetButton.Margin = new System.Windows.Forms.Padding(0);
-            this.ResetButton.Name = "ResetButton";
-            this.ResetButton.Size = new System.Drawing.Size(20, 20);
-            this.ResetButton.TabIndex = 1;
-            this.ToolTipHelper.SetToolTip(this.ResetButton, "Отправляет команду для перезагрузки устройства\r\nПовторное нажатие останавливает п" +
-        "роцесс отправки команды дополнительных кннопок");
-            this.ResetButton.UseVisualStyleBackColor = true;
-            this.ResetButton.Visible = false;
-            // 
-            // SetBootloaderStartButton
-            // 
-            this.SetBootloaderStartButton.ContextMenuStrip = this.ExtendedMenuStrip;
-            this.SetBootloaderStartButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.SetBootloaderStartButton.Image = ((System.Drawing.Image)(resources.GetObject("SetBootloaderStartButton.Image")));
-            this.SetBootloaderStartButton.Location = new System.Drawing.Point(22, 22);
-            this.SetBootloaderStartButton.Margin = new System.Windows.Forms.Padding(0);
-            this.SetBootloaderStartButton.Name = "SetBootloaderStartButton";
-            this.SetBootloaderStartButton.Size = new System.Drawing.Size(20, 20);
-            this.SetBootloaderStartButton.TabIndex = 2;
-            this.ToolTipHelper.SetToolTip(this.SetBootloaderStartButton, "Отправляет команду для перехода в Bootloader\r\nПовторное нажатие останавливает про" +
-        "цесс отправки команды дополнительных кннопок");
-            this.SetBootloaderStartButton.UseVisualStyleBackColor = true;
-            this.SetBootloaderStartButton.Visible = false;
-            // 
-            // SetOnlineButton
-            // 
-            this.SetOnlineButton.BackColor = System.Drawing.Color.White;
-            this.SetOnlineButton.ContextMenuStrip = this.ExtendedMenuStrip;
-            this.SetOnlineButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.SetOnlineButton.Image = ((System.Drawing.Image)(resources.GetObject("SetOnlineButton.Image")));
-            this.SetOnlineButton.Location = new System.Drawing.Point(1, 1);
-            this.SetOnlineButton.Margin = new System.Windows.Forms.Padding(0);
-            this.SetOnlineButton.Name = "SetOnlineButton";
-            this.SetOnlineButton.Size = new System.Drawing.Size(20, 20);
-            this.SetOnlineButton.TabIndex = 0;
-            this.ToolTipHelper.SetToolTip(this.SetOnlineButton, "Отправляет команду для входа устройства в Online режим\r\nПовторное нажатие останав" +
-        "ливает процесс отправки команды дополнительных кннопок");
-            this.SetOnlineButton.UseVisualStyleBackColor = false;
-            // 
             // saveToRegToolStripMenuItem
             // 
             this.saveToRegToolStripMenuItem.AutoSize = false;
@@ -3360,6 +3427,11 @@
             this.deleteSaveFromPCToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.deleteSaveFromPCToolStripMenuItem.Text = "Delete from PC";
             this.deleteSaveFromPCToolStripMenuItem.ToolTipText = "Выполняет удаление настройки пользователя из реестра\r\n";
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(151, 6);
             // 
             // toolStripMenuItem1
             // 
@@ -3484,6 +3556,11 @@
             this.IdleToolItem.Text = "Idle";
             this.IdleToolItem.ToolTipText = "Низкий";
             // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(151, 6);
+            // 
             // clearSettingsToolStrip
             // 
             this.clearSettingsToolStrip.Image = ((System.Drawing.Image)(resources.GetObject("clearSettingsToolStrip.Image")));
@@ -3492,6 +3569,11 @@
             this.clearSettingsToolStrip.Text = "Clear settings";
             this.clearSettingsToolStrip.ToolTipText = "Выполняет сброс всех настроек, которые были сохранены пользователем ранее";
             this.clearSettingsToolStrip.Click += new System.EventHandler(this.clearSettingsToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
             // dataBits
             // 
@@ -3519,6 +3601,17 @@
             this.dataBits8.Name = "dataBits8";
             this.dataBits8.Size = new System.Drawing.Size(80, 22);
             this.dataBits8.Text = "8";
+            // 
+            // dataBitsInfo
+            // 
+            this.dataBitsInfo.Enabled = false;
+            this.dataBitsInfo.Name = "dataBitsInfo";
+            this.dataBitsInfo.Size = new System.Drawing.Size(0, 22);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
             // 
             // Parity
             // 
@@ -3568,6 +3661,17 @@
             this.ParitySpace.Size = new System.Drawing.Size(105, 22);
             this.ParitySpace.Text = "Space";
             // 
+            // ParityInfo
+            // 
+            this.ParityInfo.Enabled = false;
+            this.ParityInfo.Name = "ParityInfo";
+            this.ParityInfo.Size = new System.Drawing.Size(0, 22);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 25);
+            // 
             // stopBits
             // 
             this.stopBits.AutoToolTip = false;
@@ -3594,6 +3698,17 @@
             this.stopBits2.Name = "stopBits2";
             this.stopBits2.Size = new System.Drawing.Size(80, 22);
             this.stopBits2.Text = "2";
+            // 
+            // StopBitsInfo
+            // 
+            this.StopBitsInfo.Enabled = false;
+            this.StopBitsInfo.Name = "StopBitsInfo";
+            this.StopBitsInfo.Size = new System.Drawing.Size(0, 22);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
             // AboutButton
             // 
@@ -3636,412 +3751,259 @@
             this.DinoRunningProcessOk.ToolTipText = "Dino goes ROAR\r\nAnd he can stop any task!";
             this.DinoRunningProcessOk.Visible = false;
             // 
-            // SearchChangeFontMenuItem
+            // SignaturePanel
             // 
-            this.SearchChangeFontMenuItem.Image = global::RMDebugger.Properties.Resources.FontDialogControl;
-            this.SearchChangeFontMenuItem.Name = "SearchChangeFontMenuItem";
-            this.SearchChangeFontMenuItem.Size = new System.Drawing.Size(142, 22);
-            this.SearchChangeFontMenuItem.Text = "Change Font";
+            this.SignaturePanel.BackColor = System.Drawing.Color.White;
+            this.SignaturePanel.Controls.Add(this.ThroughSignID);
+            this.SignaturePanel.Controls.Add(this.label1);
+            this.SignaturePanel.Controls.Add(this.TargetSignID);
+            this.SignaturePanel.Controls.Add(this.NeedThrough);
+            this.SignaturePanel.Location = new System.Drawing.Point(9, 177);
+            this.SignaturePanel.Name = "SignaturePanel";
+            this.SignaturePanel.Size = new System.Drawing.Size(163, 46);
+            this.SignaturePanel.TabIndex = 21;
             // 
-            // SearchChangeColorMenuItem
+            // ThroughSignID
             // 
-            this.SearchChangeColorMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("SearchChangeColorMenuItem.Image")));
-            this.SearchChangeColorMenuItem.Name = "SearchChangeColorMenuItem";
-            this.SearchChangeColorMenuItem.Size = new System.Drawing.Size(145, 22);
-            this.SearchChangeColorMenuItem.Text = "Change color";
-            this.SearchChangeColorMenuItem.ToolTipText = "Выбрать цвет выделения";
+            this.ThroughSignID.Enabled = false;
+            this.ThroughSignID.Location = new System.Drawing.Point(109, 23);
+            this.ThroughSignID.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.ThroughSignID.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.ThroughSignID.Name = "ThroughSignID";
+            this.ThroughSignID.Size = new System.Drawing.Size(52, 20);
+            this.ThroughSignID.TabIndex = 2;
+            this.ThroughSignID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.ThroughSignID.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
-            // SearchAutoButton
+            // NeedThrough
             // 
-            this.SearchAutoButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SearchAutoButton.Image = ((System.Drawing.Image)(resources.GetObject("SearchAutoButton.Image")));
-            this.SearchAutoButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.SearchAutoButton.Location = new System.Drawing.Point(211, 24);
-            this.SearchAutoButton.Margin = new System.Windows.Forms.Padding(1);
-            this.SearchAutoButton.Name = "SearchAutoButton";
-            this.SearchAutoButton.Size = new System.Drawing.Size(107, 23);
-            this.SearchAutoButton.TabIndex = 23;
-            this.SearchAutoButton.Text = "Auto";
-            this.SearchAutoButton.UseVisualStyleBackColor = true;
+            this.NeedThrough.AutoSize = true;
+            this.NeedThrough.BackColor = System.Drawing.Color.Transparent;
+            this.NeedThrough.Location = new System.Drawing.Point(3, 25);
+            this.NeedThrough.Margin = new System.Windows.Forms.Padding(0);
+            this.NeedThrough.Name = "NeedThrough";
+            this.NeedThrough.Size = new System.Drawing.Size(107, 17);
+            this.NeedThrough.TabIndex = 4;
+            this.NeedThrough.Text = "Through RM485:";
+            this.NeedThrough.UseVisualStyleBackColor = false;
             // 
-            // HexUploadClearFileList
+            // ExtraButtonsGroup
             // 
-            this.HexUploadClearFileList.BackColor = System.Drawing.Color.Transparent;
-            this.HexUploadClearFileList.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.HexUploadClearFileList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.HexUploadClearFileList.Image = global::RMDebugger.Properties.Resources.Delete;
-            this.HexUploadClearFileList.Location = new System.Drawing.Point(-1, 104);
-            this.HexUploadClearFileList.Margin = new System.Windows.Forms.Padding(0);
-            this.HexUploadClearFileList.Name = "HexUploadClearFileList";
-            this.HexUploadClearFileList.Size = new System.Drawing.Size(22, 22);
-            this.HexUploadClearFileList.TabIndex = 45;
-            this.ToolTipHelper.SetToolTip(this.HexUploadClearFileList, "Очистка списка");
-            this.HexUploadClearFileList.UseVisualStyleBackColor = false;
+            this.ExtraButtonsGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.ExtraButtonsGroup.Controls.Add(this.ButtonsPanel);
+            this.ExtraButtonsGroup.Enabled = false;
+            this.ExtraButtonsGroup.Location = new System.Drawing.Point(9, 223);
+            this.ExtraButtonsGroup.Margin = new System.Windows.Forms.Padding(0);
+            this.ExtraButtonsGroup.Name = "ExtraButtonsGroup";
+            this.ExtraButtonsGroup.Size = new System.Drawing.Size(163, 96);
+            this.ExtraButtonsGroup.TabIndex = 3;
+            this.ExtraButtonsGroup.TabStop = false;
+            this.ExtraButtonsGroup.Text = "Extra buttons";
             // 
-            // HexUploadUpFile
+            // ButtonsPanel
             // 
-            this.HexUploadUpFile.BackColor = System.Drawing.Color.Transparent;
-            this.HexUploadUpFile.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.HexUploadUpFile.Enabled = false;
-            this.HexUploadUpFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.HexUploadUpFile.Image = ((System.Drawing.Image)(resources.GetObject("HexUploadUpFile.Image")));
-            this.HexUploadUpFile.Location = new System.Drawing.Point(-1, 62);
-            this.HexUploadUpFile.Margin = new System.Windows.Forms.Padding(0);
-            this.HexUploadUpFile.Name = "HexUploadUpFile";
-            this.HexUploadUpFile.Size = new System.Drawing.Size(22, 22);
-            this.HexUploadUpFile.TabIndex = 44;
-            this.ToolTipHelper.SetToolTip(this.HexUploadUpFile, "Поднять выленный файл в списке");
-            this.HexUploadUpFile.UseVisualStyleBackColor = false;
+            this.ButtonsPanel.Controls.Add(this.label24);
+            this.ButtonsPanel.Controls.Add(this.SetBootloaderStopButton);
+            this.ButtonsPanel.Controls.Add(this.AutoExtraButtonsTimeout);
+            this.ButtonsPanel.Controls.Add(this.ResetButton);
+            this.ButtonsPanel.Controls.Add(this.SetBootloaderStartButton);
+            this.ButtonsPanel.Controls.Add(this.SetOnlineFreqNumeric);
+            this.ButtonsPanel.Controls.Add(this.label18);
+            this.ButtonsPanel.Controls.Add(this.SetOnlineButton);
+            this.ButtonsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ButtonsPanel.Location = new System.Drawing.Point(3, 16);
+            this.ButtonsPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.ButtonsPanel.Name = "ButtonsPanel";
+            this.ButtonsPanel.Size = new System.Drawing.Size(157, 77);
+            this.ButtonsPanel.TabIndex = 20;
             // 
-            // HexUploadDownFile
+            // label24
             // 
-            this.HexUploadDownFile.BackColor = System.Drawing.Color.Transparent;
-            this.HexUploadDownFile.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.HexUploadDownFile.Enabled = false;
-            this.HexUploadDownFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.HexUploadDownFile.Image = ((System.Drawing.Image)(resources.GetObject("HexUploadDownFile.Image")));
-            this.HexUploadDownFile.Location = new System.Drawing.Point(-1, 83);
-            this.HexUploadDownFile.Margin = new System.Windows.Forms.Padding(0);
-            this.HexUploadDownFile.Name = "HexUploadDownFile";
-            this.HexUploadDownFile.Size = new System.Drawing.Size(22, 22);
-            this.HexUploadDownFile.TabIndex = 43;
-            this.ToolTipHelper.SetToolTip(this.HexUploadDownFile, "Опустить выленный файл в списке");
-            this.HexUploadDownFile.UseVisualStyleBackColor = false;
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(55, 50);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(20, 13);
+            this.label24.TabIndex = 22;
+            this.label24.Text = "ms";
+            this.label24.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+            this.label24.Visible = false;
             // 
-            // HexUploadOpenInExplorer
+            // SetBootloaderStopButton
             // 
-            this.HexUploadOpenInExplorer.BackColor = System.Drawing.Color.Transparent;
-            this.HexUploadOpenInExplorer.Enabled = false;
-            this.HexUploadOpenInExplorer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.HexUploadOpenInExplorer.Image = ((System.Drawing.Image)(resources.GetObject("HexUploadOpenInExplorer.Image")));
-            this.HexUploadOpenInExplorer.Location = new System.Drawing.Point(-1, 41);
-            this.HexUploadOpenInExplorer.Margin = new System.Windows.Forms.Padding(0);
-            this.HexUploadOpenInExplorer.Name = "HexUploadOpenInExplorer";
-            this.HexUploadOpenInExplorer.Size = new System.Drawing.Size(22, 22);
-            this.HexUploadOpenInExplorer.TabIndex = 41;
-            this.ToolTipHelper.SetToolTip(this.HexUploadOpenInExplorer, "Открыть выделенный файл в проводнике");
-            this.HexUploadOpenInExplorer.UseVisualStyleBackColor = false;
+            this.SetBootloaderStopButton.ContextMenuStrip = this.ExtendedMenuStrip;
+            this.SetBootloaderStopButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.SetBootloaderStopButton.Image = ((System.Drawing.Image)(resources.GetObject("SetBootloaderStopButton.Image")));
+            this.SetBootloaderStopButton.Location = new System.Drawing.Point(43, 22);
+            this.SetBootloaderStopButton.Margin = new System.Windows.Forms.Padding(0);
+            this.SetBootloaderStopButton.Name = "SetBootloaderStopButton";
+            this.SetBootloaderStopButton.Size = new System.Drawing.Size(20, 20);
+            this.SetBootloaderStopButton.TabIndex = 3;
+            this.ToolTipHelper.SetToolTip(this.SetBootloaderStopButton, "Отправляет команду для остановки Bootloader\r\nПовторное нажатие останавливает проц" +
+        "есс отправки команды дополнительных кннопок");
+            this.SetBootloaderStopButton.UseVisualStyleBackColor = true;
+            this.SetBootloaderStopButton.Visible = false;
             // 
-            // HexUploadControlPanelButton
+            // ExtendedMenuStrip
             // 
-            this.HexUploadControlPanelButton.BackColor = System.Drawing.Color.Transparent;
-            this.HexUploadControlPanelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.HexUploadControlPanelButton.Image = global::RMDebugger.Properties.Resources.Unhide;
-            this.HexUploadControlPanelButton.Location = new System.Drawing.Point(-1, -1);
-            this.HexUploadControlPanelButton.Margin = new System.Windows.Forms.Padding(0);
-            this.HexUploadControlPanelButton.Name = "HexUploadControlPanelButton";
-            this.HexUploadControlPanelButton.Size = new System.Drawing.Size(22, 22);
-            this.HexUploadControlPanelButton.TabIndex = 40;
-            this.ToolTipHelper.SetToolTip(this.HexUploadControlPanelButton, "Открывает панель управления");
-            this.HexUploadControlPanelButton.UseVisualStyleBackColor = false;
+            this.ExtendedMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ExtendedRepeatMenuItem});
+            this.ExtendedMenuStrip.Name = "ExtendedMenuStrip";
+            this.ExtendedMenuStrip.Size = new System.Drawing.Size(111, 26);
             // 
-            // HexUploadPathButton
+            // ExtendedRepeatMenuItem
             // 
-            this.HexUploadPathButton.BackColor = System.Drawing.Color.Transparent;
-            this.HexUploadPathButton.CausesValidation = false;
-            this.HexUploadPathButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.HexUploadPathButton.Image = ((System.Drawing.Image)(resources.GetObject("HexUploadPathButton.Image")));
-            this.HexUploadPathButton.Location = new System.Drawing.Point(-1, 20);
-            this.HexUploadPathButton.Margin = new System.Windows.Forms.Padding(0);
-            this.HexUploadPathButton.Name = "HexUploadPathButton";
-            this.HexUploadPathButton.Size = new System.Drawing.Size(22, 22);
-            this.HexUploadPathButton.TabIndex = 23;
-            this.HexUploadPathButton.TabStop = false;
-            this.ToolTipHelper.SetToolTip(this.HexUploadPathButton, "Открывает проводник для выбора файлов");
-            this.HexUploadPathButton.UseVisualStyleBackColor = false;
+            this.ExtendedRepeatMenuItem.CheckOnClick = true;
+            this.ExtendedRepeatMenuItem.Name = "ExtendedRepeatMenuItem";
+            this.ExtendedRepeatMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.ExtendedRepeatMenuItem.Text = "Repeat";
             // 
-            // HexUploadButton
+            // AutoExtraButtonsTimeout
             // 
-            this.HexUploadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.HexUploadButton.ContextMenuStrip = this.HexUploadContextMenu;
-            this.HexUploadButton.Enabled = false;
-            this.HexUploadButton.Image = ((System.Drawing.Image)(resources.GetObject("HexUploadButton.Image")));
-            this.HexUploadButton.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.HexUploadButton.Location = new System.Drawing.Point(-1, 230);
-            this.HexUploadButton.Margin = new System.Windows.Forms.Padding(1);
-            this.HexUploadButton.Name = "HexUploadButton";
-            this.HexUploadButton.Size = new System.Drawing.Size(65, 22);
-            this.HexUploadButton.TabIndex = 2;
-            this.HexUploadButton.Text = "Upload";
-            this.HexUploadButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolTipHelper.SetToolTip(this.HexUploadButton, "ПКМ для дополнительных настроек");
-            this.HexUploadButton.UseVisualStyleBackColor = true;
+            this.AutoExtraButtonsTimeout.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.AutoExtraButtonsTimeout.Location = new System.Drawing.Point(1, 43);
+            this.AutoExtraButtonsTimeout.Margin = new System.Windows.Forms.Padding(0);
+            this.AutoExtraButtonsTimeout.Maximum = new decimal(new int[] {
+            5000,
+            0,
+            0,
+            0});
+            this.AutoExtraButtonsTimeout.Name = "AutoExtraButtonsTimeout";
+            this.AutoExtraButtonsTimeout.Size = new System.Drawing.Size(51, 20);
+            this.AutoExtraButtonsTimeout.TabIndex = 21;
+            this.ToolTipHelper.SetToolTip(this.AutoExtraButtonsTimeout, "Период опроса, мс");
+            this.AutoExtraButtonsTimeout.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.AutoExtraButtonsTimeout.Visible = false;
             // 
-            // HideConfigPanel
+            // ResetButton
             // 
-            this.HideConfigPanel.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.HideConfigPanel.Image = global::RMDebugger.Properties.Resources.Unhide;
-            this.HideConfigPanel.Location = new System.Drawing.Point(296, -1);
-            this.HideConfigPanel.Name = "HideConfigPanel";
-            this.HideConfigPanel.Size = new System.Drawing.Size(22, 22);
-            this.HideConfigPanel.TabIndex = 34;
-            this.HideConfigPanel.Tag = "Unhided";
-            this.ToolTipHelper.SetToolTip(this.HideConfigPanel, "Скрыть\\Раскрыть дополнительную панель настроек");
-            this.HideConfigPanel.UseVisualStyleBackColor = true;
+            this.ResetButton.ContextMenuStrip = this.ExtendedMenuStrip;
+            this.ResetButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.ResetButton.Image = ((System.Drawing.Image)(resources.GetObject("ResetButton.Image")));
+            this.ResetButton.Location = new System.Drawing.Point(1, 22);
+            this.ResetButton.Margin = new System.Windows.Forms.Padding(0);
+            this.ResetButton.Name = "ResetButton";
+            this.ResetButton.Size = new System.Drawing.Size(20, 20);
+            this.ResetButton.TabIndex = 1;
+            this.ToolTipHelper.SetToolTip(this.ResetButton, "Отправляет команду для перезагрузки устройства\r\nПовторное нажатие останавливает п" +
+        "роцесс отправки команды дополнительных кннопок");
+            this.ResetButton.UseVisualStyleBackColor = true;
+            this.ResetButton.Visible = false;
             // 
-            // LoadConfigButton
+            // SetBootloaderStartButton
             // 
-            this.LoadConfigButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.LoadConfigButton.Image = ((System.Drawing.Image)(resources.GetObject("LoadConfigButton.Image")));
-            this.LoadConfigButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.LoadConfigButton.Location = new System.Drawing.Point(-1, -1);
-            this.LoadConfigButton.Margin = new System.Windows.Forms.Padding(0);
-            this.LoadConfigButton.Name = "LoadConfigButton";
-            this.LoadConfigButton.Size = new System.Drawing.Size(106, 22);
-            this.LoadConfigButton.TabIndex = 1;
-            this.LoadConfigButton.Text = "Load from fields";
-            this.LoadConfigButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolTipHelper.SetToolTip(this.LoadConfigButton, "Загрузка конфигурации из устройства");
-            this.LoadConfigButton.UseVisualStyleBackColor = true;
+            this.SetBootloaderStartButton.ContextMenuStrip = this.ExtendedMenuStrip;
+            this.SetBootloaderStartButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.SetBootloaderStartButton.Image = ((System.Drawing.Image)(resources.GetObject("SetBootloaderStartButton.Image")));
+            this.SetBootloaderStartButton.Location = new System.Drawing.Point(22, 22);
+            this.SetBootloaderStartButton.Margin = new System.Windows.Forms.Padding(0);
+            this.SetBootloaderStartButton.Name = "SetBootloaderStartButton";
+            this.SetBootloaderStartButton.Size = new System.Drawing.Size(20, 20);
+            this.SetBootloaderStartButton.TabIndex = 2;
+            this.ToolTipHelper.SetToolTip(this.SetBootloaderStartButton, "Отправляет команду для перехода в Bootloader\r\nПовторное нажатие останавливает про" +
+        "цесс отправки команды дополнительных кннопок");
+            this.SetBootloaderStartButton.UseVisualStyleBackColor = true;
+            this.SetBootloaderStartButton.Visible = false;
             // 
-            // LoadFieldsConfigButton
+            // SetOnlineFreqNumeric
             // 
-            this.LoadFieldsConfigButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.LoadFieldsConfigButton.Image = ((System.Drawing.Image)(resources.GetObject("LoadFieldsConfigButton.Image")));
-            this.LoadFieldsConfigButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.LoadFieldsConfigButton.Location = new System.Drawing.Point(209, -1);
-            this.LoadFieldsConfigButton.Name = "LoadFieldsConfigButton";
-            this.LoadFieldsConfigButton.Size = new System.Drawing.Size(88, 22);
-            this.LoadFieldsConfigButton.TabIndex = 32;
-            this.LoadFieldsConfigButton.Text = "Scan fields";
-            this.LoadFieldsConfigButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolTipHelper.SetToolTip(this.LoadFieldsConfigButton, "Сканирование устройство на наличие полей");
-            this.LoadFieldsConfigButton.UseVisualStyleBackColor = true;
+            this.SetOnlineFreqNumeric.Location = new System.Drawing.Point(22, 1);
+            this.SetOnlineFreqNumeric.Margin = new System.Windows.Forms.Padding(0);
+            this.SetOnlineFreqNumeric.Maximum = new decimal(new int[] {
+            240,
+            0,
+            0,
+            0});
+            this.SetOnlineFreqNumeric.Name = "SetOnlineFreqNumeric";
+            this.SetOnlineFreqNumeric.Size = new System.Drawing.Size(41, 20);
+            this.SetOnlineFreqNumeric.TabIndex = 4;
+            this.ToolTipHelper.SetToolTip(this.SetOnlineFreqNumeric, "Канал отправки для входа устройства в Online режим");
+            this.SetOnlineFreqNumeric.Value = new decimal(new int[] {
+            120,
+            0,
+            0,
+            0});
             // 
-            // UploadConfigButton
+            // label18
             // 
-            this.UploadConfigButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.UploadConfigButton.Image = ((System.Drawing.Image)(resources.GetObject("UploadConfigButton.Image")));
-            this.UploadConfigButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.UploadConfigButton.Location = new System.Drawing.Point(104, -1);
-            this.UploadConfigButton.Margin = new System.Windows.Forms.Padding(0);
-            this.UploadConfigButton.Name = "UploadConfigButton";
-            this.UploadConfigButton.Size = new System.Drawing.Size(106, 22);
-            this.UploadConfigButton.TabIndex = 2;
-            this.UploadConfigButton.Text = "Upload to fields";
-            this.UploadConfigButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolTipHelper.SetToolTip(this.UploadConfigButton, "Загрузка конфигурации на устройства");
-            this.UploadConfigButton.UseVisualStyleBackColor = true;
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(63, 5);
+            this.label18.Margin = new System.Windows.Forms.Padding(0);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(25, 13);
+            this.label18.TabIndex = 5;
+            this.label18.Text = "freq";
             // 
-            // TestSettingRMLRButton
+            // SetOnlineButton
             // 
-            this.TestSettingRMLRButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.TestSettingRMLRButton.ContextMenuStrip = this.RMLRTestMenuStrip;
-            this.TestSettingRMLRButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.TestSettingRMLRButton.Image = global::RMDebugger.Properties.Resources.StatusRunning;
-            this.TestSettingRMLRButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.TestSettingRMLRButton.Location = new System.Drawing.Point(128, 212);
-            this.TestSettingRMLRButton.Margin = new System.Windows.Forms.Padding(0);
-            this.TestSettingRMLRButton.Name = "TestSettingRMLRButton";
-            this.TestSettingRMLRButton.Size = new System.Drawing.Size(55, 22);
-            this.TestSettingRMLRButton.TabIndex = 4;
-            this.TestSettingRMLRButton.Text = "Test";
-            this.TestSettingRMLRButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolTipHelper.SetToolTip(this.TestSettingRMLRButton, "Проверка, на сколько хорошо RMLR видит RMP\r\n> ПКМ для дополнительных настроек");
-            this.TestSettingRMLRButton.UseVisualStyleBackColor = true;
+            this.SetOnlineButton.BackColor = System.Drawing.Color.White;
+            this.SetOnlineButton.ContextMenuStrip = this.ExtendedMenuStrip;
+            this.SetOnlineButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.SetOnlineButton.Image = ((System.Drawing.Image)(resources.GetObject("SetOnlineButton.Image")));
+            this.SetOnlineButton.Location = new System.Drawing.Point(1, 1);
+            this.SetOnlineButton.Margin = new System.Windows.Forms.Padding(0);
+            this.SetOnlineButton.Name = "SetOnlineButton";
+            this.SetOnlineButton.Size = new System.Drawing.Size(20, 20);
+            this.SetOnlineButton.TabIndex = 0;
+            this.ToolTipHelper.SetToolTip(this.SetOnlineButton, "Отправляет команду для входа устройства в Online режим\r\nПовторное нажатие останав" +
+        "ливает процесс отправки команды дополнительных кннопок");
+            this.SetOnlineButton.UseVisualStyleBackColor = false;
             // 
-            // UploadSettingRMLRButton
+            // ToolTipHelper
             // 
-            this.UploadSettingRMLRButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.UploadSettingRMLRButton.ContextMenuStrip = this.UploadRMLRButtonMenuStrip;
-            this.UploadSettingRMLRButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.UploadSettingRMLRButton.Image = ((System.Drawing.Image)(resources.GetObject("UploadSettingRMLRButton.Image")));
-            this.UploadSettingRMLRButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.UploadSettingRMLRButton.Location = new System.Drawing.Point(64, 212);
-            this.UploadSettingRMLRButton.Margin = new System.Windows.Forms.Padding(0);
-            this.UploadSettingRMLRButton.Name = "UploadSettingRMLRButton";
-            this.UploadSettingRMLRButton.Size = new System.Drawing.Size(65, 22);
-            this.UploadSettingRMLRButton.TabIndex = 3;
-            this.UploadSettingRMLRButton.Text = "Upload";
-            this.UploadSettingRMLRButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolTipHelper.SetToolTip(this.UploadSettingRMLRButton, "Загрузка настроек в RMLR\r\n> ПКМ для дополнительных настроек");
-            this.UploadSettingRMLRButton.UseVisualStyleBackColor = true;
+            this.ToolTipHelper.AutomaticDelay = 100;
+            this.ToolTipHelper.AutoPopDelay = 5000;
+            this.ToolTipHelper.BackColor = System.Drawing.Color.White;
+            this.ToolTipHelper.ForeColor = System.Drawing.Color.Black;
+            this.ToolTipHelper.InitialDelay = 100;
+            this.ToolTipHelper.ReshowDelay = 20;
             // 
-            // LoadSettingRMLRButton
+            // ErrorMessage
             // 
-            this.LoadSettingRMLRButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.LoadSettingRMLRButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.LoadSettingRMLRButton.Image = ((System.Drawing.Image)(resources.GetObject("LoadSettingRMLRButton.Image")));
-            this.LoadSettingRMLRButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.LoadSettingRMLRButton.Location = new System.Drawing.Point(0, 212);
-            this.LoadSettingRMLRButton.Margin = new System.Windows.Forms.Padding(0);
-            this.LoadSettingRMLRButton.Name = "LoadSettingRMLRButton";
-            this.LoadSettingRMLRButton.Size = new System.Drawing.Size(65, 22);
-            this.LoadSettingRMLRButton.TabIndex = 2;
-            this.LoadSettingRMLRButton.Text = "Load";
-            this.LoadSettingRMLRButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolTipHelper.SetToolTip(this.LoadSettingRMLRButton, "Загрузка настроек из RMLR");
-            this.LoadSettingRMLRButton.UseVisualStyleBackColor = true;
+            this.ErrorMessage.BlinkRate = 500;
+            this.ErrorMessage.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.AlwaysBlink;
+            this.ErrorMessage.ContainerControl = this;
             // 
-            // SortByButton
+            // NotifyMessage
             // 
-            this.SortByButton.ContextMenuStrip = this.RS485SortMenuStrip;
-            this.SortByButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.SortByButton.Image = ((System.Drawing.Image)(resources.GetObject("SortByButton.Image")));
-            this.SortByButton.Location = new System.Drawing.Point(192, 100);
-            this.SortByButton.Margin = new System.Windows.Forms.Padding(0);
-            this.SortByButton.Name = "SortByButton";
-            this.SortByButton.Size = new System.Drawing.Size(21, 21);
-            this.SortByButton.TabIndex = 44;
-            this.SortByButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolTipHelper.SetToolTip(this.SortByButton, "Нажмите правой кнопкой мыши, для выбора сортировки");
-            this.SortByButton.UseVisualStyleBackColor = true;
+            this.NotifyMessage.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.NotifyMessage.ContextMenuStrip = this.notifyMessageStrip;
+            this.NotifyMessage.Icon = ((System.Drawing.Icon)(resources.GetObject("NotifyMessage.Icon")));
+            this.NotifyMessage.Text = "RM Debugger";
+            this.NotifyMessage.Visible = true;
+            this.NotifyMessage.Click += new System.EventHandler(this.NotifyMessage_Click);
             // 
-            // MoreInfoTestRS485
+            // notifyMessageStrip
             // 
-            this.MoreInfoTestRS485.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.MoreInfoTestRS485.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.MoreInfoTestRS485.Image = ((System.Drawing.Image)(resources.GetObject("MoreInfoTestRS485.Image")));
-            this.MoreInfoTestRS485.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.MoreInfoTestRS485.Location = new System.Drawing.Point(192, 76);
-            this.MoreInfoTestRS485.Margin = new System.Windows.Forms.Padding(0);
-            this.MoreInfoTestRS485.Name = "MoreInfoTestRS485";
-            this.MoreInfoTestRS485.Size = new System.Drawing.Size(110, 22);
-            this.MoreInfoTestRS485.TabIndex = 43;
-            this.MoreInfoTestRS485.Text = "More info";
-            this.MoreInfoTestRS485.UseVisualStyleBackColor = true;
-            // 
-            // SaveLogTestRS485
-            // 
-            this.SaveLogTestRS485.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SaveLogTestRS485.Enabled = false;
-            this.SaveLogTestRS485.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.SaveLogTestRS485.Image = ((System.Drawing.Image)(resources.GetObject("SaveLogTestRS485.Image")));
-            this.SaveLogTestRS485.Location = new System.Drawing.Point(282, -1);
-            this.SaveLogTestRS485.Margin = new System.Windows.Forms.Padding(0);
-            this.SaveLogTestRS485.Name = "SaveLogTestRS485";
-            this.SaveLogTestRS485.Size = new System.Drawing.Size(22, 22);
-            this.SaveLogTestRS485.TabIndex = 34;
-            this.SaveLogTestRS485.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolTipHelper.SetToolTip(this.SaveLogTestRS485, "Сохранить текущие данные из таблицы в log файл");
-            this.SaveLogTestRS485.UseVisualStyleBackColor = true;
-            this.SaveLogTestRS485.Click += new System.EventHandler(this.SaveLogTestRS485_Click);
-            // 
-            // ClearDataTestRS485
-            // 
-            this.ClearDataTestRS485.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ClearDataTestRS485.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.ClearDataTestRS485.Image = ((System.Drawing.Image)(resources.GetObject("ClearDataTestRS485.Image")));
-            this.ClearDataTestRS485.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.ClearDataTestRS485.Location = new System.Drawing.Point(192, 28);
-            this.ClearDataTestRS485.Margin = new System.Windows.Forms.Padding(0);
-            this.ClearDataTestRS485.Name = "ClearDataTestRS485";
-            this.ClearDataTestRS485.Size = new System.Drawing.Size(110, 22);
-            this.ClearDataTestRS485.TabIndex = 25;
-            this.ClearDataTestRS485.Text = "Clear all";
-            this.ClearDataTestRS485.UseVisualStyleBackColor = true;
-            this.ClearDataTestRS485.Click += new System.EventHandler(this.ClearDataStatusRM_Click);
-            // 
-            // ClearInfoTestRS485
-            // 
-            this.ClearInfoTestRS485.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ClearInfoTestRS485.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.ClearInfoTestRS485.Image = ((System.Drawing.Image)(resources.GetObject("ClearInfoTestRS485.Image")));
-            this.ClearInfoTestRS485.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.ClearInfoTestRS485.Location = new System.Drawing.Point(192, 52);
-            this.ClearInfoTestRS485.Margin = new System.Windows.Forms.Padding(0);
-            this.ClearInfoTestRS485.Name = "ClearInfoTestRS485";
-            this.ClearInfoTestRS485.Size = new System.Drawing.Size(110, 22);
-            this.ClearInfoTestRS485.TabIndex = 24;
-            this.ClearInfoTestRS485.Text = "Clear info";
-            this.ClearInfoTestRS485.UseVisualStyleBackColor = true;
-            // 
-            // ManualScanToTest
-            // 
-            this.ManualScanToTest.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.ManualScanToTest.Image = ((System.Drawing.Image)(resources.GetObject("ManualScanToTest.Image")));
-            this.ManualScanToTest.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.ManualScanToTest.Location = new System.Drawing.Point(6, 39);
-            this.ManualScanToTest.Margin = new System.Windows.Forms.Padding(0);
-            this.ManualScanToTest.Name = "ManualScanToTest";
-            this.ManualScanToTest.Size = new System.Drawing.Size(90, 22);
-            this.ManualScanToTest.TabIndex = 30;
-            this.ManualScanToTest.Text = "Manual Scan";
-            this.ManualScanToTest.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ManualScanToTest.UseVisualStyleBackColor = true;
-            // 
-            // AddSignatureIDToTest
-            // 
-            this.AddSignatureIDToTest.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.AddSignatureIDToTest.Image = ((System.Drawing.Image)(resources.GetObject("AddSignatureIDToTest.Image")));
-            this.AddSignatureIDToTest.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.AddSignatureIDToTest.Location = new System.Drawing.Point(6, 16);
-            this.AddSignatureIDToTest.Margin = new System.Windows.Forms.Padding(0);
-            this.AddSignatureIDToTest.Name = "AddSignatureIDToTest";
-            this.AddSignatureIDToTest.Size = new System.Drawing.Size(90, 22);
-            this.AddSignatureIDToTest.TabIndex = 26;
-            this.AddSignatureIDToTest.Text = "Signature ID";
-            this.AddSignatureIDToTest.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.AddSignatureIDToTest.UseVisualStyleBackColor = true;
-            // 
-            // ShowExtendedMenu
-            // 
-            this.ShowExtendedMenu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ShowExtendedMenu.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.ShowExtendedMenu.Image = ((System.Drawing.Image)(resources.GetObject("ShowExtendedMenu.Image")));
-            this.ShowExtendedMenu.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ShowExtendedMenu.Location = new System.Drawing.Point(147, -1);
-            this.ShowExtendedMenu.Margin = new System.Windows.Forms.Padding(0);
-            this.ShowExtendedMenu.Name = "ShowExtendedMenu";
-            this.ShowExtendedMenu.Size = new System.Drawing.Size(136, 22);
-            this.ShowExtendedMenu.TabIndex = 31;
-            this.ShowExtendedMenu.Text = "Hide &menu";
-            this.ToolTipHelper.SetToolTip(this.ShowExtendedMenu, "Показать расширенное меню");
-            this.ShowExtendedMenu.UseVisualStyleBackColor = true;
-            // 
-            // StartTestRSButton
-            // 
-            this.StartTestRSButton.Enabled = false;
-            this.StartTestRSButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.StartTestRSButton.Image = ((System.Drawing.Image)(resources.GetObject("StartTestRSButton.Image")));
-            this.StartTestRSButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.StartTestRSButton.Location = new System.Drawing.Point(-1, -1);
-            this.StartTestRSButton.Margin = new System.Windows.Forms.Padding(0);
-            this.StartTestRSButton.Name = "StartTestRSButton";
-            this.StartTestRSButton.Size = new System.Drawing.Size(75, 22);
-            this.StartTestRSButton.TabIndex = 23;
-            this.StartTestRSButton.Text = "&Start Test";
-            this.StartTestRSButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolTipHelper.SetToolTip(this.StartTestRSButton, "Запуск \\ Остановка теста");
-            this.StartTestRSButton.UseVisualStyleBackColor = true;
-            // 
-            // AutoScanToTest
-            // 
-            this.AutoScanToTest.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.AutoScanToTest.Image = ((System.Drawing.Image)(resources.GetObject("AutoScanToTest.Image")));
-            this.AutoScanToTest.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.AutoScanToTest.Location = new System.Drawing.Point(73, -1);
-            this.AutoScanToTest.Margin = new System.Windows.Forms.Padding(0);
-            this.AutoScanToTest.Name = "AutoScanToTest";
-            this.AutoScanToTest.Size = new System.Drawing.Size(75, 22);
-            this.AutoScanToTest.TabIndex = 22;
-            this.AutoScanToTest.Text = "&Auto Scan";
-            this.AutoScanToTest.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ToolTipHelper.SetToolTip(this.AutoScanToTest, "Сканирование путём соединения расширенного и зеркального поисков, что бы найти вс" +
-        "е RS485 устройства в одной шине");
-            this.AutoScanToTest.UseVisualStyleBackColor = true;
-            // 
-            // byAscMenuItem
-            // 
-            this.byAscMenuItem.Checked = true;
-            this.byAscMenuItem.CheckOnClick = true;
-            this.byAscMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.byAscMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("byAscMenuItem.Image")));
-            this.byAscMenuItem.Name = "byAscMenuItem";
-            this.byAscMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.byAscMenuItem.Text = "By Ascending";
-            // 
-            // byDescMenuItem
-            // 
-            this.byDescMenuItem.CheckOnClick = true;
-            this.byDescMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("byDescMenuItem.Image")));
-            this.byDescMenuItem.Name = "byDescMenuItem";
-            this.byDescMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.byDescMenuItem.Text = "By Descending";
+            this.notifyMessageStrip.BackColor = System.Drawing.Color.White;
+            this.notifyMessageStrip.DropShadowEnabled = false;
+            this.notifyMessageStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.OpenDebugFromToolStrip,
+            this.toolStripSeparator6,
+            this.AboutFromToolStrip,
+            this.CloseFromToolStrip});
+            this.notifyMessageStrip.Name = "notifyMessageStrip";
+            this.notifyMessageStrip.Size = new System.Drawing.Size(186, 76);
             // 
             // OpenDebugFromToolStrip
             // 
@@ -4051,6 +4013,12 @@
             this.OpenDebugFromToolStrip.Text = "Open debug window";
             this.OpenDebugFromToolStrip.ToolTipText = "Открыть окно отладки";
             // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.ForeColor = System.Drawing.Color.Black;
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(182, 6);
+            // 
             // AboutFromToolStrip
             // 
             this.AboutFromToolStrip.Image = ((System.Drawing.Image)(resources.GetObject("AboutFromToolStrip.Image")));
@@ -4058,44 +4026,75 @@
             this.AboutFromToolStrip.Size = new System.Drawing.Size(185, 22);
             this.AboutFromToolStrip.Text = "About";
             // 
-            // FreqTestRSNumeric
+            // CloseFromToolStrip
             // 
-            this.FreqTestRSNumeric.Increment = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            this.FreqTestRSNumeric.Location = new System.Drawing.Point(238, 123);
-            this.FreqTestRSNumeric.Margin = new System.Windows.Forms.Padding(1);
-            this.FreqTestRSNumeric.Maximum = new decimal(new int[] {
-            60000,
-            0,
-            0,
-            0});
-            this.FreqTestRSNumeric.Minimum = new decimal(new int[] {
-            200,
-            0,
-            0,
-            0});
-            this.FreqTestRSNumeric.Name = "FreqTestRSNumeric";
-            this.FreqTestRSNumeric.Size = new System.Drawing.Size(64, 20);
-            this.FreqTestRSNumeric.TabIndex = 47;
-            this.FreqTestRSNumeric.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.ToolTipHelper.SetToolTip(this.FreqTestRSNumeric, "Частота обнновления таблицы, мс");
-            this.FreqTestRSNumeric.Value = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
+            this.CloseFromToolStrip.Name = "CloseFromToolStrip";
+            this.CloseFromToolStrip.Size = new System.Drawing.Size(185, 22);
+            this.CloseFromToolStrip.Text = "Close";
             // 
-            // label9
+            // WorkTestTimer
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(203, 125);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(31, 13);
-            this.label9.TabIndex = 48;
-            this.label9.Text = "Freq:";
+            this.WorkTestTimer.Interval = 999;
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.FileName = "RS485Log";
+            this.saveFileDialog.Filter = "Log files (*.log)|*.log|All files (*.*)|*.*";
+            this.saveFileDialog.RestoreDirectory = true;
+            // 
+            // BottomToolStripPanel
+            // 
+            this.BottomToolStripPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.BottomToolStripPanel.Location = new System.Drawing.Point(0, 175);
+            this.BottomToolStripPanel.Name = "BottomToolStripPanel";
+            this.BottomToolStripPanel.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.BottomToolStripPanel.RowMargin = new System.Windows.Forms.Padding(3, 0, 0, 0);
+            this.BottomToolStripPanel.Size = new System.Drawing.Size(150, 0);
+            // 
+            // TopToolStripPanel
+            // 
+            this.TopToolStripPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.TopToolStripPanel.Location = new System.Drawing.Point(0, 0);
+            this.TopToolStripPanel.Name = "TopToolStripPanel";
+            this.TopToolStripPanel.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.TopToolStripPanel.RowMargin = new System.Windows.Forms.Padding(3, 0, 0, 0);
+            this.TopToolStripPanel.Size = new System.Drawing.Size(150, 0);
+            // 
+            // RightToolStripPanel
+            // 
+            this.RightToolStripPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.RightToolStripPanel.Location = new System.Drawing.Point(283, 0);
+            this.RightToolStripPanel.Name = "RightToolStripPanel";
+            this.RightToolStripPanel.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.RightToolStripPanel.RowMargin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.RightToolStripPanel.Size = new System.Drawing.Size(25, 172);
+            // 
+            // LeftToolStripPanel
+            // 
+            this.LeftToolStripPanel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.LeftToolStripPanel.Location = new System.Drawing.Point(0, 0);
+            this.LeftToolStripPanel.Name = "LeftToolStripPanel";
+            this.LeftToolStripPanel.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.LeftToolStripPanel.RowMargin = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.LeftToolStripPanel.Size = new System.Drawing.Size(0, 175);
+            // 
+            // ContentPanel
+            // 
+            this.ContentPanel.Size = new System.Drawing.Size(283, 172);
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.dataGridViewTextBoxColumn1.DataPropertyName = "devType";
+            this.dataGridViewTextBoxColumn1.FillWeight = 60F;
+            this.dataGridViewTextBoxColumn1.HeaderText = "Type";
+            this.dataGridViewTextBoxColumn1.MaxInputLength = 6;
+            this.dataGridViewTextBoxColumn1.MinimumWidth = 60;
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.ReadOnly = true;
+            this.dataGridViewTextBoxColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewTextBoxColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.dataGridViewTextBoxColumn1.Width = 60;
             // 
             // MainDebugger
             // 
@@ -4171,6 +4170,7 @@
             this.RS485Page.ResumeLayout(false);
             this.extendedMenuPanel.ResumeLayout(false);
             this.extendedMenuPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.FreqTestRSNumeric)).EndInit();
             this.RS485SortMenuStrip.ResumeLayout(false);
             this.timerPanelTest.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.numericHoursTest)).EndInit();
@@ -4203,7 +4203,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.SetOnlineFreqNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ErrorMessage)).EndInit();
             this.notifyMessageStrip.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.FreqTestRSNumeric)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

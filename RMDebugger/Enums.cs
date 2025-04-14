@@ -10,6 +10,10 @@
         DO8 = 0x53, DO7R = 0x54, AI4 = 0x55, AI4T = 0x56, LTL9 = 0x57,
         NuLL = 0x00
     }
+    enum RS485Type : byte
+    {
+        RM485 = 0x01, RMH = 0x05
+    }
     enum ProtocolReply : int
     {
         Ok = 0, 
