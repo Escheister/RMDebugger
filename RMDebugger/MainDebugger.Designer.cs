@@ -1234,7 +1234,7 @@
             this.HexUploadClearFileList.BackColor = System.Drawing.Color.Transparent;
             this.HexUploadClearFileList.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.HexUploadClearFileList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.HexUploadClearFileList.Image = global::RMDebugger.Properties.Resources.Delete;
+            this.HexUploadClearFileList.Image = global::RMDebugger.Properties.Resources.DeleteTaskList;
             this.HexUploadClearFileList.Location = new System.Drawing.Point(-1, 104);
             this.HexUploadClearFileList.Margin = new System.Windows.Forms.Padding(0);
             this.HexUploadClearFileList.Name = "HexUploadClearFileList";

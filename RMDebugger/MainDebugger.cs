@@ -1186,8 +1186,8 @@ namespace RMDebugger
         }
         private void SetHexUploadProgress(string filename, int start = 0, int end = 0)
         {
-            UpdateBar.Value = start;
             UpdateBar.Maximum = end;
+            UpdateBar.Value = start;
             if (end > 0) HexFirmwareProgressLabel.Text = $"{start}/{end, -5}";
             else HexFirmwareProgressLabel.Text = $"{0}/{0}";
 
