@@ -87,6 +87,7 @@ namespace RMDebugger
             extendedSettingsToolStrip.CheckedChanged += (s, e) =>
             {
                 ResetButton.Visible =
+                SleepButton.Visible =
                 SetBootloaderStopButton.Visible =
                 SetBootloaderStartButton.Visible =
                 HexExtendedPanel.Visible = extendedSettingsToolStrip.Checked;
@@ -437,6 +438,7 @@ namespace RMDebugger
 
             SetOnlineButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.ONLINE);
             ResetButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.RESET);
+            SleepButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.SLEEP);
             SetBootloaderStartButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.START_BOOTLOADER);
             SetBootloaderStopButton.Click += (s, e) => SendCommandFromExtraButton(CmdOutput.STOP_BOOTLOADER);
             ExtendedRepeatMenuItem.CheckedChanged += (s, e)
@@ -866,7 +868,7 @@ namespace RMDebugger
             if (reply.Status != IPStatus.Success) return;
             try
             {
-                for (int reconnect = 0; reconnect <= 5 && Options.pingOk && !cts.IsCancellationRequested;)
+                for (int reconnect = 0; reconnect <= 5 && Options.pingOk/* && !cts.IsCancellationRequested*/;)
                 {
                     reply = await ping.SendPingAsync(ip, 1000, buffer, pingOptions);
 

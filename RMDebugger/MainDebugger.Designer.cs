@@ -343,6 +343,7 @@
             this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.FontDialog = new System.Windows.Forms.FontDialog();
+            this.SleepButton = new System.Windows.Forms.Button();
             PanelInsidePanel1 = new System.Windows.Forms.Panel();
             PanelInsidePanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.HexPauseAfterUploadMainAndSec)).BeginInit();
@@ -3815,6 +3816,7 @@
             // 
             // ButtonsPanel
             // 
+            this.ButtonsPanel.Controls.Add(this.SleepButton);
             this.ButtonsPanel.Controls.Add(this.label24);
             this.ButtonsPanel.Controls.Add(this.SetBootloaderStopButton);
             this.ButtonsPanel.Controls.Add(this.AutoExtraButtonsTimeout);
@@ -3846,7 +3848,7 @@
             this.SetBootloaderStopButton.ContextMenuStrip = this.ExtendedMenuStrip;
             this.SetBootloaderStopButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.SetBootloaderStopButton.Image = ((System.Drawing.Image)(resources.GetObject("SetBootloaderStopButton.Image")));
-            this.SetBootloaderStopButton.Location = new System.Drawing.Point(43, 22);
+            this.SetBootloaderStopButton.Location = new System.Drawing.Point(64, 22);
             this.SetBootloaderStopButton.Margin = new System.Windows.Forms.Padding(0);
             this.SetBootloaderStopButton.Name = "SetBootloaderStopButton";
             this.SetBootloaderStopButton.Size = new System.Drawing.Size(20, 20);
@@ -3900,7 +3902,7 @@
             this.ResetButton.ContextMenuStrip = this.ExtendedMenuStrip;
             this.ResetButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.ResetButton.Image = ((System.Drawing.Image)(resources.GetObject("ResetButton.Image")));
-            this.ResetButton.Location = new System.Drawing.Point(1, 22);
+            this.ResetButton.Location = new System.Drawing.Point(22, 22);
             this.ResetButton.Margin = new System.Windows.Forms.Padding(0);
             this.ResetButton.Name = "ResetButton";
             this.ResetButton.Size = new System.Drawing.Size(20, 20);
@@ -3915,7 +3917,7 @@
             this.SetBootloaderStartButton.ContextMenuStrip = this.ExtendedMenuStrip;
             this.SetBootloaderStartButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.SetBootloaderStartButton.Image = ((System.Drawing.Image)(resources.GetObject("SetBootloaderStartButton.Image")));
-            this.SetBootloaderStartButton.Location = new System.Drawing.Point(22, 22);
+            this.SetBootloaderStartButton.Location = new System.Drawing.Point(43, 22);
             this.SetBootloaderStartButton.Margin = new System.Windows.Forms.Padding(0);
             this.SetBootloaderStartButton.Name = "SetBootloaderStartButton";
             this.SetBootloaderStartButton.Size = new System.Drawing.Size(20, 20);
@@ -4095,6 +4097,21 @@
             this.dataGridViewTextBoxColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridViewTextBoxColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.dataGridViewTextBoxColumn1.Width = 60;
+            // 
+            // SleepButton
+            // 
+            this.SleepButton.ContextMenuStrip = this.ExtendedMenuStrip;
+            this.SleepButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.SleepButton.Image = global::RMDebugger.Properties.Resources.Hide;
+            this.SleepButton.Location = new System.Drawing.Point(1, 22);
+            this.SleepButton.Margin = new System.Windows.Forms.Padding(0);
+            this.SleepButton.Name = "SleepButton";
+            this.SleepButton.Size = new System.Drawing.Size(20, 20);
+            this.SleepButton.TabIndex = 23;
+            this.ToolTipHelper.SetToolTip(this.SleepButton, "Отправляет команду для режима сна\r\nПовторное нажатие останавливает процесс отправ" +
+        "ки команды дополнительных кннопок");
+            this.SleepButton.UseVisualStyleBackColor = true;
+            this.SleepButton.Visible = false;
             // 
             // MainDebugger
             // 
@@ -4484,5 +4501,6 @@
         private System.Windows.Forms.NumericUpDown InfoTimeout;
         private System.Windows.Forms.NumericUpDown FreqTestRSNumeric;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Button SleepButton;
     }
 }
