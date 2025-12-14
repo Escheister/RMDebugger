@@ -1,17 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Net.Sockets;
+﻿using CRC16;
+using Enums;
+using StaticSettings;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Ports;
-using System.Text;
 using System.Linq;
-using System;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
 
-using StaticSettings;
-using ProtocolEnums;
-using CRC16;
-
-namespace RMDebugger
+namespace RMDebugger.Main
 {
     internal class CommandsOutput : IDisposable
     {
@@ -19,7 +18,7 @@ namespace RMDebugger
         protected delegate Task<byte[]> ReceiveDataDelegate(int length, int ms = 250);
         public delegate void ClearBufferDelegate();
 
-        public delegate void GetReplyEvent(string msg);
+        public delegate void GetReplyEvent(ProtocolReply reply);
         public delegate void GetDebugEvent(string msg, ProtocolReply reply);
         public event GetReplyEvent ToReply;
         public event GetDebugEvent ToDebug;
@@ -50,10 +49,10 @@ namespace RMDebugger
                 Port = ser;
                 sendData += (byte[] data) => Port.Write(data, 0, data.Length);
                 receiveData = SerialReceiveData;
-                clearBuffer += () => 
-                { 
-                    if (Port.IsOpen && Port.BytesToRead > 0) 
-                        Port.DiscardInBuffer(); 
+                clearBuffer += () =>
+                {
+                    if (Port.IsOpen && Port.BytesToRead > 0)
+                        Port.DiscardInBuffer();
                 };
             }
             else if (sender is Socket sock)
@@ -61,8 +60,8 @@ namespace RMDebugger
                 Sock = sock;
                 sendData += (byte[] data) => Sock.Send(data);
                 receiveData = SocketReceiveData;
-                clearBuffer += () => 
-                { 
+                clearBuffer += () =>
+                {
                     if (Sock.Connected && Sock.Available > 0)
                         Sock.Receive(new byte[Sock.Available]);
                 };
@@ -72,8 +71,8 @@ namespace RMDebugger
 
         public byte[] ReturnWithoutThrough(byte[] cmdIn)
         {
-            if (Enum.TryParse(Enum.GetName(typeof(CmdInput), 
-                (cmdIn[2] << 8) | cmdIn[3]), out CmdInput cmdThrough) 
+            if (Enum.TryParse(Enum.GetName(typeof(CmdInput),
+                (cmdIn[2] << 8) | cmdIn[3]), out CmdInput cmdThrough)
                 && cmdThrough == CmdInput.ROUTING_THROUGH)
             {
                 byte[] _buffer = new byte[cmdIn.Length - 4];
@@ -145,8 +144,8 @@ namespace RMDebugger
         {
             try
             {
-                return cmdMain ==       (CmdInput)((bufferIn[6] << 8) | bufferIn[7])
-                    && cmdThrough ==    (CmdInput)((bufferIn[2] << 8) | bufferIn[3]);
+                return cmdMain == (CmdInput)((bufferIn[6] << 8) | bufferIn[7])
+                    && cmdThrough == (CmdInput)((bufferIn[2] << 8) | bufferIn[3]);
             }
             catch { return false; }
         }
@@ -169,7 +168,7 @@ namespace RMDebugger
         public RmResult CheckResult(byte[] bufferIn)
         {
             try { return (RmResult)bufferIn[bufferIn.Length - 3]; }
-            catch{ return RmResult.Error; }
+            catch { return RmResult.Error; }
         }
         public byte[] FormatCmdOut(byte[] rmSign, CmdOutput cmd, byte ix = 0x00, bool crc = true)
         {
@@ -177,7 +176,7 @@ namespace RMDebugger
             data.AddRange(rmSign);
             data.AddRange(BitConverter.GetBytes((ushort)cmd).Reverse());
             if (ix != 0xff) data.Add(ix);
-            if (crc) return new CRC16_CCITT_FALSE().CrcCalc(data.ToArray());
+            if (crc) return CRC16_CCITT_FALSE.CrcCalc(data.ToArray());
             return data.ToArray();
         }
         public byte[] CmdThroughRm(byte[] cmdIn, byte[] rmThrough, CmdOutput cmd)
@@ -186,7 +185,7 @@ namespace RMDebugger
             rmThrough.CopyTo(cmdOut, 0);
             ((ushort)cmd).GetReverseBytes().CopyTo(cmdOut, 2);
             cmdIn.CopyTo(cmdOut, 4);
-            return new CRC16_CCITT_FALSE().CrcCalc(cmdOut);
+            return CRC16_CCITT_FALSE.CrcCalc(cmdOut);
         }
 
         async private Task<byte[]> SocketReceiveData(int length, int ms = 250)
@@ -244,7 +243,7 @@ namespace RMDebugger
                     break;
                 default:
                     Enum.TryParse(Enum.GetName(typeof(CmdOutput), cmdOne), out cmdMain);
-                    cmdThrough = CmdInput.NONE;
+                    cmdThrough = CmdInput.Null;
                     through = false;
                     break;
             }
@@ -261,11 +260,11 @@ namespace RMDebugger
             await Task.WhenAll(receiveTask);
             byte[] cmdIn = receiveTask.Result;
             ProtocolReply reply = through
-                ? GetReply(cmdIn,   new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
+                ? GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
                                     new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
-                : GetReply(cmdIn,   new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
+                : GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
             message += $"{DateTime.Now:dd.HH:mm:ss:fff} : {reply,-6}<- {cmdIn.GetStringOfBytes()}\n";
-            ToReply?.Invoke(reply.ToString());
+            ToReply?.Invoke(reply);
             ToDebug?.Invoke(message, reply);
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
             return new Tuple<RmResult, ProtocolReply>(CheckResult(cmdIn), reply);
@@ -282,14 +281,14 @@ namespace RMDebugger
             await Task.WhenAll(receiveTask);
             byte[] cmdIn = receiveTask.Result;
             ProtocolReply reply = through
-                ? GetReply(cmdIn,   new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
+                ? GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdThrough,
                                     new byte[2] { cmdOut[4], cmdOut[5] }, cmdMain)
-                : GetReply(cmdIn,   new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
+                : GetReply(cmdIn, new byte[2] { cmdOut[0], cmdOut[1] }, cmdMain);
             reply = (reply == ProtocolReply.Ok && cmdMain == CmdInput.LOAD_DATA_PAGE)
                     ? GetDataReply(cmdIn, cmdOut)
                     : reply;
             message += $"{DateTime.Now:dd.HH:mm:ss:fff} : {reply,-6}<- {cmdIn.GetStringOfBytes()}\n";
-            ToReply?.Invoke(reply.ToString());
+            ToReply?.Invoke(reply);
             ToDebug?.Invoke(message, reply);
             if (reply != ProtocolReply.Ok) throw new Exception(reply.ToString());
             return new Tuple<byte[], ProtocolReply>(cmdIn, reply);

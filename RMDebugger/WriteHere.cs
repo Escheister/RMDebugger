@@ -1,13 +1,14 @@
-﻿using System.Windows.Forms;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
+using RMDebugger.Main;
 using System;
+using System.Windows.Forms;
 
 namespace RMDebugger
 {
     public partial class WriteHere : Form
     {
-        MainDebugger debugger;
-        public WriteHere(MainDebugger _debugger)
+        MainForm debugger;
+        public WriteHere(MainForm _debugger)
         {
             InitializeComponent();
             debugger = _debugger;
@@ -44,10 +45,10 @@ namespace RMDebugger
         private void CancelButton_Click(object sender, EventArgs e) => Close();
         private void FolderNameBox_TextChanged(object sender, EventArgs e)
         {
-            if (FolderNameBox.Text.Length > 0) saveButton.Enabled = true; 
+            if (FolderNameBox.Text.Length > 0) saveButton.Enabled = true;
             else saveButton.Enabled = false;
         }
-        
+
         private void saveButton_Click(object sender, EventArgs e)
         {
             RegEditSaveParams();

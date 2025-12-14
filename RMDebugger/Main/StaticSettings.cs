@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Debugger;
+using Enums;
+using RMDebugger.Main;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using System;
-
-using ProtocolEnums;
-using RMDebugger;
+using System.Threading.Tasks;
 
 namespace StaticSettings
 {
@@ -17,7 +17,7 @@ namespace StaticSettings
 
 
         public static DataDebuggerForm debugForm = null;
-        public static MainDebugger debugger = null;
+        public static MainForm debugger = null;
 
         //Socket
         public static bool pingOk { get; set; } = false;
@@ -27,7 +27,7 @@ namespace StaticSettings
         public static bool mainIsAvailable { get; set; } = false;
 
         public static bool through { get; set; } = false;
-        public static bool showMessages {  get; set; }
+        public static bool showMessages { get; set; }
 
         //Search
         public static int timeoutSearch { get; set; } = 200;

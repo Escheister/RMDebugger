@@ -1,13 +1,12 @@
-﻿using System.Resources;
-using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿using System.Reflection;
+using System.Resources;
 using System.Runtime.InteropServices;
 
 // Общие сведения об этой сборке предоставляются следующим набором
 // набора атрибутов. Измените значения этих атрибутов для изменения сведений,
 // связанных со сборкой.
 [assembly: AssemblyTitle("RM Debugger")]
-[assembly: AssemblyDescription("Программа для поиска, получения мощности сигнала и прошивки (радио)устройств.")]
+[assembly: AssemblyDescription("Программа для отладки устройств, работающих через протокол SPPT")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Denis Ekimchenko")]
 [assembly: AssemblyProduct("RM Debugger")]
@@ -33,6 +32,6 @@ using System.Runtime.InteropServices;
 // Можно задать все значения или принять номера сборки и редакции по умолчанию 
 // используя "*", как показано ниже:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.9.2.3")]
-[assembly: AssemblyFileVersion("1.9.2.3")]
+[assembly: AssemblyVersion("1.9.3.0")]
+[assembly: AssemblyFileVersion("1.9.3.0")]
 [assembly: NeutralResourcesLanguage("")]

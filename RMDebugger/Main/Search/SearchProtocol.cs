@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using System;
-
+﻿using Enums;
+using RMDebugger.Main;
 using StaticSettings;
-using ProtocolEnums;
-using RMDebugger;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SearchProtocol
 {
@@ -87,8 +86,8 @@ namespace SearchProtocol
                 }
             return data;
         }
-        public int GetVersion(byte[] bufferIn)  => bufferIn[bufferIn.Length - 3] << 8
-                                                |  bufferIn[bufferIn.Length - 4];
+        public int GetVersion(byte[] bufferIn) => bufferIn[bufferIn.Length - 3] << 8
+                                                | bufferIn[bufferIn.Length - 4];
         public DevType GetType(byte[] bufferIn) => (DevType)bufferIn[5];
     }
     class DeviceData

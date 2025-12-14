@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System;
+using System.Reflection;
+using System.Windows.Forms;
 
-namespace RMDebugger
+namespace RMDebugger.Main
 {
     public static class Extension
     {
@@ -41,7 +41,7 @@ namespace RMDebugger
         }
         public static string GetPropertyByHeader(this DataGridView dgv, object header)
         {
-            foreach(DataGridViewColumn column in dgv.Columns)
+            foreach (DataGridViewColumn column in dgv.Columns)
                 if (column.HeaderText == header.ToString()) return column.DataPropertyName;
             return null;
         }

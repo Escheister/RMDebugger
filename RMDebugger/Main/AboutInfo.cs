@@ -1,12 +1,11 @@
-﻿using System.Windows.Forms;
-using System.Diagnostics;
-using System.Reflection;
-using System.IO;
+﻿using CRC32;
 using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Windows.Forms;
 
-using CRC16;
-
-namespace File_Verifier
+namespace FileVerifier
 {
     public partial class AboutInfo : Form
     {
@@ -16,16 +15,16 @@ namespace File_Verifier
             AddEvents();
         }
 
-        private void AddEvents() => 
-            this.Load += (s, e) =>
+        private void AddEvents() =>
+            Load += (s, e) =>
                 {
                     using (FileStream fs = File.OpenRead(Assembly.GetExecutingAssembly().Location))
                     {
                         byte[] fileData = new byte[fs.Length];
                         fs.Read(fileData, 0, (int)fs.Length);
-                        crcBox.Text = BitConverter.ToString(new CRC32().CRC_calc(fileData)).Replace("-", string.Empty);
+                        crcBox.Text = BitConverter.ToString(CRC32_ISO_HDLC.CrcCalc(fileData)).Replace("-", string.Empty);
                     }
-                    verBox.Text = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion.ToString();
+                    verBox.Text = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
                 };
     }
 }

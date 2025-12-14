@@ -1,8 +1,7 @@
-﻿using System.ComponentModel;
-
-using ProtocolEnums;
-using RMDebugger;
-using CRC16;
+﻿using CRC16;
+using Enums;
+using RMDebugger.Main;
+using System.ComponentModel;
 
 namespace ConfigurationProtocol
 {
@@ -43,7 +42,7 @@ namespace ConfigurationProtocol
             if (factory)
             {
                 byte[] valueKoi8r = new byte[size];
-                for (int i = 0; i < size-1; i++) 
+                for (int i = 0; i < size - 1; i++)
                     valueKoi8r[i] = 0xff;
                 return valueKoi8r;
             }
@@ -55,7 +54,7 @@ namespace ConfigurationProtocol
             _targetSign.CopyTo(loadField, 0);
             ((ushort)CmdOutput.GET_CONFIG).GetReverseBytes().CopyTo(loadField, 2);
             field.CopyTo(loadField, 4);
-            return new CRC16_CCITT_FALSE().CrcCalc(loadField);
+            return CRC16_CCITT_FALSE.CrcCalc(loadField);
         }
         private byte[] FormationUploadConfig(byte[] field, byte[] value)
         {
@@ -64,7 +63,7 @@ namespace ConfigurationProtocol
             ((ushort)CmdOutput.SET_CONFIG).GetReverseBytes().CopyTo(loadField, 2);
             field.CopyTo(loadField, 4);
             value.CopyTo(loadField, 4 + field.Length);
-            return new CRC16_CCITT_FALSE().CrcCalc(loadField);
+            return CRC16_CCITT_FALSE.CrcCalc(loadField);
         }
         private byte[] FormationGetFieldsByIX(byte ix)
         {
@@ -72,7 +71,7 @@ namespace ConfigurationProtocol
             _targetSign.CopyTo(loadField, 0);
             ((ushort)CmdOutput.GET_CONFIG_IX).GetReverseBytes().CopyTo(loadField, 2);
             new byte[] { ix }.CopyTo(loadField, 4);
-            return new CRC16_CCITT_FALSE().CrcCalc(loadField);
+            return CRC16_CCITT_FALSE.CrcCalc(loadField);
         }
 
         public byte[] ConfigLoad(string field)
@@ -128,7 +127,7 @@ namespace ConfigurationProtocol
                     return ConfigRule.len16;
                 case "lamp":
                     return ConfigRule.len4;
-                default: 
+                default:
                     return ConfigRule.NoRule;
             }
         }
@@ -144,14 +143,15 @@ namespace ConfigurationProtocol
                     return value.Length > 0 && value.Length <= 16;
                 case ConfigRule.len4:
                     return value.Length > 0 && value.Length <= 4;
-                case ConfigRule.NoRule: 
-                    goto default; 
-                default: 
+                case ConfigRule.NoRule:
+                    goto default;
+                default:
                     return true;
             }
         }
         public string GetFieldToolTip()
-            => fieldName switch {
+            => fieldName switch
+            {
                 "tag_min_pwr" => "Порог мощности сигнала",
                 "tag_pack_cnt" => "Количество пакетов, по которому определяется метка",
                 "tag_ttl" => "Время жизни записи о метке",
@@ -159,7 +159,8 @@ namespace ConfigurationProtocol
                 "ps_rise_threshold" => "На сколько должны вырасти показания датчика приближения, чтобы это воспринималось как наличие объекта перед УРС",
                 "als_drop_threshold" => "Во сколько раз должна упасть освещенность, относительно средней, чтобы вместе со срабатыванием датчика приближения это воспринималось как помещение объекта к УРС",
                 "als_ps_delay" => "Сколько раз, после первого срабатывания, должно выполниться условие по датчику освещенности и приближения, чтобы изменилось сосояние с \"Объет далеко\" на \"Объет близко\"",
-                _ => "" };
+                _ => ""
+            };
         public void ClearValues()
         {
             uploadValue = string.Empty;
@@ -172,7 +173,7 @@ namespace ConfigurationProtocol
 
         private ConfigRule Rule = ConfigRule.NoRule;
         [Browsable(false)]
-        public ConfigRule rule 
+        public ConfigRule rule
         {
             get => Rule;
             set
@@ -183,7 +184,8 @@ namespace ConfigurationProtocol
         }
 
         private string FieldName;
-        public string fieldName {
+        public string fieldName
+        {
             get => FieldName;
             set
             {
@@ -197,12 +199,12 @@ namespace ConfigurationProtocol
         public bool fieldActive { get; set; }
         public string loadValue { get; set; }
         private string UploadValue;
-        public string uploadValue 
+        public string uploadValue
         {
             get => UploadValue;
             set
             {
-                if (string.IsNullOrEmpty(value) || CheckRule(value)) 
+                if (string.IsNullOrEmpty(value) || CheckRule(value))
                     UploadValue = value;
             }
         }

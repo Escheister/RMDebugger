@@ -7,7 +7,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{A303BB4A-3345-40B8-BFF6-DF4A7CED2E8A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>RMDebugger</RootNamespace>
+    <RootNamespace>RMDebugger.Main</RootNamespace>
     <AssemblyName>RM Debugger</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -78,52 +78,97 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutInfo.cs">
+    <Compile Include="Main\AboutInfo.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutInfo.designer.cs">
+    <Compile Include="Main\AboutInfo.designer.cs">
       <DependentUpon>AboutInfo.cs</DependentUpon>
     </Compile>
-    <Compile Include="CommandsOutput.cs" />
-    <Compile Include="CSVLib.cs" />
-    <Compile Include="Enums.cs" />
-    <Compile Include="BootloaderProtocol.cs" />
-    <Compile Include="CRC16.cs" />
-    <Compile Include="Extension.cs" />
-    <Compile Include="MainDebugger.cs">
+    <Compile Include="Main\CommandsOutput.cs" />
+    <Compile Include="Main\Config\ConfigEvents.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainDebugger.Designer.cs">
-      <DependentUpon>MainDebugger.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DataDebugger.cs">
+    <Compile Include="Main\Config\ConfigMethods.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DataDebugger.Designer.cs">
+    <Compile Include="Main\ExtraButtons\ExtraButtonsEvents.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\ExtraButtons\ExtraButtonsMethods.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\Info\CSVLib.cs" />
+    <Compile Include="Main\CRC\CRC32.cs" />
+    <Compile Include="Main\Enums\Devices.cs" />
+    <Compile Include="Main\Enums\Enums.cs" />
+    <Compile Include="Main\Info\InfoMethods.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\Info\InfoEvents.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\Settings\RMLR\SettingsRmlrMethods.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\Settings\RMLR\SettingsRmlrEvents.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\Test\RS485\TestRs485Events.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\Test\RS485\TestRs485Methods.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\Uploader\BootloaderProtocol.cs" />
+    <Compile Include="Main\CRC\CRC16_CCITT_FALSE.cs" />
+    <Compile Include="Main\Extension.cs" />
+    <Compile Include="Main\Enums\Protocol.cs" />
+    <Compile Include="Main\Search\SearchEvents.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debug\DataDebugger.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debug\DataDebugger.Designer.cs">
       <DependentUpon>DataDebugger.cs</DependentUpon>
     </Compile>
-    <Compile Include="ForTests.cs" />
+    <Compile Include="Main\Test\RS485\ForTests.cs" />
+    <Compile Include="Main\Search\SearchMethods.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\Uploader\UploaderEvents.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\Uploader\UploaderMethods.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Configuration.cs" />
-    <Compile Include="SearchProtocol.cs" />
-    <Compile Include="RMLR.cs" />
+    <Compile Include="Main\Config\Configuration.cs" />
+    <Compile Include="Main\Search\SearchProtocol.cs" />
+    <Compile Include="Main\Settings\RMLR\RMLR.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="Information.cs" />
-    <Compile Include="StaticSettings.cs" />
+    <Compile Include="Main\Info\Information.cs" />
+    <Compile Include="Main\StaticSettings.cs" />
     <Compile Include="WriteHere.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="WriteHere.Designer.cs">
       <DependentUpon>WriteHere.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AboutInfo.resx">
+    <EmbeddedResource Include="Main\AboutInfo.resx">
       <DependentUpon>AboutInfo.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MainDebugger.resx">
-      <DependentUpon>MainDebugger.cs</DependentUpon>
+    <EmbeddedResource Include="Main\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DataDebugger.resx">
+    <EmbeddedResource Include="Debug\DataDebugger.resx">
       <DependentUpon>DataDebugger.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -149,8 +194,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="RMDebugger_TemporaryKey.pfx" />
-    <None Include="RSSI_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

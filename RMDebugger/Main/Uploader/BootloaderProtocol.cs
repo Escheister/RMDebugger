@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using ProtocolEnums;
-using System.Linq;
-using System.IO;
+﻿using CRC16;
+using Enums;
+using RMDebugger.Main;
 using System;
-
-using RMDebugger;
-using CRC16;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BootloaderProtocol
 {
@@ -77,13 +76,13 @@ namespace BootloaderProtocol
         private byte[] BuildDataCmd(byte[] data) => FormatUploadData(data);
         private byte[] BuildDataCmdThrough(byte[] data) => CmdThroughRm(BuildDataCmd(data), _throughSign, CmdOutput.ROUTING_PROG);
 
-        private byte[] FormatUploadData(byte[] data)
+        private byte[] FormatUploadData(IEnumerable<byte> data)
         {
-            byte[] loadField = new byte[4 + data.Length];
-            _targetSign.CopyTo(loadField, 0);
-            ((ushort)CmdOutput.LOAD_DATA_PAGE).GetReverseBytes().CopyTo(loadField, 2);
-            data.CopyTo(loadField, 4);
-            return new CRC16_CCITT_FALSE().CrcCalc(loadField);
+            List<byte> loadField = new List<byte>();
+            loadField.AddRange(_targetSign);
+            loadField.AddRange(((ushort)CmdOutput.LOAD_DATA_PAGE).GetReverseBytes());
+            loadField.AddRange(data);
+            return CRC16_CCITT_FALSE.CrcCalc(loadField);
         }
         private void GetStringsFromFile(string path, out string[] fileStrings)
         {
@@ -113,10 +112,10 @@ namespace BootloaderProtocol
                 if (!IntelHexCheckSum(byteString)) throw new Exception($"{FileCheck.CrcError}: {i + 1}");
                 switch ((RecordType)byteString[3])
                 {
-                    case RecordType.ESAR: goto default;
-                    case RecordType.SSAR: continue;
                     case RecordType.Rec: break;
                     case RecordType.EndRec: continue;
+                    case RecordType.ESAR: goto default;
+                    case RecordType.SSAR: continue;
                     case RecordType.ELAR: break;
                     case RecordType.SLAR: continue;
                     default: throw new Exception($"{FileCheck.CmdError}: {i + 1}");
@@ -135,7 +134,7 @@ namespace BootloaderProtocol
             while (pageSize > data.Count)
             {
                 byte[] dequeueArray = hexQueue.Dequeue();
-                switch ((RecordType)dequeueArray[3]) 
+                switch ((RecordType)dequeueArray[3])
                 {
                     case RecordType.Rec: // 0x00
                         if (data.Count == 0) _addrHex = new byte[] { dequeueArray[2], dequeueArray[1] };
@@ -152,17 +151,18 @@ namespace BootloaderProtocol
             cmd.AddRange(_addrElar);
             cmd.AddRange(data);
             int progress = hexLinesCount - hexQueue.Count;
-            SetProgress?.BeginInvoke(   hexFilename,
-                                        progress == hexLinesCount 
-                                            ? 0 
-                                            : progress, 
+            SetProgress?.BeginInvoke(hexFilename,
+                                        progress == hexLinesCount
+                                            ? 0
+                                            : progress,
                                         hexLinesCount, null, null);
             dataOutput = cmd.ToArray();
         }
     }
     public class FileInfoClass
     {
-        public FileInfoClass(string filepath) {
+        public FileInfoClass(string filepath)
+        {
             _filepath = filepath;
             _filename = Path.GetFileName(filepath);
             _linesCount = File.ReadAllLines(filepath).Length;

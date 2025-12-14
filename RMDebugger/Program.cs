@@ -1,5 +1,6 @@
-﻿using System.Windows.Forms;
+﻿using RMDebugger.Main;
 using System;
+using System.Windows.Forms;
 
 namespace RMDebugger
 {
@@ -13,7 +14,7 @@ namespace RMDebugger
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainDebugger());
+            Application.Run(new MainForm());
         }
     }
 }

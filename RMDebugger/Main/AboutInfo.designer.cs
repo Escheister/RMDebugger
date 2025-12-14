@@ -1,4 +1,4 @@
-﻿namespace File_Verifier
+﻿namespace FileVerifier
 {
     partial class AboutInfo
     {

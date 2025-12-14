@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Reflection;
-using System;
-
-using System.Drawing;
+﻿using CRC16;
+using Enums;
 using SearchProtocol;
 using StaticSettings;
-using ProtocolEnums;
-using CRC16;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Reflection;
+using System.Threading.Tasks;
 
-
-namespace RMDebugger
+namespace RMDebugger.Main
 {
     internal class ForTests : Searching
     {
@@ -92,8 +90,8 @@ namespace RMDebugger
 
         async public Task GetDataFromDevice(DeviceClass device, CmdOutput cmdOutput)
         {
-            Tuple <byte[], ProtocolReply> reply = await GetData(
-                FormatCmdOut(device.devSign.GetBytes(), cmdOutput, 0xff), 
+            Tuple<byte[], ProtocolReply> reply = await GetData(
+                FormatCmdOut(device.devSign.GetBytes(), cmdOutput, 0xff),
                 GetSizeCMD(cmdOutput, device.devType), 50);
             device.devTx++;
             if (!AddValueToDevice(device, reply.Item2)) return;
@@ -113,7 +111,7 @@ namespace RMDebugger
                 catch
                 {
                     AddValueToDevice(device, ProtocolReply.WData);
-                    return; 
+                    return;
                 }
             }
             device.devRx++;
@@ -189,15 +187,18 @@ namespace RMDebugger
         public int devTx { get; set; }
         private double SetPercentErrors()
         {
-            try {
+            try
+            {
                 return 100.000 - (100.000 * DeviceRx / devTx);
-            } catch (DivideByZeroException) {
+            }
+            catch (DivideByZeroException)
+            {
                 return 0;
             }
         }
         private int DeviceRx;
-        public int devRx 
-        { 
+        public int devRx
+        {
             get => DeviceRx;
             set
             {
@@ -237,18 +238,19 @@ namespace RMDebugger
             }
         }
 
-        private int SetError() => 
-            devErrors = 
-                DeviceNoReply + 
-                DeviceBadCRC + 
-                DeviceBadReply + 
+        private int SetError() =>
+            devErrors =
+                DeviceNoReply +
+                DeviceBadCRC +
+                DeviceBadReply +
                 DeviceBadRadio;
 
         private int DeviceNoReply;
         public int devNoReply
         {
             get => DeviceNoReply;
-            set {
+            set
+            {
                 DeviceNoReply = value;
                 SetError();
             }
@@ -258,7 +260,8 @@ namespace RMDebugger
         public int devBadReply
         {
             get => DeviceBadReply;
-            set {
+            set
+            {
                 DeviceBadReply = value;
                 SetError();
             }
@@ -268,7 +271,8 @@ namespace RMDebugger
         public int devBadCRC
         {
             get => DeviceBadCRC;
-            set {
+            set
+            {
                 DeviceBadCRC = value;
                 SetError();
             }
@@ -278,7 +282,8 @@ namespace RMDebugger
         public int devBadRadio
         {
             get => DeviceBadRadio;
-            set {
+            set
+            {
                 DeviceBadRadio = value;
                 SetError();
             }

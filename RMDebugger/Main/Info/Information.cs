@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Enums;
 using System;
-
-using ProtocolEnums;
-using System.Text;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
-namespace RMDebugger
+namespace RMDebugger.Main
 {
     internal class Information : CommandsOutput
     {
@@ -36,7 +35,7 @@ namespace RMDebugger
         private byte[] ByteArrayParse(byte[] data, byte exception)
         {
             List<byte> result = new List<byte>();
-            foreach(byte b in data)
+            foreach (byte b in data)
             {
                 if (b == exception) break;
                 result.Add(b);
@@ -55,12 +54,14 @@ namespace RMDebugger
                     byte[] location = new byte[8];
                     Array.Copy(cmdIn, 6, location, 0, location.Length);
                     data[$"{infoEnum.Location}"] = CheckSymbols(ByteArrayParse(location, 0x00));
-                    data["Zone"] = (int)cmdIn[14] switch {
+                    data["Zone"] = (int)cmdIn[14] switch
+                    {
                         0 => $"{cmdIn[14]}-Undefined",
                         1 => $"{cmdIn[14]}-Ламповая",
                         2 => $"{cmdIn[14]}-На поверхности",
                         3 => $"{cmdIn[14]}-Под землей",
-                        _ => $"{cmdIn[14]}-???" };
+                        _ => $"{cmdIn[14]}-???"
+                    };
                     ushort delayPGLR = (ushort)((cmdIn[cmdIn.Length - 5] << 8) | cmdIn[cmdIn.Length - 6]);
                     data["PGLR Delay"] = $"{(delayPGLR == 65535 ? 0 : delayPGLR)} seconds";
                     data[$"{infoEnum.Version}"] = $"{(cmdIn[cmdIn.Length - 3] << 8) | cmdIn[cmdIn.Length - 4]}";
@@ -134,11 +135,22 @@ namespace RMDebugger
         }
         public bool RMGInfo(byte[] cmdIn, out Dictionary<string, string> data)
         {
-            string GetRmgATestType(int type) => 
-                type switch {   0 => "2M1",  1 => "2MU1", 2 => "2M2",
-                                3 => "2MU2", 4 => "2D1",  5 => "2D2",
-                                6 => "2D3",  7 => "2C1",  8 => "2CU1",                 
-                                9 => "2C2", 10 => "2CU2", _ => "Error" };
+            string GetRmgATestType(int type) =>
+                type switch
+                {
+                    0 => "2M1",
+                    1 => "2MU1",
+                    2 => "2M2",
+                    3 => "2MU2",
+                    4 => "2D1",
+                    5 => "2D2",
+                    6 => "2D3",
+                    7 => "2C1",
+                    8 => "2CU1",
+                    9 => "2C2",
+                    10 => "2CU2",
+                    _ => "Error"
+                };
             string GetRmgChanelState(int b)
             {
                 if ((b & 0b0001) != 0) return " | Level 2";
@@ -147,29 +159,35 @@ namespace RMDebugger
                 else if ((b & 0b1000) != 0) return " | Reserv";
                 else return "";
             }
-            string GetRmgSensorValue(int b, int valIn) => 
-                b switch {  0 => "No sensor",
-                            1 => $"{valIn / 100}.{valIn % 100:00} %",
-                            2 => $"{valIn / 10}.{valIn % 10} %",
-                            3 => $"{valIn} ppm",
-                            4 => $"{valIn} ppm",
-                            5 => $"{valIn} ppm",
-                            6 => $"{valIn} ppm",
-                            7 => $"{valIn} ppm",
-                            8 => $"{valIn} ppm",
-                            _ => "Error" };
-            string GetRmgATestSensorValue(int b, int valIn) => 
-                b switch {  0 => "No sensor",
-                            1 => $"{valIn / 100}.{valIn % 100:00} %",
-                            2 => $"{valIn / 10}.{valIn % 10} %",
-                            3 => $"{valIn} ppm",
-                            4 => $"{valIn / 100}.{valIn % 100:00} %",
-                            5 => $"{valIn / 10}.{valIn % 10} ppm",
-                            6 => $"{valIn / 10}.{valIn % 10} ppm",
-                            7 => $"{valIn / 10}.{valIn % 10} ppm",
-                            14 => $"{valIn} mmHg",
-                            15 => $"{valIn} C",
-                            _ => "Error" };
+            string GetRmgSensorValue(int b, int valIn) =>
+                b switch
+                {
+                    0 => "No sensor",
+                    1 => $"{valIn / 100}.{valIn % 100:00} %",
+                    2 => $"{valIn / 10}.{valIn % 10} %",
+                    3 => $"{valIn} ppm",
+                    4 => $"{valIn} ppm",
+                    5 => $"{valIn} ppm",
+                    6 => $"{valIn} ppm",
+                    7 => $"{valIn} ppm",
+                    8 => $"{valIn} ppm",
+                    _ => "Error"
+                };
+            string GetRmgATestSensorValue(int b, int valIn) =>
+                b switch
+                {
+                    0 => "No sensor",
+                    1 => $"{valIn / 100}.{valIn % 100:00} %",
+                    2 => $"{valIn / 10}.{valIn % 10} %",
+                    3 => $"{valIn} ppm",
+                    4 => $"{valIn / 100}.{valIn % 100:00} %",
+                    5 => $"{valIn / 10}.{valIn % 10} ppm",
+                    6 => $"{valIn / 10}.{valIn % 10} ppm",
+                    7 => $"{valIn / 10}.{valIn % 10} ppm",
+                    14 => $"{valIn} mmHg",
+                    15 => $"{valIn} C",
+                    _ => "Error"
+                };
 
             data = new Dictionary<string, string>();
             RMG_UID cmd = (RMG_UID)cmdIn[4];
@@ -194,10 +212,10 @@ namespace RMDebugger
                     data["States"] = (cmdIn[17] & 0b0000_0001) != 0 ? "S1:Charging | " : "";
                     data["States"] += (cmdIn[17] & 0b1000_0000) != 0 ? "S8:Time from NPC ATB" : "";
 
-                    for(int i = 18, ch = 1; ch <= 4; ch++)
+                    for (int i = 18, ch = 1; ch <= 4; ch++)
                     {
                         data[$"CH{ch} info"] = $"Sensor type: {(RMG_SensorType)(cmdIn[i] / 16)}{GetRmgChanelState(cmdIn[i] % 16)}";
-                        data[$"CH{ch} value"] = GetRmgSensorValue(cmdIn[i] / 16, cmdIn[i+2] << 8 | cmdIn[i+1]);
+                        data[$"CH{ch} value"] = GetRmgSensorValue(cmdIn[i] / 16, cmdIn[i + 2] << 8 | cmdIn[i + 1]);
                         i += 3;
                     }
                     break;
@@ -349,14 +367,14 @@ namespace RMDebugger
             => new string[7] { Type, Signature, Version, Radio, Location, Fio, Date };
 
         private string _type;
-        public string Type 
+        public string Type
         {
             get => _type;
             set
             {
                 _type = value;
                 haveDataForCSV = value != "";
-            } 
+            }
         }
         private string _sig;
         public string Signature

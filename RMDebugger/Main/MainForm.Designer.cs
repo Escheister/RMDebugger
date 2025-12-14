@@ -1,6 +1,6 @@
-﻿namespace RMDebugger
+﻿namespace RMDebugger.Main
 {
-    partial class MainDebugger
+    partial class MainForm
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.Panel PanelInsidePanel1;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainDebugger));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -315,10 +315,11 @@
             this.NeedThrough = new System.Windows.Forms.CheckBox();
             this.ExtraButtonsGroup = new System.Windows.Forms.GroupBox();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
-            this.label24 = new System.Windows.Forms.Label();
-            this.SetBootloaderStopButton = new System.Windows.Forms.Button();
+            this.SleepButton = new System.Windows.Forms.Button();
             this.ExtendedMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ExtendedRepeatMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label24 = new System.Windows.Forms.Label();
+            this.SetBootloaderStopButton = new System.Windows.Forms.Button();
             this.AutoExtraButtonsTimeout = new System.Windows.Forms.NumericUpDown();
             this.ResetButton = new System.Windows.Forms.Button();
             this.SetBootloaderStartButton = new System.Windows.Forms.Button();
@@ -343,7 +344,6 @@
             this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.FontDialog = new System.Windows.Forms.FontDialog();
-            this.SleepButton = new System.Windows.Forms.Button();
             PanelInsidePanel1 = new System.Windows.Forms.Panel();
             PanelInsidePanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.HexPauseAfterUploadMainAndSec)).BeginInit();
@@ -835,7 +835,7 @@
             // 
             // SearchChangeFontMenuItem
             // 
-            this.SearchChangeFontMenuItem.Image = global::RMDebugger.Properties.Resources.FontDialogControl;
+            this.SearchChangeFontMenuItem.Image = global::RMDebugger.Main.Properties.Resources.FontDialogControl;
             this.SearchChangeFontMenuItem.Name = "SearchChangeFontMenuItem";
             this.SearchChangeFontMenuItem.Size = new System.Drawing.Size(142, 22);
             this.SearchChangeFontMenuItem.Text = "Change Font";
@@ -1184,7 +1184,7 @@
             this.HexUpdatePage.Name = "HexUpdatePage";
             this.HexUpdatePage.Size = new System.Drawing.Size(319, 266);
             this.HexUpdatePage.TabIndex = 3;
-            this.HexUpdatePage.Text = "Hex Update";
+            this.HexUpdatePage.Text = "Uploader";
             // 
             // HexFirmwareProgressLabel
             // 
@@ -1235,7 +1235,7 @@
             this.HexUploadClearFileList.BackColor = System.Drawing.Color.Transparent;
             this.HexUploadClearFileList.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.HexUploadClearFileList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.HexUploadClearFileList.Image = global::RMDebugger.Properties.Resources.DeleteTaskList;
+            this.HexUploadClearFileList.Image = global::RMDebugger.Main.Properties.Resources.DeleteTaskList;
             this.HexUploadClearFileList.Location = new System.Drawing.Point(-1, 104);
             this.HexUploadClearFileList.Margin = new System.Windows.Forms.Padding(0);
             this.HexUploadClearFileList.Name = "HexUploadClearFileList";
@@ -1292,7 +1292,7 @@
             // 
             this.HexUploadControlPanelButton.BackColor = System.Drawing.Color.Transparent;
             this.HexUploadControlPanelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.HexUploadControlPanelButton.Image = global::RMDebugger.Properties.Resources.Unhide;
+            this.HexUploadControlPanelButton.Image = global::RMDebugger.Main.Properties.Resources.Unhide;
             this.HexUploadControlPanelButton.Location = new System.Drawing.Point(-1, -1);
             this.HexUploadControlPanelButton.Margin = new System.Windows.Forms.Padding(0);
             this.HexUploadControlPanelButton.Name = "HexUploadControlPanelButton";
@@ -1730,7 +1730,7 @@
             // HideConfigPanel
             // 
             this.HideConfigPanel.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.HideConfigPanel.Image = global::RMDebugger.Properties.Resources.Unhide;
+            this.HideConfigPanel.Image = global::RMDebugger.Main.Properties.Resources.Unhide;
             this.HideConfigPanel.Location = new System.Drawing.Point(296, -1);
             this.HideConfigPanel.Name = "HideConfigPanel";
             this.HideConfigPanel.Size = new System.Drawing.Size(22, 22);
@@ -2005,7 +2005,7 @@
             this.TestSettingRMLRButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.TestSettingRMLRButton.ContextMenuStrip = this.RMLRTestMenuStrip;
             this.TestSettingRMLRButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.TestSettingRMLRButton.Image = global::RMDebugger.Properties.Resources.StatusRunning;
+            this.TestSettingRMLRButton.Image = global::RMDebugger.Main.Properties.Resources.StatusRunning;
             this.TestSettingRMLRButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.TestSettingRMLRButton.Location = new System.Drawing.Point(128, 212);
             this.TestSettingRMLRButton.Margin = new System.Windows.Forms.Padding(0);
@@ -3496,7 +3496,7 @@
             this.NormalToolItem,
             this.BelowNormalToolItem,
             this.IdleToolItem});
-            this.PriorityToolStripMenuItem.Image = global::RMDebugger.Properties.Resources.Processor;
+            this.PriorityToolStripMenuItem.Image = global::RMDebugger.Main.Properties.Resources.Processor;
             this.PriorityToolStripMenuItem.Name = "PriorityToolStripMenuItem";
             this.PriorityToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.PriorityToolStripMenuItem.Text = "Priority";
@@ -3832,6 +3832,35 @@
             this.ButtonsPanel.Size = new System.Drawing.Size(157, 77);
             this.ButtonsPanel.TabIndex = 20;
             // 
+            // SleepButton
+            // 
+            this.SleepButton.ContextMenuStrip = this.ExtendedMenuStrip;
+            this.SleepButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.SleepButton.Image = global::RMDebugger.Main.Properties.Resources.Hide;
+            this.SleepButton.Location = new System.Drawing.Point(1, 22);
+            this.SleepButton.Margin = new System.Windows.Forms.Padding(0);
+            this.SleepButton.Name = "SleepButton";
+            this.SleepButton.Size = new System.Drawing.Size(20, 20);
+            this.SleepButton.TabIndex = 23;
+            this.ToolTipHelper.SetToolTip(this.SleepButton, "Отправляет команду для режима сна\r\nПовторное нажатие останавливает процесс отправ" +
+        "ки команды дополнительных кннопок");
+            this.SleepButton.UseVisualStyleBackColor = true;
+            this.SleepButton.Visible = false;
+            // 
+            // ExtendedMenuStrip
+            // 
+            this.ExtendedMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ExtendedRepeatMenuItem});
+            this.ExtendedMenuStrip.Name = "ExtendedMenuStrip";
+            this.ExtendedMenuStrip.Size = new System.Drawing.Size(111, 26);
+            // 
+            // ExtendedRepeatMenuItem
+            // 
+            this.ExtendedRepeatMenuItem.CheckOnClick = true;
+            this.ExtendedRepeatMenuItem.Name = "ExtendedRepeatMenuItem";
+            this.ExtendedRepeatMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.ExtendedRepeatMenuItem.Text = "Repeat";
+            // 
             // label24
             // 
             this.label24.AutoSize = true;
@@ -3857,20 +3886,6 @@
         "есс отправки команды дополнительных кннопок");
             this.SetBootloaderStopButton.UseVisualStyleBackColor = true;
             this.SetBootloaderStopButton.Visible = false;
-            // 
-            // ExtendedMenuStrip
-            // 
-            this.ExtendedMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ExtendedRepeatMenuItem});
-            this.ExtendedMenuStrip.Name = "ExtendedMenuStrip";
-            this.ExtendedMenuStrip.Size = new System.Drawing.Size(111, 26);
-            // 
-            // ExtendedRepeatMenuItem
-            // 
-            this.ExtendedRepeatMenuItem.CheckOnClick = true;
-            this.ExtendedRepeatMenuItem.Name = "ExtendedRepeatMenuItem";
-            this.ExtendedRepeatMenuItem.Size = new System.Drawing.Size(110, 22);
-            this.ExtendedRepeatMenuItem.Text = "Repeat";
             // 
             // AutoExtraButtonsTimeout
             // 
@@ -4098,22 +4113,7 @@
             this.dataGridViewTextBoxColumn1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.dataGridViewTextBoxColumn1.Width = 60;
             // 
-            // SleepButton
-            // 
-            this.SleepButton.ContextMenuStrip = this.ExtendedMenuStrip;
-            this.SleepButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.SleepButton.Image = global::RMDebugger.Properties.Resources.Hide;
-            this.SleepButton.Location = new System.Drawing.Point(1, 22);
-            this.SleepButton.Margin = new System.Windows.Forms.Padding(0);
-            this.SleepButton.Name = "SleepButton";
-            this.SleepButton.Size = new System.Drawing.Size(20, 20);
-            this.SleepButton.TabIndex = 23;
-            this.ToolTipHelper.SetToolTip(this.SleepButton, "Отправляет команду для режима сна\r\nПовторное нажатие останавливает процесс отправ" +
-        "ки команды дополнительных кннопок");
-            this.SleepButton.UseVisualStyleBackColor = true;
-            this.SleepButton.Visible = false;
-            // 
-            // MainDebugger
+            // MainForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.White;
@@ -4129,7 +4129,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(528, 386);
-            this.Name = "MainDebugger";
+            this.Name = "MainForm";
             this.Opacity = 0.95D;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

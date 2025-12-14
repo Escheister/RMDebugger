@@ -154,7 +154,7 @@
   <data name="CloudDownload" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\CloudDownload.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="dinosaur" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="dinosaurBlue" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\dinosaur.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="CloudUpload" type="System.Resources.ResXFileRef, System.Windows.Forms">
