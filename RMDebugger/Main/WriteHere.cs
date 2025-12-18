@@ -1,9 +1,8 @@
 ﻿using Microsoft.Win32;
-using RMDebugger.Main;
 using System;
 using System.Windows.Forms;
 
-namespace RMDebugger
+namespace RMDebugger.Main
 {
     public partial class WriteHere : Form
     {

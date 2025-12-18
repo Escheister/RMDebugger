@@ -156,10 +156,10 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Main\Info\Information.cs" />
     <Compile Include="Main\StaticSettings.cs" />
-    <Compile Include="WriteHere.cs">
+    <Compile Include="Main\WriteHere.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="WriteHere.Designer.cs">
+    <Compile Include="Main\WriteHere.Designer.cs">
       <DependentUpon>WriteHere.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Main\AboutInfo.resx">
@@ -181,7 +181,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="WriteHere.resx">
+    <EmbeddedResource Include="Main\WriteHere.resx">
       <DependentUpon>WriteHere.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
